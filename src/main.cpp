@@ -1,5 +1,6 @@
 #include <raylib.h>
 #include "game.hpp"
+#include <vector>
 
 int main(void)
 {
@@ -7,20 +8,20 @@ int main(void)
     const int screenHeight = 768;
 
     SetConfigFlags(FLAG_VSYNC_HINT);
-    InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
+    InitWindow(screenWidth, screenHeight, "BLINDER");
     InitAudioDevice();
-    Tiles map[12][16];
-    TileInit(map);
+    Game game = {};
+    
     // Main game loop
     while (!WindowShouldClose())
     {
         BeginDrawing();
-        TileDraw(map);
+        game.UpdateAndDraw();
         
 
         ClearBackground(RAYWHITE);
-        DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
-        DrawRectangle(1024,0,256,768,GREEN);
+     
+        DrawRectangle(1024,0,256,768,PURPLE);
         DrawFPS(10, 10);
 
         EndDrawing();

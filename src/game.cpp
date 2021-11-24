@@ -1,27 +1,34 @@
 #include "game.hpp"
 
-void TileInit(Tiles (&map)[12][16])
-{
-   
 
-    for (int j = 0; j < 12; j++)
-    {
-        for (int i = 0; i < 16; i++)
-        {
-            map[j][i].Init(i, j);
-        }
-    }
+
+
+
+Game::Game()
+{
+    map.Init();
+
 }
 
-void TileDraw(Tiles (&map)[12][16])
+void Game::UpdateAndDraw()
 {
-   
+    map.Draw();
 
-    for (int j = 0; j < 12; j++)
-    {
-        for (int i = 0; i < 16; i++)
-        {
-            map[j][i].Draw();
-        }
+
+
+}
+
+
+
+
+bool Timer(int &timer, int const second)
+{
+
+    timer++;
+    if(timer==second*60){
+        timer = 0;
+        return true;
     }
+    return false;
+
 }

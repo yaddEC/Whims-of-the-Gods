@@ -17,3 +17,15 @@ bool collCirclex2(A posCircle1, int radiusCircle1, B posCircle2,int radiusCircle
     }
     return false;
 }
+
+template<typename A>
+A vector(A a, A b)
+{
+    A res;
+    res.x=b.x-a.x;
+    res.y=b.y-a.y;
+    return res;
+}
+
+
+
