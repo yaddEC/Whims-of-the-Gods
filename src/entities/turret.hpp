@@ -4,6 +4,7 @@
 class Turret : public Entity
 {
 public:
+    int target = -1;
     float rotation = 0.0f;
     int damage;
     float range = 100.0f;
@@ -16,7 +17,11 @@ public:
     {
 
     }
+    virtual ~Turret()
+    {
+    }
 };
+
 
 class ClassicTurret : public Turret
 {

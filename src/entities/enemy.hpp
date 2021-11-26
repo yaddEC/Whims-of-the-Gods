@@ -5,6 +5,8 @@
 class Enemy : public Entity
 {
 public:
+    Enemy();
+    int radius = 5.0f;
     int damage;
     float speed;
     Vector2 direction;
@@ -12,6 +14,9 @@ public:
      void UpdateAndDraw() override
     {
 
+    }
+    virtual ~Enemy()
+    {
     }
 };
 

@@ -6,15 +6,7 @@
 #include "entities/enemy.hpp"
 #include "entities/tower.hpp"
 
-struct TextureObject
-{
-    float width;
-    float height;
-    Texture2D model;
-    Rectangle sourceRec;
-    Vector2 origin;
-    Rectangle destRec;
-};
+
 
 class Tile
 {
@@ -27,7 +19,7 @@ public:
     char value;
     Tile()
     {
-        mWidthTile = 64;
+        mWidthTile = SIZE;
     }
     ~Tile()
     {
@@ -45,10 +37,15 @@ public:
     void Draw(Texture2D tilesheet, Tile frame)
     {
 
-        Rectangle source = {frame.mPos.x, frame.mPos.y, 64, 64};
-        Rectangle dest = {mPos.x, mPos.y, 64, 64};
+        Rectangle source = {frame.mPos.x, frame.mPos.y, SIZE, SIZE};
+        Rectangle dest = {mPos.x, mPos.y, SIZE, SIZE};
         Vector2 origin = {0, 0};
         DrawTexturePro(tilesheet, source, dest, origin, 0, WHITE);
+
+        if (GetTile(GetMousePosition()) == mTilePos && GetMousePosition().x < 1024)
+        {
+            DrawRectangleLines(mPos.x, mPos.y, SIZE, SIZE, ColorAlpha(WHITE, 0.5));
+        }
     }
 };
 
@@ -169,10 +166,21 @@ class Game
 public:
     int money;
     int timer;
-    TextureObject turret;
+    bool showTurretRange = false;
+    TextureObject classicTurret;
+    TextureObject slowingTurret;
+    TextureObject explosiveTurret;
     Tilemap map;
     std::vector<Enemy> enemies;
 
     Game();
     void UpdateAndDraw();
+    void Delete();
 };
+
+
+bool InRec(int x, int y, float width, float height);
+
+bool InRec(Rectangle rec);
+
+bool Button(int x, int y, float width, float height, const char *name, Color color);

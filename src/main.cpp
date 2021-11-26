@@ -16,17 +16,16 @@ int main(void)
     while (!WindowShouldClose())
     {
         BeginDrawing();
-        game.UpdateAndDraw();
-        
-
         ClearBackground(RAYWHITE);
      
-        DrawRectangle(1024,0,256,768,PURPLE);
+        DrawRectangle(1024,0,256,768,BROWN);
+        game.UpdateAndDraw();
         DrawFPS(10, 10);
 
         EndDrawing();
     }
 
+    game.Delete();
     CloseAudioDevice();
     CloseWindow();
 

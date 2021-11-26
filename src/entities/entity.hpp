@@ -3,7 +3,7 @@
 #include <raylib.h>
 #include <vector>
 #include <cmath>
-#include "../game.hpp"
+#include <mathematics.hpp>
 
 
 class Entity
@@ -11,7 +11,8 @@ class Entity
 
     public:
     
-    bool active;
+    TextureObject texture;
+    bool active = false;
     int hp;
     Vector2 pos;
     Vector2 posTile;

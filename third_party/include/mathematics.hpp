@@ -1,5 +1,18 @@
 #pragma once 
 #include <cmath>
+#include <vector>
+#include <raylib.h>
+
+#define SIZE 64.0f
+
+struct TextureObject
+{
+    Texture2D model;
+    Rectangle sourceRec = (Rectangle){0.0f, 0.0f, SIZE, SIZE};
+    Vector2 origin = (Vector2){SIZE / 2.0f, SIZE / 2.0f};
+    Rectangle destRec;
+};
+
 template<typename A>
 inline float norm(A Vec)
 {
@@ -25,6 +38,13 @@ A vector(A a, A b)
     res.x=b.x-a.x;
     res.y=b.y-a.y;
     return res;
+}
+
+template<typename A>
+int GetTile(A vec)
+{
+
+    return static_cast<int>(vec.x/64)+16*static_cast<int>(vec.y/64);
 }
 
 
