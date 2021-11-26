@@ -9,11 +9,11 @@
 class Tile
 {
 private:
-    Vector2 mPos;
     int mTilePos;
     int mWidthTile;
 
 public:
+    Vector2 mPos;
     char value;
     Tile();
     ~Tile();
@@ -30,9 +30,9 @@ private:
     int mHeight;
     int mWidth;
     int total;
-    Tile *tile;
 
 public:
+    Tile *tile;
     Texture2D tilesheet;
     Tile texture[368];
     Tilemap();

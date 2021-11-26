@@ -10,8 +10,6 @@ Game::Game()
     explosiveTurret.model = LoadTexture("assets/explosive_turret.png");
 }
 
-
-
 bool Button(int x, int y, float width, float height, const char *name, Color color)
 {
     bool res = false;
@@ -223,16 +221,29 @@ void Game::UpdateAndDrawUI()
             turret.back()->texture = explosiveTurret;
         }
     }
-    if (pointSelected || (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && (InRec(classicTurretIcone) || InRec(slowingTurretIcone) || InRec(explosiveTurretIcone))))
+    if ((pointSelected || (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && (InRec(classicTurretIcone) || InRec(slowingTurretIcone) || InRec(explosiveTurretIcone)))))
     {
+        if (GetMousePosition().x < 1024)
+        {
+            turret.back()->pos.x = map.tile[GetTile(GetMousePosition())].mPos.x + SIZE / 2;
+            turret.back()->pos.y = map.tile[GetTile(GetMousePosition())].mPos.y + SIZE / 2;
+        }
+        else
+        {
+              turret.back()->pos=GetMousePosition();
+        }
 
-        turret.back()->pos = GetMousePosition();
         pointSelected = true;
 
-        if (IsMouseButtonUp(MOUSE_LEFT_BUTTON))
+        if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && GetMousePosition().x < 1024)
         {
 
             turret.back()->active = true;
+            pointSelected = false;
+        }
+        else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && GetMousePosition().x >= 1024)
+        {
+            turret.pop_back();
             pointSelected = false;
         }
     }
@@ -251,8 +262,6 @@ void Game::UpdateAndDrawUI()
     }
 }
 
-
-
 void Game::UpdateAndDraw()
 {
     map.Draw();
@@ -267,9 +276,9 @@ void Game::UpdateAndDraw()
         t->UpdateAndDraw();
     }
 
-     if (IsKeyDown(KEY_SPACE)) // TEST enemy spawner
+    if (IsKeyDown(KEY_SPACE)) // TEST enemy spawner
     {
-            enemy.push_back(new Enemy);
+        enemy.push_back(new Enemy);
     }
 }
 
