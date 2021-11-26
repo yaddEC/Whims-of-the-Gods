@@ -25,7 +25,7 @@ int main(void)
         EndDrawing();
     }
 
-    game.Delete();
+   
     CloseAudioDevice();
     CloseWindow();
 

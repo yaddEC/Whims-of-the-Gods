@@ -6,7 +6,7 @@
 Enemy::Enemy()
 {
     pos.x = rand() % 1024;
-    pos.y = rand() % 728;
+    pos.y = rand() % 768;
 
     int randomDegree = rand() % 360 + 1;
     direction.x = sin(randomDegree * DEG2RAD) * 3;

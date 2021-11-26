@@ -1,10 +1,6 @@
 #include "game.hpp"
 
 static bool pointSelected = false;
-static Vector2 mousePos;
-const Rectangle classicTurretIcone = (Rectangle){1110, 64, SIZE, SIZE};
-const Rectangle slowingTurretIcone = (Rectangle){1110,  256, SIZE, SIZE};
-const Rectangle explosiveTurretIcone = (Rectangle){1110, 448, SIZE, SIZE};
 
 std::vector<Turret *> turret;
 std::vector<Enemy *> enemy;
@@ -71,21 +67,154 @@ bool Button(int x, int y, float width, float height, const char *name, Color col
     return res;
 }
 
-void Game::UpdateAndDraw()
+Tile::Tile()
 {
-    map.Draw();
+    mWidthTile = SIZE;
+}
 
+void Tile::Init(int i, int mapWidth, char val)
+{
+
+    mTilePos = i;
+    value = val;
+    mPos.x = (i % mapWidth) * mWidthTile;
+    mPos.y = static_cast<int>(i / mapWidth) * mWidthTile;
+}
+
+void Tile::Draw(Texture2D tilesheet, Tile frame)
+{
+
+    Rectangle source = {frame.mPos.x, frame.mPos.y, SIZE, SIZE};
+    Rectangle dest = {mPos.x, mPos.y, SIZE, SIZE};
+    Vector2 origin = {0, 0};
+    DrawTexturePro(tilesheet, source, dest, origin, 0, WHITE);
+
+    if (GetTile(GetMousePosition()) == mTilePos && GetMousePosition().x < 1024)
+    {
+        DrawRectangleLines(mPos.x, mPos.y, SIZE, SIZE, ColorAlpha(WHITE, 0.5));
+    }
+}
+
+Tile::~Tile()
+{
+}
+
+Tilemap::Tilemap()
+{
+    mHeight = 12;
+    mWidth = 16;
+    total = mHeight * mWidth;
+    tile = new Tile[total];
+    tilesheet = LoadTexture("assets/towerDefense_tilesheet.png");
+
+    plan =
+        {
+            "-------T|OOOOOOO"
+            "OOOOOOOl|OOOOOOO"
+            "OOOOOOOl|OOOOOOO"
+            "OOOOOOOl|OOOOOOO"
+            "OOOOOOOl|OOOOOOO"
+            "OO[____JL____]OO"
+            "OOlb--------d|OO"
+            "OOl|OOOOOOOOl|OO"
+            "OOlL________J|OO"
+            "OO{---------d|OO"
+            "OOOOOOOOOOOOl|OO"
+            "OOOOOOOOOOOOlL__"};
+}
+
+Tilemap::~Tilemap()
+{
+
+    delete[] tile;
+}
+
+void Tilemap::Init()
+{
+    for (int i = 0; i < total; i++)
+    {
+        tile[i].Init(i, mWidth, plan[i]);
+    }
+
+    for (int i = 0; i < 368; i++)
+    {
+        texture[i].Init(i, 23, 'a');
+    }
+}
+
+void Tilemap::Draw()
+{
+
+    for (int i = 0; i < total; i++)
+    {
+        switch (tile[i].value)
+        {
+        case 'I':
+            tile[i].Draw(tilesheet, texture[50]);
+            break;
+        case '-':
+            tile[i].Draw(tilesheet, texture[1]);
+            break;
+        case 'T':
+            tile[i].Draw(tilesheet, texture[2]);
+            break;
+        case 'l':
+            tile[i].Draw(tilesheet, texture[25]);
+            break;
+        case '|':
+            tile[i].Draw(tilesheet, texture[23]);
+            break;
+        case 'L':
+            tile[i].Draw(tilesheet, texture[46]);
+            break;
+        case 'J':
+            tile[i].Draw(tilesheet, texture[48]);
+            break;
+        case '_':
+            tile[i].Draw(tilesheet, texture[47]);
+            break;
+        case 'O':
+            tile[i].Draw(tilesheet, texture[24]);
+            break;
+        case '[':
+            tile[i].Draw(tilesheet, texture[3]);
+            break;
+        case ']':
+            tile[i].Draw(tilesheet, texture[4]);
+            break;
+        case '{':
+            tile[i].Draw(tilesheet, texture[26]);
+            break;
+        case '}':
+            tile[i].Draw(tilesheet, texture[27]);
+            break;
+
+        case 'd':
+            tile[i].Draw(tilesheet, texture[2]);
+            break;
+
+        case 'b':
+            tile[i].Draw(tilesheet, texture[0]);
+            break;
+        }
+    }
+}
+
+void Game::UpdateAndDrawUI()
+{
+    const Rectangle classicTurretIcone = (Rectangle){1110, 64, SIZE, SIZE};
+    const Rectangle slowingTurretIcone = (Rectangle){1110, 256, SIZE, SIZE};
+    const Rectangle explosiveTurretIcone = (Rectangle){1110, 448, SIZE, SIZE};
+
+    //UpdateAndDrawUI turret Normal
     DrawRectangleLinesEx(classicTurretIcone, 2, RED);
     DrawTexture(classicTurret.model, classicTurretIcone.x, classicTurretIcone.y, WHITE);
-
+    //UpdateAndDrawUI turret Slow
     DrawRectangleLinesEx(slowingTurretIcone, 2, GREEN);
     DrawTexture(slowingTurret.model, slowingTurretIcone.x, slowingTurretIcone.y, WHITE);
-
+    //UpdateAndDrawUI turret Explsive
     DrawRectangleLinesEx(explosiveTurretIcone, 2, ORANGE);
     DrawTexture(explosiveTurret.model, explosiveTurretIcone.x, explosiveTurretIcone.y, WHITE);
-
-    mousePos.x = GetMousePosition().x;
-    mousePos.y = GetMousePosition().y;
 
     if (InRec(classicTurretIcone))
     {
@@ -127,11 +256,10 @@ void Game::UpdateAndDraw()
             turret.back()->texture = explosiveTurret;
         }
     }
-
     if (pointSelected || (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && (InRec(classicTurretIcone) || InRec(slowingTurretIcone) || InRec(explosiveTurretIcone))))
     {
 
-        turret.back()->pos = mousePos;
+        turret.back()->pos = GetMousePosition();
         pointSelected = true;
 
         if (IsMouseButtonUp(MOUSE_LEFT_BUTTON))
@@ -190,14 +318,14 @@ void Game::UpdateAndDraw()
 
         if (enemy[i]->pos.x - enemy[i]->radius < 0 || enemy[i]->pos.x + enemy[i]->radius > 1024) // TEST ENEMY
             enemy[i]->direction.x *= -1;
-        if (enemy[i]->pos.y - enemy[i]->radius < 0 || enemy[i]->pos.y + enemy[i]->radius > 728)
+        if (enemy[i]->pos.y - enemy[i]->radius < 0 || enemy[i]->pos.y + enemy[i]->radius > 768)
             enemy[i]->direction.y *= -1;
         enemy[i]->pos.x += enemy[i]->direction.x;
         enemy[i]->pos.y += enemy[i]->direction.y;
         DrawCircle(enemy[i]->pos.x, enemy[i]->pos.y, enemy[i]->radius, RED);
     }
 
-    if (IsKeyPressed(KEY_SPACE)) // TEST enemy spawner
+    if (IsKeyDown(KEY_SPACE)) // TEST enemy spawner
     {
         enemy.push_back(new Enemy);
     }
@@ -208,7 +336,13 @@ void Game::UpdateAndDraw()
     }
 }
 
-void Game::Delete()
+void Game::UpdateAndDraw()
+{
+    map.Draw();
+    UpdateAndDrawUI();
+}
+
+Game::~Game()
 {
     for (Turret *t : turret)
         delete t;
