@@ -189,7 +189,7 @@ void Game::UpdateAndDrawUI()
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) // Buy and place new classic turret
         {
-            turret.push_back(new Turret);
+            turret.push_back(new ClassicTurret);
             turret.back()->texture = classicTurret;
         }
     }
@@ -203,7 +203,7 @@ void Game::UpdateAndDrawUI()
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) // Buy and place new slowing turret
         {
-            turret.push_back(new Turret);
+            turret.push_back(new SlowingTurret);
             turret.back()->texture = slowingTurret;
         }
     }
@@ -217,7 +217,7 @@ void Game::UpdateAndDrawUI()
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) // Buy and place new explosive turret
         {
-            turret.push_back(new Turret);
+            turret.push_back(new ExplosiveTurret);
             turret.back()->texture = explosiveTurret;
         }
     }
@@ -280,6 +280,7 @@ void Game::UpdateAndDraw()
     {
         enemy.push_back(new Enemy);
     }
+
 }
 
 Game::~Game()

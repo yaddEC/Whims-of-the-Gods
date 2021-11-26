@@ -7,6 +7,7 @@ public:
     Enemy();
     int radius = 5.0f;
     int damage;
+    int hp = 60;
     float speed;
     Vector2 direction;
 
@@ -20,7 +21,9 @@ public:
         pos.x += direction.x;
         pos.y += direction.y;
         DrawCircle(pos.x, pos.y, radius, RED);
-
+        DrawRectangle(pos.x-20, pos.y+20, 40,10, ColorAlpha(BLACK, 0.5));
+        DrawRectangle(pos.x-20, pos.y+20, hp*40/60,10, GREEN);
+        DrawRectangleLines(pos.x-21, pos.y+20, 42,10, BLACK);
        
     }
     virtual ~Enemy()

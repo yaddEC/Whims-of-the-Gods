@@ -11,14 +11,14 @@ class Turret : public Entity
 public:
     float range = 100.0f;
     float rotation = 0.0f;
-    int target=-1;
+    int target = -1;
     int damage;
     int price;
     float attackSpeed;
     float slowEffect;
     int timer;
 
-    void UpdateAndDraw(std::vector<Enemy *> enemy)
+    void UpdateAndDraw(std::vector<Enemy *> &enemy)
     {
         if (active) //if the turret is active
         {
@@ -26,13 +26,17 @@ public:
             int nearestEnemyDistance = -1;
             for (auto j = 0u; target == -1 && j < enemy.size(); j++) // Check every enemy if turret has no current target
             {
-                float normTurretEnemy = norm(vector(enemy[j]->pos, Vector2{pos.x, pos.y}));
-                if (normTurretEnemy <= range) // if enemy in turret range
+                if (enemy[j]->hp > 0)
                 {
-                    if (nearestEnemyDistance == -1 || normTurretEnemy < nearestEnemyDistance) // if enemy closer than current nearest enemy
+
+                    float normTurretEnemy = norm(vector(enemy[j]->pos, Vector2{pos.x, pos.y}));
+                    if (normTurretEnemy <= range) // if enemy in turret range
                     {
-                        nearestEnemyDistance = normTurretEnemy;
-                        nearestEnemyId = j;
+                        if (nearestEnemyDistance == -1 || normTurretEnemy < nearestEnemyDistance) // if enemy closer than current nearest enemy
+                        {
+                            nearestEnemyDistance = normTurretEnemy;
+                            nearestEnemyId = j;
+                        }
                     }
                 }
             }
@@ -40,7 +44,7 @@ public:
             {
                 target = nearestEnemyId;
             }
-            if (target != -1 && norm(vector(enemy[target]->pos, Vector2{pos.x, pos.y})) <= range) // The turret rotate to aim the target
+            if (target != -1 && enemy[target]->hp>0 && norm(vector(enemy[target]->pos, Vector2{pos.x, pos.y})) <= range) // The turret rotate to aim the target
             {
                 rotation = -acos((enemy[target]->pos.x - pos.x) / norm(vector(enemy[target]->pos, Vector2{pos.x, pos.y}))) * RAD2DEG;
                 if (enemy[target]->pos.y - pos.y > 0)
@@ -48,11 +52,21 @@ public:
                     rotation = -rotation;
                 }
                 rotation += 90;
+                enemy[target]->hp -= 1;
+                
+                if (enemy[target]->hp <= 0)
+                {
+                    enemy.erase(enemy.begin()+target);  // HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEELPPPPPPPEEEEEEEEEEEEEEEEEEEEEEUH  aled 
+                    target = -1;
+             
+                }   
             }
             else // No more target
             {
                 target = -1;
             }
+
+      
         }
 
         if (InRec(pos.x - 32, pos.y - 32, SIZE, SIZE))
@@ -69,11 +83,10 @@ public:
 
 class ClassicTurret : public Turret
 {
-
+ 
 public:
     ClassicTurret()
-    {
-
+    {   
         damage = 10;
         price = 100;
         attackSpeed = 4;
