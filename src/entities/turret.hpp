@@ -54,11 +54,9 @@ public:
                 rotation += 90;
                 enemy[target]->hp -= 1;
                 
-                if (enemy[target]->hp <= 0)
+                if (enemy[target]->hp <= 0) // target dead
                 {
-                    enemy.erase(enemy.begin()+target);  // HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEELPPPPPPPEEEEEEEEEEEEEEEEEEEEEEUH  aled 
                     target = -1;
-             
                 }   
             }
             else // No more target

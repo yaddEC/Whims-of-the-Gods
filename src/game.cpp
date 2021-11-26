@@ -271,9 +271,13 @@ void Game::UpdateAndDraw()
         t->UpdateAndDraw(enemy);
     }
 
-    for (Enemy *t : enemy)
+    for (long unsigned int t=0; t<enemy.size();t++)
     {
-        t->UpdateAndDraw();
+        enemy[t]->UpdateAndDraw();
+        if(enemy[t]->hp<=0)
+        {
+            enemy.erase(enemy.begin()+t);
+        }
     }
 
     if (IsKeyDown(KEY_SPACE)) // TEST enemy spawner
