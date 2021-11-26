@@ -1,7 +1,38 @@
-#include "turret.hpp"
 #include "enemy.hpp"
+#include "turret.hpp"
 #include "tower.hpp"
-#include "entity.hpp"
+
+bool InRec(int x, int y, float width, float height)
+{
+    int X = GetMouseX();
+    int Y = GetMouseY();
+
+    if (
+        (X >= x) &&
+        (X <= x + width) &&
+        (Y >= y) &&
+        (Y <= y + height))
+    {
+        return true;
+    }
+    return false;
+}
+bool InRec(Rectangle rec)
+{
+    int X = GetMouseX();
+    int Y = GetMouseY();
+
+    if (
+        (X >= rec.x) &&
+        (X <= rec.x + rec.width) &&
+        (Y >= rec.y) &&
+        (Y <= rec.y + rec.height))
+    {
+        return true;
+    }
+    return false;
+}
+
 
 Enemy::Enemy()
 {

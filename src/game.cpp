@@ -2,9 +2,6 @@
 
 static bool pointSelected = false;
 
-std::vector<Turret *> turret;
-std::vector<Enemy *> enemy;
-
 Game::Game()
 {
     map.Init();
@@ -13,37 +10,7 @@ Game::Game()
     explosiveTurret.model = LoadTexture("assets/explosive_turret.png");
 }
 
-bool InRec(int x, int y, float width, float height)
-{
-    int X = GetMouseX();
-    int Y = GetMouseY();
 
-    if (
-        (X >= x) &&
-        (X <= x + width) &&
-        (Y >= y) &&
-        (Y <= y + height))
-    {
-        return true;
-    }
-    return false;
-}
-
-bool InRec(Rectangle rec)
-{
-    int X = GetMouseX();
-    int Y = GetMouseY();
-
-    if (
-        (X >= rec.x) &&
-        (X <= rec.x + rec.width) &&
-        (Y >= rec.y) &&
-        (Y <= rec.y + rec.height))
-    {
-        return true;
-    }
-    return false;
-}
 
 bool Button(int x, int y, float width, float height, const char *name, Color color)
 {
@@ -264,93 +231,46 @@ void Game::UpdateAndDrawUI()
 
         if (IsMouseButtonUp(MOUSE_LEFT_BUTTON))
         {
+
             turret.back()->active = true;
             pointSelected = false;
         }
     }
 
-}
-
-void Game::UpdateAndDrawTurret()
-{
-    for (long unsigned int i = 0; i < turret.size(); i++)
+    if (showTurretRange)
     {
-        if (turret[i]->active) //if the turret is active
-        {
-            int nearestEnemyId = -1;
-            int nearestEnemyDistance = -1;
-            for (auto j = 0u; turret[i]->target == -1 && j < enemy.size(); j++) // Check every enemy if turret has no current target
-            {
-                float normTurretEnemy = norm(vector(enemy[j]->pos, Vector2{turret[i]->pos.x, turret[i]->pos.y}));
-                if (normTurretEnemy <= turret[i]->range) // if enemy in turret range
-                {
-                    if (nearestEnemyDistance == -1 || normTurretEnemy < nearestEnemyDistance) // if enemy closer than current nearest enemy
-                    {
-                        nearestEnemyDistance = normTurretEnemy;
-                        nearestEnemyId = j;
-                    }
-                }
-            }
-            if (nearestEnemyId != -1) // targets nearest enemy if turret has no current target
-            {
-                turret[i]->target = nearestEnemyId;
-            }
-            if (turret[i]->target != -1 && norm(vector(enemy[turret[i]->target]->pos, Vector2{turret[i]->pos.x, turret[i]->pos.y})) <= turret[i]->range) // The turret rotate to aim the target
-            {
-                turret[i]->rotation = -acos((enemy[turret[i]->target]->pos.x - turret[i]->pos.x) / norm(vector(enemy[turret[i]->target]->pos, Vector2{turret[i]->pos.x, turret[i]->pos.y}))) * RAD2DEG;
-                if (enemy[turret[i]->target]->pos.y - turret[i]->pos.y > 0)
-                {
-                    turret[i]->rotation = -turret[i]->rotation;
-                }
-                turret[i]->rotation += 90;
-            }
-            else // No more target
-            {
-                turret[i]->target = -1;
-            }
-        }
-
-        if (showTurretRange || InRec(turret[i]->pos.x - 32, turret[i]->pos.y - 32, SIZE, SIZE))
+        for (long unsigned int i = 0; i < turret.size(); i++)
         {
             DrawCircleV(turret[i]->pos, turret[i]->range, ColorAlpha(DARKBLUE, 0.3)); // Draw turret range
         }
-        Rectangle destRec = {turret[i]->pos.x, turret[i]->pos.y, SIZE, SIZE};
-        DrawTexturePro(turret[i]->texture.model, turret[i]->texture.sourceRec, destRec, turret[i]->texture.origin, turret[i]->rotation, WHITE); // Draw turret
     }
 
     if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON))
     {
         showTurretRange = !showTurretRange;
     }
-
 }
 
-void Game::UpdateAndDrawEnemy()
-{
-     for (auto i = 0u; i < enemy.size(); i++)
-    {
 
-        if (enemy[i]->pos.x - enemy[i]->radius < 0 || enemy[i]->pos.x + enemy[i]->radius > 1024) // TEST ENEMY
-            enemy[i]->direction.x *= -1;
-        if (enemy[i]->pos.y - enemy[i]->radius < 0 || enemy[i]->pos.y + enemy[i]->radius > 768)
-            enemy[i]->direction.y *= -1;
-        enemy[i]->pos.x += enemy[i]->direction.x;
-        enemy[i]->pos.y += enemy[i]->direction.y;
-        DrawCircle(enemy[i]->pos.x, enemy[i]->pos.y, enemy[i]->radius, RED);
-    }
-
-    if (IsKeyDown(KEY_SPACE)) // TEST enemy spawner
-    {
-        enemy.push_back(new Enemy);
-    }
-}
 
 void Game::UpdateAndDraw()
 {
     map.Draw();
     UpdateAndDrawUI();
-    UpdateAndDrawTurret();
-    UpdateAndDrawEnemy();
+    for (Turret *t : turret)
+    {
+        t->UpdateAndDraw(enemy);
+    }
+
+    for (Enemy *t : enemy)
+    {
+        t->UpdateAndDraw();
+    }
+
+     if (IsKeyDown(KEY_SPACE)) // TEST enemy spawner
+    {
+            enemy.push_back(new Enemy);
+    }
 }
 
 Game::~Game()

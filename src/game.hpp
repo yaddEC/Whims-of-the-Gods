@@ -31,13 +31,14 @@ private:
     int mWidth;
     int total;
     Tile *tile;
+
 public:
     Texture2D tilesheet;
     Tile texture[368];
     Tilemap();
     void Init();
     void Draw();
-    ~Tilemap(); 
+    ~Tilemap();
 };
 
 class Game
@@ -50,7 +51,8 @@ public:
     TextureObject slowingTurret;
     TextureObject explosiveTurret;
     Tilemap map;
-    std::vector<Enemy> enemies;
+    std::vector<Turret *> turret;
+    std::vector<Enemy *> enemy;
     Game();
     void UpdateAndDraw();
     void UpdateAndDrawUI();

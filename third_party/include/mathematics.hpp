@@ -5,6 +5,8 @@
 
 #define SIZE 64.0f
 
+
+
 struct TextureObject
 {
     Texture2D model;
