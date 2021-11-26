@@ -269,6 +269,10 @@ void Game::UpdateAndDrawUI()
         }
     }
 
+}
+
+void Game::UpdateAndDrawTurret()
+{
     for (long unsigned int i = 0; i < turret.size(); i++)
     {
         if (turret[i]->active) //if the turret is active
@@ -313,7 +317,17 @@ void Game::UpdateAndDrawUI()
         Rectangle destRec = {turret[i]->pos.x, turret[i]->pos.y, SIZE, SIZE};
         DrawTexturePro(turret[i]->texture.model, turret[i]->texture.sourceRec, destRec, turret[i]->texture.origin, turret[i]->rotation, WHITE); // Draw turret
     }
-    for (auto i = 0u; i < enemy.size(); i++)
+
+    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON))
+    {
+        showTurretRange = !showTurretRange;
+    }
+
+}
+
+void Game::UpdateAndDrawEnemy()
+{
+     for (auto i = 0u; i < enemy.size(); i++)
     {
 
         if (enemy[i]->pos.x - enemy[i]->radius < 0 || enemy[i]->pos.x + enemy[i]->radius > 1024) // TEST ENEMY
@@ -329,17 +343,14 @@ void Game::UpdateAndDrawUI()
     {
         enemy.push_back(new Enemy);
     }
-
-    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON))
-    {
-        showTurretRange = !showTurretRange;
-    }
 }
 
 void Game::UpdateAndDraw()
 {
     map.Draw();
     UpdateAndDrawUI();
+    UpdateAndDrawTurret();
+    UpdateAndDrawEnemy();
 }
 
 Game::~Game()

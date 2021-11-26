@@ -54,6 +54,8 @@ public:
     Game();
     void UpdateAndDraw();
     void UpdateAndDrawUI();
+    void UpdateAndDrawTurret();
+    void UpdateAndDrawEnemy();
     ~Game();
 };
 
