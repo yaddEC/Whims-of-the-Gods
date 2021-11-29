@@ -5,11 +5,8 @@
 #include <cmath>
 #include <mathematics.hpp>
 
-
-
 class Entity
 {
-
     public:
     
     TextureObject texture;
@@ -23,6 +20,8 @@ class Entity
 
     }
 };
+
+void FrameTimer(int &timer);
 
 
 

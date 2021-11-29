@@ -32,6 +32,8 @@ bool Button(int x, int y, float width, float height, const char *name, Color col
     return res;
 }
 
+
+
 Tile::Tile()
 {
     mWidthTile = SIZE;
@@ -191,6 +193,7 @@ void Game::UpdateAndDrawUI()
         {
             turret.push_back(new ClassicTurret);
             turret.back()->texture = classicTurret;
+            turret.back()->shotTextureId = 296;
         }
     }
 
@@ -205,6 +208,7 @@ void Game::UpdateAndDrawUI()
         {
             turret.push_back(new SlowingTurret);
             turret.back()->texture = slowingTurret;
+            turret.back()->shotTextureId = 297;
         }
     }
 
@@ -219,6 +223,7 @@ void Game::UpdateAndDrawUI()
         {
             turret.push_back(new ExplosiveTurret);
             turret.back()->texture = explosiveTurret;
+            turret.back()->shotTextureId = 298;
         }
     }
     if ((pointSelected || (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && (InRec(classicTurretIcone) || InRec(slowingTurretIcone) || InRec(explosiveTurretIcone)))))
@@ -268,7 +273,7 @@ void Game::UpdateAndDraw()
     UpdateAndDrawUI();
     for (Turret *t : turret)
     {
-        t->UpdateAndDraw(enemy);
+        t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->shotTextureId].mPos);
     }
 
     for (long unsigned int t=0; t<enemy.size();t++)
@@ -293,16 +298,4 @@ Game::~Game()
         delete t;
     for (Enemy *e : enemy)
         delete e;
-}
-
-bool Timer(int &timer, int const second)
-{
-
-    timer++;
-    if (timer == second * 60)
-    {
-        timer = 0;
-        return true;
-    }
-    return false;
 }

@@ -9,17 +9,25 @@ public:
     int damage;
     int hp = 60;
     float speed;
+    int slowingTimer = 0;
+    float slowingCoef = 1;
     Vector2 direction;
 
     void UpdateAndDraw() override
     {
+        FrameTimer(slowingTimer);
 
         if (pos.x - radius < 0 || pos.x + radius > 1024) // TEST ENEMY
             direction.x *= -1;
         if (pos.y - radius < 0 || pos.y + radius > 768)
             direction.y *= -1;
-        pos.x += direction.x;
-        pos.y += direction.y;
+        if(slowingTimer==0 && slowingCoef != 1)
+        {
+            slowingCoef = 1;
+        }
+        pos.x += direction.x*slowingCoef;
+        pos.y += direction.y*slowingCoef;
+
         DrawCircle(pos.x, pos.y, radius, RED);
         DrawRectangle(pos.x-20, pos.y+20, 40,10, ColorAlpha(BLACK, 0.5));
         DrawRectangle(pos.x-20, pos.y+20, hp*40/60,10, GREEN);

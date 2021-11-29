@@ -48,6 +48,3 @@ int GetTile(A vec)
 
     return static_cast<int>(vec.x/64)+16*static_cast<int>(vec.y/64);
 }
-
-
-
