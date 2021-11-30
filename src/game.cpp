@@ -57,7 +57,7 @@ void Tile::Draw(Texture2D tilesheet, Tile frame)
     Vector2 origin = {0, 0};
     DrawTexturePro(tilesheet, source, dest, origin, 0, WHITE);
 
-    if (GetTile(GetMousePosition()) == mTilePos && GetMousePosition().x < 1024)
+    if (GetTile(GetMousePosition()) == mTilePos && GetMousePosition().x < 1024 && GetMousePosition().x > 0  && GetMousePosition().y < 768 && GetMousePosition().y > 0)
     {
         DrawRectangleLines(mPos.x, mPos.y, SIZE, SIZE, ColorAlpha(WHITE, 0.5));
     }
@@ -214,7 +214,7 @@ void Game::UpdateAndDrawUI()
         }
     }
 
-    else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && GetMousePosition().x < 1024 && jackActive)
+    else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON)  && jackActive)
     {
         map.tile[GetTile(GetMousePosition())].active = false;
         int a = 0;
@@ -261,7 +261,7 @@ void Game::UpdateAndDrawUI()
     }
     if ((pointSelected || (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && (InRec(classicTurretIcone) || InRec(slowingTurretIcone) || InRec(explosiveTurretIcone)))))
     {
-        if (GetMousePosition().x < 1024)
+        if (GetMousePosition().x < 1024 && GetMousePosition().x > 0  && GetMousePosition().y < 768 && GetMousePosition().y > 0)
         {
             turret.back()->pos.x = map.tile[GetTile(GetMousePosition())].mPos.x + SIZE / 2;
             turret.back()->pos.y = map.tile[GetTile(GetMousePosition())].mPos.y + SIZE / 2;
@@ -272,7 +272,7 @@ void Game::UpdateAndDrawUI()
         }
 
         pointSelected = true;
-        if (GetMousePosition().x >= 1024 || map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].value != 'O')
+        if ((GetMousePosition().x >= 1024||GetMousePosition().x <= 0  || GetMousePosition().y >= 768 || GetMousePosition().y <= 0 )|| map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].value != 'O')
         {
             turret.back()->colorZone = RED;
         }
@@ -281,7 +281,7 @@ void Game::UpdateAndDrawUI()
             turret.back()->colorZone = DARKBLUE;
         }
 
-        if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && (GetMousePosition().x >= 1024 || map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].value != 'O'))
+        if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && ((GetMousePosition().x >= 1024 || GetMousePosition().x <= 0  || GetMousePosition().y >= 768 || GetMousePosition().y <= 0 )|| map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].value != 'O'))
         {
             turret.pop_back();
             pointSelected = false;
