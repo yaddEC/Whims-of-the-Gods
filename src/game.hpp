@@ -15,6 +15,7 @@ private:
 public:
     Vector2 mPos;
     char value;
+    bool active;
     Tile();
     ~Tile();
 
@@ -50,6 +51,7 @@ public:
     TextureObject classicTurret;
     TextureObject slowingTurret;
     TextureObject explosiveTurret;
+    TextureObject jackhammer;
     Tilemap map;
     std::vector<Turret *> turret;
     std::vector<Enemy *> enemy;

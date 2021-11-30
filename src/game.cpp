@@ -1,6 +1,7 @@
 #include "game.hpp"
 
 static bool pointSelected = false;
+static bool jackActive = false;
 
 Game::Game()
 {
@@ -8,6 +9,7 @@ Game::Game()
     classicTurret.model = LoadTexture("assets/classic_turret.png");
     slowingTurret.model = LoadTexture("assets/slowing_turret.png");
     explosiveTurret.model = LoadTexture("assets/explosive_turret.png");
+    jackhammer.model = LoadTexture("assets/jackhammer.png");
 }
 
 bool Button(int x, int y, float width, float height, const char *name, Color color)
@@ -32,8 +34,6 @@ bool Button(int x, int y, float width, float height, const char *name, Color col
     return res;
 }
 
-
-
 Tile::Tile()
 {
     mWidthTile = SIZE;
@@ -43,6 +43,7 @@ void Tile::Init(int i, int mapWidth, char val)
 {
 
     mTilePos = i;
+    active = false;
     value = val;
     mPos.x = (i % mapWidth) * mWidthTile;
     mPos.y = static_cast<int>(i / mapWidth) * mWidthTile;
@@ -169,9 +170,11 @@ void Tilemap::Draw()
 
 void Game::UpdateAndDrawUI()
 {
-    const Rectangle classicTurretIcone = (Rectangle){1110, 64, SIZE, SIZE};
-    const Rectangle slowingTurretIcone = (Rectangle){1110, 256, SIZE, SIZE};
+    const Rectangle classicTurretIcone = (Rectangle){1110, 192, SIZE, SIZE};
+    const Rectangle slowingTurretIcone = (Rectangle){1110, 320, SIZE, SIZE};
     const Rectangle explosiveTurretIcone = (Rectangle){1110, 448, SIZE, SIZE};
+
+    const Rectangle jackHammerIcone = (Rectangle){1110, 64, SIZE, SIZE};
 
     //UpdateAndDrawUI turret Normal
     DrawRectangleLinesEx(classicTurretIcone, 2, RED);
@@ -182,6 +185,10 @@ void Game::UpdateAndDrawUI()
     //UpdateAndDrawUI turret Explsive
     DrawRectangleLinesEx(explosiveTurretIcone, 2, ORANGE);
     DrawTexture(explosiveTurret.model, explosiveTurretIcone.x, explosiveTurretIcone.y, WHITE);
+    if (jackActive)
+        DrawTexture(jackhammer.model, GetMousePosition().x-48/2, GetMousePosition().y, WHITE);
+    else
+        DrawTexture(jackhammer.model, jackHammerIcone.x, jackHammerIcone.y, WHITE);
 
     if (InRec(classicTurretIcone))
     {
@@ -195,6 +202,33 @@ void Game::UpdateAndDrawUI()
             turret.back()->texture = classicTurret;
             turret.back()->shotTextureId = 296;
         }
+    }
+
+    if (InRec(jackHammerIcone))
+    {
+        DrawText("Sell Turret", 1070, 600, 20, GREEN);
+
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) // Buy and place new slowing turret
+        {
+            jackActive = !jackActive;
+        }
+    }
+
+    else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && GetMousePosition().x < 1024 && jackActive)
+    {
+        map.tile[GetTile(GetMousePosition())].active = false;
+        int a = 0;
+        for (Turret *t : turret)
+    {
+        
+        if(GetTile(GetMousePosition())==GetTile(t->pos))
+        {
+             turret.erase(turret.begin() + a);
+        }
+        a++;
+    }
+        jackActive = !jackActive;
+
     }
 
     if (InRec(slowingTurretIcone))
@@ -235,20 +269,21 @@ void Game::UpdateAndDrawUI()
         }
         else
         {
-              turret.back()->pos=GetMousePosition();
+            turret.back()->pos = GetMousePosition();
         }
 
         pointSelected = true;
 
-        if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && GetMousePosition().x < 1024)
-        {
-
-            turret.back()->active = true;
-            pointSelected = false;
-        }
-        else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && GetMousePosition().x >= 1024)
+        if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && (GetMousePosition().x >= 1024 || map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].value != 'O'))
         {
             turret.pop_back();
+            pointSelected = false;
+        }
+
+        else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && GetMousePosition().x < 1024)
+        {
+            map.tile[GetTile(GetMousePosition())].active = true;
+            turret.back()->active = true;
             pointSelected = false;
         }
     }
@@ -276,12 +311,12 @@ void Game::UpdateAndDraw()
         t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->shotTextureId].mPos);
     }
 
-    for (long unsigned int t=0; t<enemy.size();t++)
+    for (long unsigned int t = 0; t < enemy.size(); t++)
     {
         enemy[t]->UpdateAndDraw();
-        if(enemy[t]->hp<=0)
+        if (enemy[t]->hp <= 0)
         {
-            enemy.erase(enemy.begin()+t);
+            enemy.erase(enemy.begin() + t);
         }
     }
 
@@ -289,7 +324,6 @@ void Game::UpdateAndDraw()
     {
         enemy.push_back(new Enemy);
     }
-
 }
 
 Game::~Game()
