@@ -200,7 +200,7 @@ void Game::UpdateAndDrawUI()
         {
             turret.push_back(new ClassicTurret);
             turret.back()->texture = classicTurret;
-            turret.back()->shotTextureId = 296;
+            turret.back()->id = 1;
         }
     }
 
@@ -242,7 +242,7 @@ void Game::UpdateAndDrawUI()
         {
             turret.push_back(new SlowingTurret);
             turret.back()->texture = slowingTurret;
-            turret.back()->shotTextureId = 297;
+            turret.back()->id = 2;
         }
     }
 
@@ -257,7 +257,7 @@ void Game::UpdateAndDrawUI()
         {
             turret.push_back(new ExplosiveTurret);
             turret.back()->texture = explosiveTurret;
-            turret.back()->shotTextureId = 298;
+            turret.back()->id = 3;
         }
     }
     if ((pointSelected || (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && (InRec(classicTurretIcone) || InRec(slowingTurretIcone) || InRec(explosiveTurretIcone)))))
@@ -308,7 +308,7 @@ void Game::UpdateAndDraw()
     UpdateAndDrawUI();
     for (Turret *t : turret)
     {
-        t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->shotTextureId].mPos);
+        t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->id + 295].mPos);
     }
 
     for (long unsigned int t = 0; t < enemy.size(); t++)

@@ -10,13 +10,14 @@ bool InRec(Rectangle rec);
 class Turret : public Entity
 {
 public:
-    int shotTextureId;
+    int id;
     float range = 100.0f;
     float rotation = 0.0f;
     int target = -1;
     int damage;
     int price;
     float attackSpeed;
+    Vector2 explosionPos;
     float slowEffect = 1;
     int timer=0;
 

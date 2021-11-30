@@ -21,6 +21,7 @@ class Entity
     }
 };
 
+
 void FrameTimer(int &timer);
 
 

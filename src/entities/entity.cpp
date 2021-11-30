@@ -2,6 +2,8 @@
 #include "turret.hpp"
 #include "tower.hpp"
 
+
+
 bool InRec(int x, int y, float width, float height)
 {
     int X = GetMouseX();
@@ -56,7 +58,10 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
     if (active) //if the turret is active
     {
         FrameTimer(timer);
-
+        if(id==3 && timer>0)
+        {
+            DrawCircle(explosionPos.x,explosionPos.y,50.0f,ColorAlpha(DARKGRAY, 0.5f/30.f * (timer-30.0f)));
+        }
         int nearestEnemyId = -1;
         int nearestEnemyDistance = -1;
         for (auto j = 0u; target == -1 && j < enemy.size(); j++) // Check every enemy if turret has no current target
@@ -90,12 +95,24 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
 
             if (timer <= 0)
             {
-                enemy[target]->hp -= damage;
                 timer = 60 / attackSpeed;
-                if(shotTextureId==297)
+                enemy[target]->hp -= damage;
+                if(id==2)
                 {
                     enemy[target]->slowingTimer=30;
                     enemy[target]->slowingCoef=slowEffect;
+                }
+                else if(id==3)
+                {
+                    for (Enemy *e : enemy)
+                    {
+                        if(e!=enemy[target] && collCirclex2(enemy[target]->pos, 50.0f, e->pos, e->radius))
+                        {
+                            e->hp-=damage;
+                        }
+                        explosionPos=enemy[target]->pos;
+                    }
+                    
                 }
                 if (enemy[target]->hp <= 0) // target dead
                 {
