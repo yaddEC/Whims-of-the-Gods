@@ -45,7 +45,9 @@ public:
 class Game
 {
 public:
-    int money;
+    bool quit = false;
+    bool start = false;
+    int money = 100;
     int timer;
     bool showTurretRange = false;
     TextureObject classicTurret;
@@ -56,6 +58,7 @@ public:
     std::vector<Turret *> turret;
     std::vector<Enemy *> enemy;
     Game();
+    void Menu();
     void UpdateAndDraw();
     void UpdateAndDrawUI();
     void UpdateAndDrawTurret();

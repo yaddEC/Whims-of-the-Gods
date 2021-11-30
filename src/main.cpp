@@ -13,13 +13,21 @@ int main(void)
     Game game = {};
     
     // Main game loop
-    while (!WindowShouldClose())
+    while (!WindowShouldClose() && !game.quit)
     {
         BeginDrawing();
         ClearBackground(RAYWHITE);
-     
-        DrawRectangle(1024,0,256,768,BROWN);
-        game.UpdateAndDraw();
+
+        if(game.start)
+        {
+            DrawRectangle(1024,0,256,768,BROWN);
+            game.UpdateAndDraw();
+        }
+        else
+        {
+            game.Menu();
+        }
+        
         DrawFPS(10, 10);
 
         EndDrawing();

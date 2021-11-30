@@ -18,7 +18,7 @@ bool Button(int x, int y, float width, float height, const char *name, Color col
 
     if (InRec(x, y, width, height))
     {
-        DrawRectangle(x, y, width, height, LIGHTGRAY);
+        DrawRectangle(x, y, width, height, ColorAlpha(RAYWHITE,0.7));
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
@@ -28,10 +28,22 @@ bool Button(int x, int y, float width, float height, const char *name, Color col
     }
     else
         DrawRectangle(x, y, width, height, color);
-    DrawText(name, x + 0.35 * width, y + 0.3 * height, GetFontDefault().baseSize * 2, RAYWHITE);
+    DrawText(name, x + 0.35 * width, y + 0.3 * height, GetFontDefault().baseSize * 3, RAYWHITE);
     DrawRectangleLines(x, y, width, height, DARKGRAY);
 
     return res;
+}
+
+void Game::Menu()
+{
+    if(Button(440, 200, 400, 100, "START", GRAY))
+    {
+        start = true;
+    }
+    if(Button(440, 400, 400, 100, "QUIT", GRAY))
+    {
+        quit = true;
+    }
 }
 
 Tile::Tile()
@@ -307,6 +319,13 @@ void Game::UpdateAndDrawUI()
     {
         showTurretRange = !showTurretRange;
     }
+
+    DrawText(TextFormat("%i", money), 60 , 730 , GetFontDefault().baseSize * 3, GOLD);
+    Rectangle source = {map.texture[287].mPos.x, map.texture[287].mPos.y, SIZE, SIZE};
+    Rectangle dest = {10 , 710, SIZE, SIZE};
+    Vector2 origin = {0, 0};
+    DrawTexturePro(map.tilesheet, source, dest, origin, 0, GOLD);
+
 }
 
 void Game::UpdateAndDraw()
@@ -334,6 +353,7 @@ void Game::UpdateAndDraw()
         enemy[t]->UpdateAndDraw();
         if (enemy[t]->hp <= 0)
         {
+            money+=enemy[t]->reward;
             enemy.erase(enemy.begin() + t);
         }
     }

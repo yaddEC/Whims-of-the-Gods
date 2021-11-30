@@ -12,6 +12,7 @@ public:
     int slowingTimer = 0;
     float slowingCoef = 1;
     Vector2 direction;
+    int reward = 5;
 
     void UpdateAndDraw() override
     {
