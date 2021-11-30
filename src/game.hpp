@@ -54,6 +54,8 @@ public:
     TextureObject slowingTurret;
     TextureObject explosiveTurret;
     TextureObject jackhammer;
+    Tile Spawn;
+    Tile Despawn;
     Tilemap map;
     std::vector<Turret *> turret;
     std::vector<Enemy *> enemy;
