@@ -8,7 +8,7 @@ build_linux:
  
   script:
     - make
-    - ./deploy_build.sh linux_build
+    - ./ci/deploy_build.sh linux_build
   artifacts:
     when: on_success
     paths: 
@@ -23,7 +23,7 @@ build_emscripten:
   script:
     - source $EMSDK/emsdk_env.sh
     - make CXX=em++
-    - ./deploy_build.sh emscripten_build
+    - ./ci/deploy_build.sh emscripten_build
   artifacts:
     when: on_success
     paths: 
@@ -40,7 +40,7 @@ build_windows:
   
   script:
     - make CXX=x86_64-w64-mingw32-g++
-    - ./deploy_build.sh windows_build
+    - ./ci/deploy_build.sh windows_build
   artifacts:
     when: on_success
     paths: 
