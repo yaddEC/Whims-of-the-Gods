@@ -126,10 +126,7 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
         }
     }
 
-    if (InRec(pos.x - 32, pos.y - 32, SIZE, SIZE))
-    {
-        DrawCircleV(pos, range, ColorAlpha(DARKBLUE, 0.3)); // Draw turret range
-    }
+
 
     if (active && timer > 60/attackSpeed - 3)
     {

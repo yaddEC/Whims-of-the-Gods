@@ -6,7 +6,6 @@ bool InRec(int x, int y, float width, float height);
 
 bool InRec(Rectangle rec);
 
-
 class Turret : public Entity
 {
 public:
@@ -19,10 +18,15 @@ public:
     float attackSpeed;
     Vector2 explosionPos;
     float slowEffect = 1;
-    int timer=0;
+    int timer = 0;
+    Color colorZone;
 
     void UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos);
-    
+
+    Turret()
+    {
+        colorZone = DARKBLUE;
+    }
     virtual ~Turret()
     {
     }
