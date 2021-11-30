@@ -313,41 +313,41 @@ void Game::UpdateAndDraw()
 {
     map.Draw();
     UpdateAndDrawUI();
-    for (Turret *t : turret)
+
+    if (turret.size()>0 && !turret.back()->active)
     {
+        DrawCircleV(turret.back()->pos, turret.back()->range, ColorAlpha(turret.back()->colorZone, 0.3)); // Draw turret range
+    }
+    for (Turret *t : turret)
+
+    {
+        if (turret.back()->active && InRec(t->pos.x - 32, t->pos.y - 32, SIZE, SIZE))
         {
-            if (turret.back()->active && InRec(t->pos.x - 32, t->pos.y - 32, SIZE, SIZE))
-            {
-                DrawCircleV(t->pos, t->range, ColorAlpha(t->colorZone, 0.3)); // Draw turret range
-            }
-            else if (!turret.back()->active)
-            {
-                DrawCircleV(turret.back()->pos, turret.back()->range, ColorAlpha(turret.back()->colorZone, 0.3)); // Draw turret range
-            }
-
-
-            t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->id + 295].mPos);
+            DrawCircleV(t->pos, t->range, ColorAlpha(t->colorZone, 0.3)); // Draw turret range
         }
 
-        for (long unsigned int t = 0; t < enemy.size(); t++)
+        t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->id + 295].mPos);
+    }
+    
+    for (long unsigned int t = 0; t < enemy.size(); t++)
+    {
+        enemy[t]->UpdateAndDraw();
+        if (enemy[t]->hp <= 0)
         {
-            enemy[t]->UpdateAndDraw();
-            if (enemy[t]->hp <= 0)
-            {
-                enemy.erase(enemy.begin() + t);
-            }
+            enemy.erase(enemy.begin() + t);
         }
+    }
 
-        if (IsKeyDown(KEY_SPACE)) // TEST enemy spawner
-        {
-            enemy.push_back(new Enemy);
-        }
+    if (IsKeyDown(KEY_SPACE)) // TEST enemy spawner
+    {
+        enemy.push_back(new Enemy);
     }
 }
-    Game::~Game()
-    {
-        for (Turret *t : turret)
-            delete t;
-        for (Enemy *e : enemy)
-            delete e;
-    }
+
+Game::~Game()
+{
+    for (Turret *t : turret)
+        delete t;
+    for (Enemy *e : enemy)
+        delete e;
+}
