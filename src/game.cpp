@@ -358,9 +358,11 @@ void Game::UpdateAndDraw()
         }
     }
 
-    if (IsKeyDown(KEY_SPACE)) // TEST enemy spawner
+    if (IsKeyPressed(KEY_SPACE)) // TEST enemy spawner
     {
-        enemy.push_back(new Enemy);
+        enemy.push_back(new Warrior);
+        enemy.push_back(new Healer);
+        enemy.push_back(new Berserker);
     }
 }
 
