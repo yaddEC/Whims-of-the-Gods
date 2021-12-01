@@ -6,41 +6,7 @@
 #include "entities/enemy.hpp"
 #include "entities/tower.hpp"
 
-class Tile
-{
-private:
-    int mTilePos;
-    int mWidthTile;
 
-public:
-    Vector2 mPos;
-    char value;
-    bool active;
-    Tile();
-    ~Tile();
-
-    void Init(int i, int mapWidth, char val);
-
-    void Draw(Texture2D tilesheet, Tile frame);
-};
-
-class Tilemap
-{
-private:
-    const char *plan;
-    int mHeight;
-    int mWidth;
-    int total;
-
-public:
-    Tile *tile;
-    Texture2D tilesheet;
-    Tile texture[368];
-    Tilemap();
-    void Init();
-    void Draw();
-    ~Tilemap();
-};
 
 class Game
 {
@@ -49,13 +15,12 @@ public:
     bool start = false;
     int money = 100;
     int timer;
+    int round;
     bool showTurretRange = false;
     TextureObject classicTurret;
     TextureObject slowingTurret;
     TextureObject explosiveTurret;
     TextureObject jackhammer;
-    Tile Spawn;
-    Tile Despawn;
     Tilemap map;
     std::vector<Turret *> turret;
     std::vector<Enemy *> enemy;
@@ -73,4 +38,3 @@ bool InRec(int x, int y, float width, float height);
 bool InRec(Rectangle rec);
 
 bool Button(int x, int y, float width, float height, const char *name, Color color);
-

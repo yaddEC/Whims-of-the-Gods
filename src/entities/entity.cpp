@@ -1,8 +1,113 @@
 #include "enemy.hpp"
 #include "turret.hpp"
 #include "tower.hpp"
+#include "../game.hpp"
 
+static Vector2 Spawn;
 
+bool checkTile(int tile, std::vector<int *> PrevTiles)
+{
+    for (int *i : PrevTiles)
+    {
+        if (*i == tile)
+            return false;
+    }
+    return true;
+}
+
+void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, int PrevTile, Tile *c, std::vector<int *> PrevTiles, Tile *d)
+{
+    srand(time(0));
+    int i = 0;
+    int random;
+    bool check = false;
+    check = false;
+    if (b != nullptr)
+        i++;
+    if (c != nullptr)
+        i++;
+    if (d != nullptr)
+        i++;
+    if (i == 0)
+        random = 0;
+    else
+        random = (rand() % i) + 1;
+    if (random < 2)
+    {
+        while (!check)
+        {
+            if (i == 0)
+                random = 0;
+            else
+                random = (rand() % 2) ;
+    
+            switch (random)
+            {
+            case 0:
+                if (PrevTile != a->mTilePos)
+                {
+                    DirGet(pos, a->mPos, direction);
+                    check = true;
+                }
+                break;
+            case 1:
+                if (PrevTile != b->mTilePos)
+                {
+                    DirGet(pos, b->mPos, direction);
+                    check = true;
+                }
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    else
+    {
+        while (!check)
+        {
+
+            if (i == 0)
+                random = 0;
+            else
+                random = (rand() % i) ;
+               
+            switch (random)
+            {
+            case 0:
+                if (checkTile(a->mTilePos, PrevTiles) && PrevTile != a->mTilePos)
+                {
+                    DirGet(pos, a->mPos, direction);
+                    check = true;
+                }
+                break;
+            case 1:
+                if (checkTile(b->mTilePos, PrevTiles) && PrevTile != b->mTilePos)
+                {
+                    DirGet(pos, b->mPos, direction);
+                    check = true;
+                }
+                break;
+            case 2:
+                if (checkTile(c->mTilePos, PrevTiles) && PrevTile != c->mTilePos)
+                {
+                    DirGet(pos, c->mPos, direction);
+                    check = true;
+                }
+                break;
+            case 3:
+                if (checkTile(d->mTilePos, PrevTiles) && PrevTile != d->mTilePos)
+                {
+                    DirGet(pos, d->mPos, direction);
+                    check = true;
+                }
+                break;
+            default:
+                break;
+            }
+        }
+    }
+}
 
 bool InRec(int x, int y, float width, float height)
 {
@@ -43,14 +148,15 @@ void FrameTimer(int &timer)
     }
 }
 
+void DefSpawn(Vector2 pos)
+{
+    Spawn = pos;
+}
+
 Enemy::Enemy()
 {
-    pos.x = rand() % 1024;
-    pos.y = rand() % 768;
-
-    int randomDegree = rand() % 360 + 1;
-    direction.x = sin(randomDegree * DEG2RAD) * 3;
-    direction.y = cos(randomDegree * DEG2RAD) * 3;
+    pos.x = Spawn.x + 32;
+    pos.y = Spawn.y + 32;
 }
 
 void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos)
@@ -58,9 +164,9 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
     if (active) //if the turret is active
     {
         FrameTimer(timer);
-        if(id==3 && timer>0)
+        if (id == 3 && timer > 0)
         {
-            DrawCircle(explosionPos.x,explosionPos.y,50.0f,ColorAlpha(DARKGRAY, 0.5f/30.f * (timer-30.0f)));
+            DrawCircle(explosionPos.x, explosionPos.y, 50.0f, ColorAlpha(DARKGRAY, 0.5f / 30.f * (timer - 30.0f)));
         }
         int nearestEnemyId = -1;
         int nearestEnemyDistance = -1;
@@ -97,22 +203,21 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
             {
                 timer = 60 / attackSpeed;
                 enemy[target]->hp -= damage;
-                if(id==2)
+                if (id == 2)
                 {
-                    enemy[target]->slowingTimer=30;
-                    enemy[target]->slowingCoef=slowEffect;
+                    enemy[target]->slowingTimer = 30;
+                    enemy[target]->slowingCoef = slowEffect;
                 }
-                else if(id==3)
+                else if (id == 3)
                 {
                     for (Enemy *e : enemy)
                     {
-                        if(e!=enemy[target] && collCirclex2(enemy[target]->pos, 50.0f, e->pos, e->radius))
+                        if (e != enemy[target] && collCirclex2(enemy[target]->pos, 50.0f, e->pos, e->radius))
                         {
-                            e->hp-=damage;
+                            e->hp -= damage;
                         }
-                        explosionPos=enemy[target]->pos;
+                        explosionPos = enemy[target]->pos;
                     }
-                    
                 }
                 if (enemy[target]->hp <= 0) // target dead
                 {
@@ -126,15 +231,12 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
         }
     }
 
-
-
-    if (active && timer > 60/attackSpeed - 3)
+    if (active && timer > 60 / attackSpeed - 3)
     {
         Rectangle source = {sourcePos.x, sourcePos.y, SIZE, SIZE};
         Rectangle dest = {pos.x, pos.y, SIZE, SIZE};
         Vector2 origin = {SIZE / 2, SIZE};
         DrawTexturePro(tilesheet, source, dest, origin, rotation, WHITE);
-        
     }
     Rectangle destRec = {pos.x, pos.y, SIZE, SIZE};
 

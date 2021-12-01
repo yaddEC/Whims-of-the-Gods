@@ -6,6 +6,7 @@ static bool jackActive = false;
 Game::Game()
 {
     map.Init();
+    DefSpawn(map.Spawn.mPos);
     classicTurret.model = LoadTexture("assets/classic_turret.png");
     slowingTurret.model = LoadTexture("assets/slowing_turret.png");
     explosiveTurret.model = LoadTexture("assets/explosive_turret.png");
@@ -18,10 +19,11 @@ bool Button(int x, int y, float width, float height, const char *name, Color col
 
     if (InRec(x, y, width, height))
     {
-        DrawRectangle(x, y, width, height, ColorAlpha(RAYWHITE,0.7));
+        DrawRectangle(x, y, width, height, ColorAlpha(LIGHTGRAY, 0.2));
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
+
             res = true;
             DrawRectangle(x, y, width, height, RED);
         }
@@ -36,11 +38,11 @@ bool Button(int x, int y, float width, float height, const char *name, Color col
 
 void Game::Menu()
 {
-    if(Button(440, 200, 400, 100, "START", GRAY))
+    if (Button(440, 200, 400, 100, "START", GRAY))
     {
         start = true;
     }
-    if(Button(440, 400, 400, 100, "QUIT", GRAY))
+    if (Button(440, 400, 400, 100, "QUIT", GRAY))
     {
         quit = true;
     }
@@ -69,7 +71,7 @@ void Tile::Draw(Texture2D tilesheet, Tile frame)
     Vector2 origin = {0, 0};
     DrawTexturePro(tilesheet, source, dest, origin, 0, WHITE);
 
-    if (GetTile(GetMousePosition()) == mTilePos && GetMousePosition().x < 1024 && GetMousePosition().x > 0  && GetMousePosition().y < 768 && GetMousePosition().y > 0)
+    if (GetTile(GetMousePosition()) == mTilePos && GetMousePosition().x < 1024 && GetMousePosition().x > 0 && GetMousePosition().y < 768 && GetMousePosition().y > 0)
     {
         DrawRectangleLines(mPos.x, mPos.y, SIZE, SIZE, ColorAlpha(WHITE, 0.5));
     }
@@ -83,24 +85,25 @@ Tilemap::Tilemap()
 {
     mHeight = 12;
     mWidth = 16;
+
     total = mHeight * mWidth;
     tile = new Tile[total];
     tilesheet = LoadTexture("assets/towerDefense_tilesheet.png");
 
     plan =
         {
-            "-------T|OOOOOOO"
-            "OOOOOOOl|OOOOOOO"
-            "OOOOOOOl|OOOOOOO"
-            "OOOOOOOl|OOOOOOO"
-            "OOOOOOOl|OOOOOOO"
-            "OO[____JL____]OO"
-            "OOlb--------d|OO"
-            "OOl|OOOOOOOOl|OO"
-            "OOlL________J|OO"
-            "OO{---------d|OO"
-            "OOOOOOOOOOOOl|OO"
-            "OOOOOOOOOOOOlL__"};
+            "IIIIOOOOOOOOOOOO"
+            "OOOIOOOOOOOOOOOO"
+            "OOOIOOOOOOOOOOOO"
+            "OOOIOOOOOOOOOOOO"
+            "OOOLIIIIIIIIIIOO"
+            "OOOIOOOOOOOOOIOO"
+            "OOOIOOOOOOOOOIOO"
+            "OOO>IIIIIIIIIVOO"
+            "OOOOOOOOOOOOOIOO"
+            "OOOOOOOOOOOOOIOO"
+            "OOOOOOOOOOOOOIOO"
+            "OOOOOOOOOOOOOIII"};
 }
 
 Tilemap::~Tilemap()
@@ -115,7 +118,8 @@ void Tilemap::Init()
     {
         tile[i].Init(i, mWidth, plan[i]);
     }
-
+    Spawn = tile[0];
+    Despawn = tile[191];
     for (int i = 0; i < 368; i++)
     {
         texture[i].Init(i, 23, 'a');
@@ -132,49 +136,29 @@ void Tilemap::Draw()
         case 'I':
             tile[i].Draw(tilesheet, texture[50]);
             break;
+            case 'L':
+            tile[i].Draw(tilesheet, texture[50]);
+            break;
+        case 'T':
+            tile[i].Draw(tilesheet, texture[50]);
+            break;
+        case 'A':
+            tile[i].Draw(tilesheet, texture[50]);
+            break;
+        case 'V':
+            tile[i].Draw(tilesheet, texture[50]);
+            break;
+        case '>':
+            tile[i].Draw(tilesheet, texture[50]);
+            break;
+        case '<':
+            tile[i].Draw(tilesheet, texture[50]);
+            break;
         case '-':
             tile[i].Draw(tilesheet, texture[1]);
             break;
-        case 'T':
-            tile[i].Draw(tilesheet, texture[2]);
-            break;
-        case 'l':
-            tile[i].Draw(tilesheet, texture[25]);
-            break;
-        case '|':
-            tile[i].Draw(tilesheet, texture[23]);
-            break;
-        case 'L':
-            tile[i].Draw(tilesheet, texture[46]);
-            break;
-        case 'J':
-            tile[i].Draw(tilesheet, texture[48]);
-            break;
-        case '_':
-            tile[i].Draw(tilesheet, texture[47]);
-            break;
         case 'O':
             tile[i].Draw(tilesheet, texture[24]);
-            break;
-        case '[':
-            tile[i].Draw(tilesheet, texture[3]);
-            break;
-        case ']':
-            tile[i].Draw(tilesheet, texture[4]);
-            break;
-        case '{':
-            tile[i].Draw(tilesheet, texture[26]);
-            break;
-        case '}':
-            tile[i].Draw(tilesheet, texture[27]);
-            break;
-
-        case 'd':
-            tile[i].Draw(tilesheet, texture[2]);
-            break;
-
-        case 'b':
-            tile[i].Draw(tilesheet, texture[0]);
             break;
         }
     }
@@ -226,7 +210,7 @@ void Game::UpdateAndDrawUI()
         }
     }
 
-    else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON)  && jackActive)
+    else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && jackActive)
     {
         map.tile[GetTile(GetMousePosition())].active = false;
         int a = 0;
@@ -273,7 +257,7 @@ void Game::UpdateAndDrawUI()
     }
     if ((pointSelected || (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && (InRec(classicTurretIcone) || InRec(slowingTurretIcone) || InRec(explosiveTurretIcone)))))
     {
-        if (GetMousePosition().x < 1024 && GetMousePosition().x > 0  && GetMousePosition().y < 768 && GetMousePosition().y > 0)
+        if (GetMousePosition().x < 1024 && GetMousePosition().x > 0 && GetMousePosition().y < 768 && GetMousePosition().y > 0)
         {
             turret.back()->pos.x = map.tile[GetTile(GetMousePosition())].mPos.x + SIZE / 2;
             turret.back()->pos.y = map.tile[GetTile(GetMousePosition())].mPos.y + SIZE / 2;
@@ -284,7 +268,7 @@ void Game::UpdateAndDrawUI()
         }
 
         pointSelected = true;
-        if ((GetMousePosition().x >= 1024||GetMousePosition().x <= 0  || GetMousePosition().y >= 768 || GetMousePosition().y <= 0 )|| map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].value != 'O')
+        if ((GetMousePosition().x >= 1024 || GetMousePosition().x <= 0 || GetMousePosition().y >= 768 || GetMousePosition().y <= 0) || map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].value != 'O')
         {
             turret.back()->colorZone = RED;
         }
@@ -293,7 +277,7 @@ void Game::UpdateAndDrawUI()
             turret.back()->colorZone = DARKBLUE;
         }
 
-        if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && ((GetMousePosition().x >= 1024 || GetMousePosition().x <= 0  || GetMousePosition().y >= 768 || GetMousePosition().y <= 0 )|| map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].value != 'O'))
+        if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && ((GetMousePosition().x >= 1024 || GetMousePosition().x <= 0 || GetMousePosition().y >= 768 || GetMousePosition().y <= 0) || map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].value != 'O'))
         {
             turret.pop_back();
             pointSelected = false;
@@ -320,12 +304,11 @@ void Game::UpdateAndDrawUI()
         showTurretRange = !showTurretRange;
     }
 
-    DrawText(TextFormat("%i", money), 60 , 730 , GetFontDefault().baseSize * 3, GOLD);
+    DrawText(TextFormat("%i", money), 60, 730, GetFontDefault().baseSize * 3, GOLD);
     Rectangle source = {map.texture[287].mPos.x, map.texture[287].mPos.y, SIZE, SIZE};
-    Rectangle dest = {10 , 710, SIZE, SIZE};
+    Rectangle dest = {10, 710, SIZE, SIZE};
     Vector2 origin = {0, 0};
     DrawTexturePro(map.tilesheet, source, dest, origin, 0, GOLD);
-
 }
 
 void Game::UpdateAndDraw()
@@ -333,7 +316,7 @@ void Game::UpdateAndDraw()
     map.Draw();
     UpdateAndDrawUI();
 
-    if (turret.size()>0 && !turret.back()->active)
+    if (turret.size() > 0 && !turret.back()->active)
     {
         DrawCircleV(turret.back()->pos, turret.back()->range, ColorAlpha(turret.back()->colorZone, 0.3)); // Draw turret range
     }
@@ -347,22 +330,30 @@ void Game::UpdateAndDraw()
 
         t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->id + 295].mPos);
     }
-    
+
     for (long unsigned int t = 0; t < enemy.size(); t++)
     {
-        enemy[t]->UpdateAndDraw();
-        if (enemy[t]->hp <= 0)
+        enemy[t]->UpdateAndDraw(map, round);
+        if (enemy[t]->hp <= 0 || enemy[t]->posTile == map.Despawn.mTilePos)
         {
-            money+=enemy[t]->reward;
+            money += enemy[t]->reward;
             enemy.erase(enemy.begin() + t);
         }
     }
 
     if (IsKeyPressed(KEY_SPACE)) // TEST enemy spawner
     {
+        round++;
         enemy.push_back(new Warrior);
         enemy.push_back(new Healer);
         enemy.push_back(new Berserker);
+        enemy.push_back(new Warrior);
+        enemy.push_back(new Healer);
+        enemy.push_back(new Berserker);
+        enemy.push_back(new Warrior);
+        enemy.push_back(new Healer);
+        enemy.push_back(new Berserker);
+        
     }
 }
 
