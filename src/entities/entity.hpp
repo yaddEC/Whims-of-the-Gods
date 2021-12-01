@@ -47,6 +47,7 @@ class Entity
 {
     public:
     
+    float rotation = 0.0f;
     Rectangle sourceTexture;
     bool active = false;
     int hp;

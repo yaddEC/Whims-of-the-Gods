@@ -11,7 +11,6 @@ class Turret : public Entity
 public:
     int id;
     float range = 100.0f;
-    float rotation = 0.0f;
     int target = -1;
     int damage;
     int price;

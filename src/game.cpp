@@ -17,8 +17,8 @@ Game::Game()
     explosiveTurret = {map.texture[226].mPos.x, map.texture[226].mPos.y, SIZE, SIZE};
 
     warriorEnemy = {map.texture[247].mPos.x, map.texture[247].mPos.y, SIZE, SIZE};
-    healerEnemy = {map.texture[246].mPos.x, map.texture[246].mPos.y, SIZE, SIZE};
-    berserkerEnemy = {map.texture[245].mPos.x, map.texture[245].mPos.y, SIZE, SIZE};
+    healerEnemy = {map.texture[245].mPos.x, map.texture[245].mPos.y, SIZE, SIZE};
+    berserkerEnemy = {map.texture[246].mPos.x, map.texture[246].mPos.y, SIZE, SIZE};
 
     //menuScreen.model = LoadTexture("assets/menu_screen.png");
     //pauseScreen.model = LoadTexture("assets/pause_screen.png");
@@ -417,8 +417,11 @@ void Game::UpdateAndDraw()
         if (IsKeyPressed(KEY_SPACE)) // TEST enemy spawner
         {
             enemy.push_back(new Warrior);
+            enemy.back()->sourceTexture = warriorEnemy;
             enemy.push_back(new Healer);
+            enemy.back()->sourceTexture = healerEnemy;
             enemy.push_back(new Berserker);
+            enemy.back()->sourceTexture = berserkerEnemy;
             round++;
         }
 

@@ -364,7 +364,8 @@ public:
             }
         }
 
-        DrawCircle(pos.x, pos.y, radius, color);
+        Rectangle destRec {pos.x, pos.y, SIZE, SIZE};
+        DrawTexturePro(map.tilesheet, sourceTexture, destRec, {SIZE/2, SIZE/2}, 0, WHITE);
         DrawRectangle(pos.x - 20, pos.y + 20, 40, 10, ColorAlpha(BLACK, 0.5));
         DrawRectangle(pos.x - 20, pos.y + 20, hp * 40 / maxHp, 10, GREEN);
         DrawRectangleLines(pos.x - 21, pos.y + 20, 42, 10, BLACK);
