@@ -15,14 +15,15 @@ public:
     int hp = 60;
     int maxHp = 60;
     int prevTile = 0;
+    int timer = 0;
     float speed = 1;
     int slowingTimer = 0;
     float slowingCoef = 1;
     Vector2 direction;
-    int reward = 5;
+    int reward;
     Color color; // TEMPORAIRE
 
-    void UpdateAndDraw(Tilemap &map, int round)
+    void UpdateAndDraw(Tilemap &map, int round,std::vector<Enemy *> &enemy)
     {
 
         if (posTile != GetTile(pos))
@@ -315,6 +316,7 @@ public:
         }
 
         FrameTimer(slowingTimer);
+        FrameTimer(timer);
 
 
 
@@ -322,9 +324,45 @@ public:
         {
             slowingCoef = 1;
         }
- 
-        pos.x += direction.x * slowingCoef * speed ;
-        pos.y += direction.y * slowingCoef * speed ;
+        pos.x += direction.x * slowingCoef * speed;
+        pos.y += direction.y * slowingCoef * speed;
+
+        if (maxHp == 30)
+        {
+            
+            if(timer>30)
+            {
+                DrawCircleLines(pos.x, pos.y, 50.0f, ColorAlpha(YELLOW, 0.5f/30.f * (timer-30.0f)));
+            }
+            if (timer == 0)
+            {
+                
+                
+                bool selfHeal = true;
+                for (Enemy *t : enemy)
+                {
+                    if (t != this && t->hp < t->maxHp && collCirclex2(t->pos, 50.0f, pos, radius))
+                    {
+                        t->hp += 10;
+                        timer=60;
+                        if (t->hp > t->maxHp)
+                        {
+                            t->hp = t->maxHp;
+                        }
+                        selfHeal = false;
+                    }
+                }
+                if (hp<maxHp && selfHeal)
+                {
+                    hp += 10;
+                    timer=60;
+                    if (hp > maxHp)
+                    {
+                        hp = maxHp;
+                    }
+                }
+            }
+        }
 
         DrawCircle(pos.x, pos.y, radius, color);
         DrawRectangle(pos.x - 20, pos.y + 20, 40, 10, ColorAlpha(BLACK, 0.5));
@@ -346,14 +384,12 @@ public:
         speed = 0.8;
         hp = 60;
         maxHp = 60;
+        reward = 5;
     }
 };
 
 class Healer : public Enemy
 {
-private:
-    int heal;
-    int timer;
 
 public:
     Healer()
@@ -363,6 +399,7 @@ public:
         speed = 1;
         hp = 30;
         maxHp = 30;
+        reward = 10;
     }
 };
 
@@ -377,5 +414,6 @@ public:
         speed = 0.6;
         hp = 120;
         maxHp = 120;
+        reward = 20;
     }
 };

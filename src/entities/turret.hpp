@@ -39,7 +39,7 @@ public:
     ClassicTurret()
     {
         damage = 10;
-        price = 100;
+        price = 50;
         attackSpeed = 2;
     }
 };

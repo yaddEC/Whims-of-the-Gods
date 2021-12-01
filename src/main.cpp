@@ -21,6 +21,7 @@ int main(void)
         if(game.start)
         {
             DrawRectangle(1024,0,256,768,BROWN);
+            DrawRectangle(1030, 580, 245, 170, ColorAlpha(DARKBROWN, 0.5));
             game.UpdateAndDraw();
         }
         else

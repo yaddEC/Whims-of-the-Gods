@@ -166,7 +166,7 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
         FrameTimer(timer);
         if (id == 3 && timer > 0)
         {
-            DrawCircle(explosionPos.x, explosionPos.y, 50.0f, ColorAlpha(DARKGRAY, 0.5f / 30.f * (timer - 30.0f)));
+            DrawCircle(explosionPos.x,explosionPos.y,50.0f,ColorAlpha(ORANGE, 0.5f/30.f * (timer-30.0f)));
         }
         int nearestEnemyId = -1;
         int nearestEnemyDistance = -1;
@@ -240,5 +240,5 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
     }
     Rectangle destRec = {pos.x, pos.y, SIZE, SIZE};
 
-    DrawTexturePro(texture.model, texture.sourceRec, destRec, texture.origin, rotation, WHITE); // Draw turret
+    DrawTexturePro(tilesheet, sourceTexture , destRec, {SIZE / 2, SIZE / 2}, rotation, WHITE); // Draw turret
 }

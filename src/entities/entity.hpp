@@ -47,7 +47,7 @@ class Entity
 {
     public:
     
-    TextureObject texture;
+    Rectangle sourceTexture;
     bool active = false;
     int hp;
     Vector2 pos;

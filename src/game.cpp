@@ -7,10 +7,21 @@ Game::Game()
 {
     map.Init();
     DefSpawn(map.Spawn.mPos);
-    classicTurret.model = LoadTexture("assets/classic_turret.png");
-    slowingTurret.model = LoadTexture("assets/slowing_turret.png");
-    explosiveTurret.model = LoadTexture("assets/explosive_turret.png");
+
+    pauseSource = {map.texture[107].mPos.x, map.texture[107].mPos.y, SIZE, SIZE};
+
     jackhammer.model = LoadTexture("assets/jackhammer.png");
+
+    classicTurret = {map.texture[250].mPos.x, map.texture[250].mPos.y, SIZE, SIZE};
+    slowingTurret = {map.texture[249].mPos.x, map.texture[249].mPos.y, SIZE, SIZE};
+    explosiveTurret = {map.texture[226].mPos.x, map.texture[226].mPos.y, SIZE, SIZE};
+
+    warriorEnemy = {map.texture[247].mPos.x, map.texture[247].mPos.y, SIZE, SIZE};
+    healerEnemy = {map.texture[246].mPos.x, map.texture[246].mPos.y, SIZE, SIZE};
+    berserkerEnemy = {map.texture[245].mPos.x, map.texture[245].mPos.y, SIZE, SIZE};
+
+    //menuScreen.model = LoadTexture("assets/menu_screen.png");
+    //pauseScreen.model = LoadTexture("assets/pause_screen.png");
 }
 
 bool Button(int x, int y, float width, float height, const char *name, Color color)
@@ -19,7 +30,7 @@ bool Button(int x, int y, float width, float height, const char *name, Color col
 
     if (InRec(x, y, width, height))
     {
-        DrawRectangle(x, y, width, height, ColorAlpha(LIGHTGRAY, 0.2));
+        DrawRectangle(x, y, width, height, ColorAlpha(LIGHTGRAY, 0.7));
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
@@ -136,7 +147,7 @@ void Tilemap::Draw()
         case 'I':
             tile[i].Draw(tilesheet, texture[50]);
             break;
-            case 'L':
+        case 'L':
             tile[i].Draw(tilesheet, texture[50]);
             break;
         case 'T':
@@ -164,45 +175,114 @@ void Tilemap::Draw()
     }
 }
 
-void Game::UpdateAndDrawUI()
+void Game::backUI()
 {
-    const Rectangle classicTurretIcone = (Rectangle){1110, 192, SIZE, SIZE};
-    const Rectangle slowingTurretIcone = (Rectangle){1110, 320, SIZE, SIZE};
-    const Rectangle explosiveTurretIcone = (Rectangle){1110, 448, SIZE, SIZE};
+    const Rectangle classicTurretIcon = (Rectangle){1110, 192, SIZE, SIZE};
+    const Rectangle slowingTurretIcon = (Rectangle){1110, 320, SIZE, SIZE};
+    const Rectangle explosiveTurretIcon = (Rectangle){1110, 448, SIZE, SIZE};
+    const Rectangle jackHammerIcon = (Rectangle){1110, 64, SIZE, SIZE};
+    const Rectangle pauseIcon = (Rectangle){1210, 5, SIZE, SIZE};
 
-    const Rectangle jackHammerIcone = (Rectangle){1110, 64, SIZE, SIZE};
+    Color priceColor = GOLD;
+    Vector2 origin = {0, 0};
 
-    //UpdateAndDrawUI turret Normal
-    DrawRectangleLinesEx(classicTurretIcone, 2, RED);
-    DrawTexture(classicTurret.model, classicTurretIcone.x, classicTurretIcone.y, WHITE);
-    //UpdateAndDrawUI turret Slow
-    DrawRectangleLinesEx(slowingTurretIcone, 2, GREEN);
-    DrawTexture(slowingTurret.model, slowingTurretIcone.x, slowingTurretIcone.y, WHITE);
-    //UpdateAndDrawUI turret Explsive
-    DrawRectangleLinesEx(explosiveTurretIcone, 2, ORANGE);
-    DrawTexture(explosiveTurret.model, explosiveTurretIcone.x, explosiveTurretIcone.y, WHITE);
-    if (jackActive)
-        DrawTexture(jackhammer.model, GetMousePosition().x - 48 / 2, GetMousePosition().y, WHITE);
-    else
-        DrawTexture(jackhammer.model, jackHammerIcone.x, jackHammerIcone.y, WHITE);
+    //UpdateAndDrawUI Normal turret
+    DrawRectangleLinesEx(classicTurretIcon, 2, RED);
+    DrawTexturePro(map.tilesheet, classicTurret, classicTurretIcon, origin, 0, WHITE);
 
-    if (InRec(classicTurretIcone))
+    if (money < 50)
+    {
+        priceColor = LIGHTGRAY;
+    }
+    DrawText("50", classicTurretIcon.x + 25, classicTurretIcon.y + 70, GetFontDefault().baseSize * 2, priceColor);
+    Rectangle source = {map.texture[287].mPos.x, map.texture[287].mPos.y, SIZE, SIZE};
+    Rectangle dest = {classicTurretIcon.x - 5, classicTurretIcon.y + 62, SIZE / 2, SIZE / 2};
+    DrawTexturePro(map.tilesheet, source, dest, origin, 0, priceColor);
+
+    if (InRec(classicTurretIcon))
     {
         DrawText("Classic Turret", 1070, 600, 20, RED);
         DrawText("Damage: Medium", 1050, 650, 20, BLACK);
         DrawText("Attack Speed: Medium", 1050, 680, 20, BLACK);
 
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) // Buy and place new classic turret
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 50) // Buy and place new classic turret
         {
+            pointSelected = true;
             turret.push_back(new ClassicTurret);
-            turret.back()->texture = classicTurret;
+            turret.back()->sourceTexture = classicTurret;
             turret.back()->id = 1;
         }
     }
 
-    if (InRec(jackHammerIcone))
+    //UpdateAndDrawUI Slow turret
+    DrawRectangleLinesEx(slowingTurretIcon, 2, GREEN);
+    DrawTexturePro(map.tilesheet, slowingTurret, slowingTurretIcon, origin, 0, WHITE);
+
+    if (money < 150)
     {
-        DrawText("Sell Turret", 1070, 600, 20, GREEN);
+        priceColor = LIGHTGRAY;
+    }
+    DrawText("150", slowingTurretIcon.x + 25, slowingTurretIcon.y + 70, GetFontDefault().baseSize * 2, priceColor);
+    dest = {slowingTurretIcon.x - 5, slowingTurretIcon.y + 62, SIZE / 2, SIZE / 2};
+    DrawTexturePro(map.tilesheet, source, dest, origin, 0, priceColor);
+
+    if (InRec(slowingTurretIcon))
+    {
+        DrawText("Slowing Turret", 1070, 600, 20, GREEN);
+        DrawText("Damage: Low", 1050, 650, 20, BLACK);
+        DrawText("Attack Speed: High", 1050, 680, 20, BLACK);
+        DrawText("Special:  Slows", 1050, 705, 19, BLACK);
+
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 150) // Buy and place new slowing turret
+        {
+            pointSelected = true;
+            turret.push_back(new SlowingTurret);
+            turret.back()->sourceTexture = slowingTurret;
+            turret.back()->id = 2;
+        }
+    }
+
+    //UpdateAndDrawUI Explosive turret
+    DrawRectangleLinesEx(explosiveTurretIcon, 2, ORANGE);
+    DrawTexturePro(map.tilesheet, explosiveTurret, explosiveTurretIcon, origin, 0, WHITE);
+
+    if (money < 300)
+    {
+        priceColor = LIGHTGRAY;
+    }
+    DrawText("300", explosiveTurretIcon.x + 25, explosiveTurretIcon.y + 70, GetFontDefault().baseSize * 2, priceColor);
+    dest = {explosiveTurretIcon.x - 5, explosiveTurretIcon.y + 62, SIZE / 2, SIZE / 2};
+    DrawTexturePro(map.tilesheet, source, dest, origin, 0, priceColor);
+
+    if (InRec(explosiveTurretIcon))
+    {
+        DrawText("Explosive Turret", 1060, 600, 20, ORANGE);
+        DrawText("Damage: High", 1050, 650, 20, BLACK);
+        DrawText("Attack Speed: Low", 1050, 680, 20, BLACK);
+        DrawText("Special:  Area Damage", 1050, 705, 19, BLACK);
+
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 300) // Buy and place new explosive turret
+        {
+            pointSelected = true;
+            turret.push_back(new ExplosiveTurret);
+            turret.back()->sourceTexture = explosiveTurret;
+            turret.back()->id = 3;
+        }
+    }
+
+    //UpdateAndDrawUI jack hammer
+    DrawRectangleLinesEx(jackHammerIcon, 2, SKYBLUE);
+
+    if (!jackActive)
+    {
+        DrawTexture(jackhammer.model, jackHammerIcon.x + 6, jackHammerIcon.y + 10, WHITE);
+    }
+
+    if (InRec(jackHammerIcon))
+    {
+        DrawText("Sell Turret", 1080, 600, 20, SKYBLUE);
+        DrawText("Recover half the", 1060, 650, 20, BLACK);
+        DrawText("turret's price", 1070, 680, 20, BLACK);
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) // Buy and place new slowing turret
         {
@@ -219,43 +299,16 @@ void Game::UpdateAndDrawUI()
 
             if (GetTile(GetMousePosition()) == GetTile(t->pos))
             {
+                money += t->price / 2;
                 turret.erase(turret.begin() + a);
+                break;
             }
             a++;
         }
         jackActive = !jackActive;
     }
 
-    if (InRec(slowingTurretIcone))
-    {
-        DrawText("Slowing Turret", 1070, 600, 20, GREEN);
-        DrawText("Damage: Low", 1050, 650, 20, BLACK);
-        DrawText("Attack Speed: High", 1050, 680, 20, BLACK);
-        DrawText("Special:  Slows", 1050, 705, 19, BLACK);
-
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) // Buy and place new slowing turret
-        {
-            turret.push_back(new SlowingTurret);
-            turret.back()->texture = slowingTurret;
-            turret.back()->id = 2;
-        }
-    }
-
-    if (InRec(explosiveTurretIcone))
-    {
-        DrawText("Explosive Turret", 1060, 600, 20, ORANGE);
-        DrawText("Damage: High", 1050, 650, 20, BLACK);
-        DrawText("Attack Speed: Low", 1050, 680, 20, BLACK);
-        DrawText("Special:  Area Damage", 1050, 705, 19, BLACK);
-
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) // Buy and place new explosive turret
-        {
-            turret.push_back(new ExplosiveTurret);
-            turret.back()->texture = explosiveTurret;
-            turret.back()->id = 3;
-        }
-    }
-    if ((pointSelected || (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && (InRec(classicTurretIcone) || InRec(slowingTurretIcone) || InRec(explosiveTurretIcone)))))
+    if (pointSelected)
     {
         if (GetMousePosition().x < 1024 && GetMousePosition().x > 0 && GetMousePosition().y < 768 && GetMousePosition().y > 0)
         {
@@ -267,27 +320,25 @@ void Game::UpdateAndDrawUI()
             turret.back()->pos = GetMousePosition();
         }
 
-        pointSelected = true;
         if ((GetMousePosition().x >= 1024 || GetMousePosition().x <= 0 || GetMousePosition().y >= 768 || GetMousePosition().y <= 0) || map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].value != 'O')
         {
             turret.back()->colorZone = RED;
+            if (IsMouseButtonUp(MOUSE_LEFT_BUTTON))
+            {
+                turret.pop_back();
+                pointSelected = false;
+            }
         }
         else
         {
             turret.back()->colorZone = DARKBLUE;
-        }
-
-        if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && ((GetMousePosition().x >= 1024 || GetMousePosition().x <= 0 || GetMousePosition().y >= 768 || GetMousePosition().y <= 0) || map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].value != 'O'))
-        {
-            turret.pop_back();
-            pointSelected = false;
-        }
-
-        else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && GetMousePosition().x < 1024)
-        {
-            map.tile[GetTile(GetMousePosition())].active = true;
-            turret.back()->active = true;
-            pointSelected = false;
+            if (IsMouseButtonUp(MOUSE_LEFT_BUTTON))
+            {
+                money -= turret.back()->price;
+                map.tile[GetTile(GetMousePosition())].active = true;
+                turret.back()->active = true;
+                pointSelected = false;
+            }
         }
     }
 
@@ -304,6 +355,20 @@ void Game::UpdateAndDrawUI()
         showTurretRange = !showTurretRange;
     }
 
+    DrawTexturePro(map.tilesheet, pauseSource, pauseIcon, origin, 0, WHITE);
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && InRec(pauseIcon))
+    {
+        pause = true;
+    }
+}
+
+void Game::frontUI()
+{
+    if (jackActive)
+    {
+        DrawTexture(jackhammer.model, GetMousePosition().x - 48 / 2, GetMousePosition().y, WHITE);
+    }
+
     DrawText(TextFormat("%i", money), 60, 730, GetFontDefault().baseSize * 3, GOLD);
     Rectangle source = {map.texture[287].mPos.x, map.texture[287].mPos.y, SIZE, SIZE};
     Rectangle dest = {10, 710, SIZE, SIZE};
@@ -314,46 +379,66 @@ void Game::UpdateAndDrawUI()
 void Game::UpdateAndDraw()
 {
     map.Draw();
-    UpdateAndDrawUI();
 
-    if (turret.size() > 0 && !turret.back()->active)
+    if (!pause)
     {
-        DrawCircleV(turret.back()->pos, turret.back()->range, ColorAlpha(turret.back()->colorZone, 0.3)); // Draw turret range
-    }
-    for (Turret *t : turret)
+        backUI();
 
-    {
-        if (turret.back()->active && InRec(t->pos.x - 32, t->pos.y - 32, SIZE, SIZE))
+        if (turret.size() > 0 && !turret.back()->active)
         {
-            DrawCircleV(t->pos, t->range, ColorAlpha(t->colorZone, 0.3)); // Draw turret range
+            DrawCircleV(turret.back()->pos, turret.back()->range, ColorAlpha(turret.back()->colorZone, 0.3)); // Draw turret range
+        }
+        for (Turret *t : turret)
+
+        {
+            if (turret.back()->active && InRec(t->pos.x - 32, t->pos.y - 32, SIZE, SIZE))
+            {
+                DrawCircleV(t->pos, t->range, ColorAlpha(t->colorZone, 0.3)); // Draw turret range
+            }
+
+            t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->id + 295].mPos);
         }
 
-        t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->id + 295].mPos);
-    }
-
-    for (long unsigned int t = 0; t < enemy.size(); t++)
-    {
-        enemy[t]->UpdateAndDraw(map, round);
-        if (enemy[t]->hp <= 0 || enemy[t]->posTile == map.Despawn.mTilePos)
+        for (long unsigned int t = 0; t < enemy.size(); t++)
         {
-            money += enemy[t]->reward;
-            enemy.erase(enemy.begin() + t);
+            enemy[t]->UpdateAndDraw(map, round, enemy);
+            if (enemy[t]->hp <= 0)
+            {
+                enemy.erase(enemy.begin() + t);
+                money += enemy[t]->reward;
+            }
+            else if (enemy[t]->posTile == map.Despawn.mTilePos)
+            {
+                enemy.erase(enemy.begin() + t);
+            }
+            
+        }
+
+        if (IsKeyPressed(KEY_SPACE)) // TEST enemy spawner
+        {
+            enemy.push_back(new Warrior);
+            enemy.push_back(new Healer);
+            enemy.push_back(new Berserker);
+            round++;
+        }
+
+        frontUI();
+    }
+    else
+    {
+        if (Button(440, 200, 400, 100, "RESUME", GRAY))
+        {
+            pause = false;
+        }
+        if (Button(440, 400, 400, 100, "MENU", GRAY))
+        {
+            pause = false;
+            start = false;
         }
     }
-
-    if (IsKeyPressed(KEY_SPACE)) // TEST enemy spawner
+    if (IsKeyPressed(KEY_P))
     {
-        round++;
-        enemy.push_back(new Warrior);
-        enemy.push_back(new Healer);
-        enemy.push_back(new Berserker);
-        enemy.push_back(new Warrior);
-        enemy.push_back(new Healer);
-        enemy.push_back(new Berserker);
-        enemy.push_back(new Warrior);
-        enemy.push_back(new Healer);
-        enemy.push_back(new Berserker);
-        
+        pause = !pause;
     }
 }
 
