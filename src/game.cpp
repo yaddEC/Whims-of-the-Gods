@@ -8,7 +8,9 @@ Game::Game()
     quit = false;
     start = false;
     pause = false;
+    gameOver = false;
     hp = 20;
+    maxHp = 20;
     money = 500;
     round = 0;
     showTurretRange = false;
@@ -181,7 +183,7 @@ void Tilemap::Draw()
 }
 
 void Game::backUI()
-{  
+{
     const Rectangle classicTurretIcon = (Rectangle){1110, 152, SIZE, SIZE};
     const Rectangle slowingTurretIcon = (Rectangle){1110, 280, SIZE, SIZE};
     const Rectangle explosiveTurretIcon = (Rectangle){1110, 408, SIZE, SIZE};
@@ -374,7 +376,7 @@ void Game::backUI()
     DrawTexturePro(map.tilesheet, pauseSource, pauseIcon, origin, 0, WHITE);
     if (InRec(pauseIcon))
     {
-        DrawRectangleLinesEx(pauseIcon, 1, ColorAlpha(WHITE,0.3) );
+        DrawRectangleLinesEx(pauseIcon, 1, ColorAlpha(WHITE, 0.3));
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) // Pause the game
         {
@@ -395,80 +397,109 @@ void Game::frontUI()
     Rectangle dest = {10, 710, SIZE, SIZE};
     Vector2 origin = {0, 0};
     DrawTexturePro(map.tilesheet, source, dest, origin, 0, GOLD);
+
+    // Health bar
+    DrawRectangle(1040, 720, 225, 30, DARKBROWN);    
+    
+    DrawRectangle(1040, 720, hp * 225 / maxHp, 30, ColorAlpha(GREEN, hp/(float)maxHp));
+    DrawRectangle(1040, 720, hp * 225 / maxHp, 30, ColorAlpha(YELLOW, (1.0f - 2*std::abs(0.5f - (hp/(float)maxHp)))));
+    DrawRectangle(1040, 720, hp * 225 / maxHp, 30, ColorAlpha(RED, 1.0f - (hp/(float)maxHp)));
+    
+    DrawRectangleLines(1040, 720, 225, 30, WHITE);
+    DrawText(TextFormat("%i / %i", hp, maxHp), 1050, 727, GetFontDefault().baseSize * 2, WHITE);
 }
 
 void Game::UpdateAndDraw()
 {
     map.Draw();
 
-    if (!pause)
+    if (!gameOver)
     {
-        backUI();
-
-        if (turret.size() > 0 && !turret.back()->active)
+        if (!pause)
         {
-            DrawCircleV(turret.back()->pos, turret.back()->range, ColorAlpha(turret.back()->colorZone, 0.3)); // Draw turret range
-        }
-        for (Turret *t : turret)
-
-        {
-            if (turret.back()->active && InRec(t->pos.x - 32, t->pos.y - 32, SIZE, SIZE))
+            if (hp <= 0)
             {
-                DrawCircleV(t->pos, t->range, ColorAlpha(t->colorZone, 0.3)); // Draw turret range
+                gameOver = true;
+            }
+            backUI(); 
+
+            if (turret.size() > 0 && !turret.back()->active)
+            {
+                DrawCircleV(turret.back()->pos, turret.back()->range, ColorAlpha(turret.back()->colorZone, 0.3)); // Draw turret range
+            }
+            for (Turret *t : turret)
+
+            {
+                if (turret.back()->active && InRec(t->pos.x - 32, t->pos.y - 32, SIZE, SIZE))
+                {
+                    DrawCircleV(t->pos, t->range, ColorAlpha(t->colorZone, 0.3)); // Draw turret range
+                }
+
+                t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->id + 295].mPos);
             }
 
-            t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->id + 295].mPos);
-        }
-
-        for (long unsigned int t = 0; t < enemy.size(); t++)
-        {
-            enemy[t]->UpdateAndDraw(map, round, enemy);
-            if (enemy[t]->hp <= 0)
+            for (long unsigned int t = 0; t < enemy.size(); t++)
             {
-                delete enemy[t];
-                enemy.erase(enemy.begin() + t);
-                money += enemy[t]->reward;
+                enemy[t]->UpdateAndDraw(map, round, enemy);
+                if (enemy[t]->hp <= 0)
+                {
+                    money += enemy[t]->reward;
+                    Enemy *tmp = enemy[t];
+                    enemy.erase(enemy.begin() + t);
+                    delete tmp;
+                    t--;
+                }
+                else if (enemy[t]->posTile == map.Despawn.mTilePos)
+                {
+                    hp -= enemy[t]->damage;
+                    Enemy *tmp = enemy[t];
+                    enemy.erase(enemy.begin() + t);
+                    delete tmp;
+                    t--;
+                }
             }
-            else if (enemy[t]->posTile == map.Despawn.mTilePos)
+
+            if (IsKeyPressed(KEY_SPACE)) // TEST enemy spawner
             {
-                delete enemy[t];
-                enemy.erase(enemy.begin() + t);
+                enemy.push_back(new Warrior);
+                enemy.back()->sourceTexture = warriorEnemy;
+                enemy.push_back(new Healer);
+                enemy.back()->sourceTexture = healerEnemy;
+                enemy.push_back(new Berserker);
+                enemy.back()->sourceTexture = berserkerEnemy;
+                round++;
             }
-            
-        }
 
-        if (IsKeyPressed(KEY_SPACE)) // TEST enemy spawner
+            frontUI();
+        }
+        else
         {
-            enemy.push_back(new Warrior);
-            enemy.back()->sourceTexture = warriorEnemy;
-            enemy.push_back(new Healer);
-            enemy.back()->sourceTexture = healerEnemy;
-            enemy.push_back(new Berserker);
-            enemy.back()->sourceTexture = berserkerEnemy;
-            round++;
-        }
+            DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 0.3));
+            if (Button(440, 200, 400, 100, "RESUME", GRAY))
+            {
+                pause = false;
+            }
+            if (Button(440, 400, 400, 100, "MENU", GRAY))
+            {
 
-        frontUI();
+                this->~Game();
+                new (this) Game();
+                pause = false;
+                start = false;
+            }
+        }
     }
     else
     {
-        DrawRectangle(0,0,1280,768, ColorAlpha(BLACK, 0.3));
-        if (Button(440, 200, 400, 100, "RESUME", GRAY))
-        {
-            pause = false;
-        }
+        DrawRectangleGradientV(0, 0, 1280, 1500, BLACK, MAROON);
         if (Button(440, 400, 400, 100, "MENU", GRAY))
         {
 
             this->~Game();
-            new(this) Game();
+            new (this) Game();
             pause = false;
             start = false;
         }
-    }
-    if (IsKeyPressed(KEY_P))
-    {
-        pause = !pause;
     }
 }
 

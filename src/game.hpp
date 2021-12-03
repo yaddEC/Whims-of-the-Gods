@@ -11,7 +11,9 @@ public:
     bool quit;
     bool start;
     bool pause;
+    bool gameOver;
     int hp;
+    int maxHp;
     int money;
     int timer;
     int round;
