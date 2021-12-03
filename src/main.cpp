@@ -21,7 +21,7 @@ int main(void)
         if(game.start) // if button start is pressed
         {
             DrawRectangle(1024,0,256,768,BROWN);
-            DrawRectangle(1030, 580, 245, 170, ColorAlpha(DARKBROWN, 0.5));
+            DrawRectangle(1030, 530, 245, 170, ColorAlpha(DARKBROWN, 0.5));
             game.UpdateAndDraw();
         }
         else // print menu

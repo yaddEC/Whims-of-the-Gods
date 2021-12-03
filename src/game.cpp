@@ -5,9 +5,10 @@ static bool jackActive = false;
 
 Game::Game()
 {
-        quit = false;
+    quit = false;
     start = false;
     pause = false;
+    hp = 20;
     money = 500;
     round = 0;
     showTurretRange = false;
@@ -180,24 +181,31 @@ void Tilemap::Draw()
 }
 
 void Game::backUI()
-{
-    const Rectangle classicTurretIcon = (Rectangle){1110, 192, SIZE, SIZE};
-    const Rectangle slowingTurretIcon = (Rectangle){1110, 320, SIZE, SIZE};
-    const Rectangle explosiveTurretIcon = (Rectangle){1110, 448, SIZE, SIZE};
-    const Rectangle jackHammerIcon = (Rectangle){1110, 64, SIZE, SIZE};
+{  
+    const Rectangle classicTurretIcon = (Rectangle){1110, 152, SIZE, SIZE};
+    const Rectangle slowingTurretIcon = (Rectangle){1110, 280, SIZE, SIZE};
+    const Rectangle explosiveTurretIcon = (Rectangle){1110, 408, SIZE, SIZE};
+    const Rectangle jackHammerIcon = (Rectangle){1110, 24, SIZE, SIZE};
     const Rectangle pauseIcon = (Rectangle){1210, 5, SIZE, SIZE};
 
+    Color classicColor = RED;
+    Color slowingColor = GREEN;
+    Color explosiveColor = ORANGE;
+
     Color priceColor = GOLD;
+
+    Color textureColor = WHITE;
     Vector2 origin = {0, 0};
 
     //UpdateAndDrawUI Normal turret
-    DrawRectangleLinesEx(classicTurretIcon, 2, RED);
-    DrawTexturePro(map.tilesheet, classicTurret, classicTurretIcon, origin, 0, WHITE);
-
     if (money < 50)
     {
-        priceColor = LIGHTGRAY;
+        priceColor = classicColor = textureColor = LIGHTGRAY;
     }
+
+    DrawRectangleLinesEx(classicTurretIcon, 2, classicColor);
+    DrawTexturePro(map.tilesheet, classicTurret, classicTurretIcon, origin, 0, textureColor);
+
     DrawText("50", classicTurretIcon.x + 25, classicTurretIcon.y + 70, GetFontDefault().baseSize * 2, priceColor);
     Rectangle source = {map.texture[287].mPos.x, map.texture[287].mPos.y, SIZE, SIZE};
     Rectangle dest = {classicTurretIcon.x - 5, classicTurretIcon.y + 62, SIZE / 2, SIZE / 2};
@@ -205,9 +213,9 @@ void Game::backUI()
 
     if (InRec(classicTurretIcon))
     {
-        DrawText("Classic Turret", 1070, 600, 20, RED);
-        DrawText("Damage: Medium", 1050, 650, 20, BLACK);
-        DrawText("Attack Speed: Medium", 1050, 680, 20, BLACK);
+        DrawText("Classic Turret", 1070, 550, 20, RED);
+        DrawText("Damage: Medium", 1050, 600, 20, BLACK);
+        DrawText("Attack Speed: Medium", 1050, 630, 20, BLACK);
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 50) // Buy and place new classic turret
         {
@@ -219,23 +227,24 @@ void Game::backUI()
     }
 
     //UpdateAndDrawUI Slow turret
-    DrawRectangleLinesEx(slowingTurretIcon, 2, GREEN);
-    DrawTexturePro(map.tilesheet, slowingTurret, slowingTurretIcon, origin, 0, WHITE);
-
     if (money < 150)
     {
-        priceColor = LIGHTGRAY;
+        priceColor = slowingColor = textureColor = LIGHTGRAY;
     }
+
+    DrawRectangleLinesEx(slowingTurretIcon, 2, slowingColor);
+    DrawTexturePro(map.tilesheet, slowingTurret, slowingTurretIcon, origin, 0, textureColor);
+
     DrawText("150", slowingTurretIcon.x + 25, slowingTurretIcon.y + 70, GetFontDefault().baseSize * 2, priceColor);
     dest = {slowingTurretIcon.x - 5, slowingTurretIcon.y + 62, SIZE / 2, SIZE / 2};
     DrawTexturePro(map.tilesheet, source, dest, origin, 0, priceColor);
 
     if (InRec(slowingTurretIcon))
     {
-        DrawText("Slowing Turret", 1070, 600, 20, GREEN);
-        DrawText("Damage: Low", 1050, 650, 20, BLACK);
-        DrawText("Attack Speed: High", 1050, 680, 20, BLACK);
-        DrawText("Special:  Slows", 1050, 705, 19, BLACK);
+        DrawText("Slowing Turret", 1070, 550, 20, GREEN);
+        DrawText("Damage: Low", 1050, 600, 20, BLACK);
+        DrawText("Attack Speed: High", 1050, 630, 20, BLACK);
+        DrawText("Special:  Slows", 1050, 655, 19, BLACK);
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 150) // Buy and place new slowing turret
         {
@@ -247,23 +256,24 @@ void Game::backUI()
     }
 
     //UpdateAndDrawUI Explosive turret
-    DrawRectangleLinesEx(explosiveTurretIcon, 2, ORANGE);
-    DrawTexturePro(map.tilesheet, explosiveTurret, explosiveTurretIcon, origin, 0, WHITE);
-
     if (money < 300)
     {
-        priceColor = LIGHTGRAY;
+        priceColor = explosiveColor = textureColor = LIGHTGRAY;
     }
+
+    DrawRectangleLinesEx(explosiveTurretIcon, 2, explosiveColor);
+    DrawTexturePro(map.tilesheet, explosiveTurret, explosiveTurretIcon, origin, 0, textureColor);
+
     DrawText("300", explosiveTurretIcon.x + 25, explosiveTurretIcon.y + 70, GetFontDefault().baseSize * 2, priceColor);
     dest = {explosiveTurretIcon.x - 5, explosiveTurretIcon.y + 62, SIZE / 2, SIZE / 2};
     DrawTexturePro(map.tilesheet, source, dest, origin, 0, priceColor);
 
     if (InRec(explosiveTurretIcon))
     {
-        DrawText("Explosive Turret", 1060, 600, 20, ORANGE);
-        DrawText("Damage: High", 1050, 650, 20, BLACK);
-        DrawText("Attack Speed: Low", 1050, 680, 20, BLACK);
-        DrawText("Special:  Area Damage", 1050, 705, 19, BLACK);
+        DrawText("Explosive Turret", 1060, 550, 20, ORANGE);
+        DrawText("Damage: High", 1050, 600, 20, BLACK);
+        DrawText("Attack Speed: Low", 1050, 630, 20, BLACK);
+        DrawText("Special:  Area Damage", 1050, 655, 19, BLACK);
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 300) // Buy and place new explosive turret
         {
@@ -284,9 +294,9 @@ void Game::backUI()
 
     if (InRec(jackHammerIcon))
     {
-        DrawText("Sell Turret", 1080, 600, 20, SKYBLUE);
-        DrawText("Recover half the", 1060, 650, 20, BLACK);
-        DrawText("turret's price", 1070, 680, 20, BLACK);
+        DrawText("Sell Turret", 1080, 550, 20, SKYBLUE);
+        DrawText("Recover half the", 1060, 600, 20, BLACK);
+        DrawText("turret's price", 1070, 630, 20, BLACK);
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) // Buy and place new slowing turret
         {
@@ -362,9 +372,14 @@ void Game::backUI()
     }
 
     DrawTexturePro(map.tilesheet, pauseSource, pauseIcon, origin, 0, WHITE);
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && InRec(pauseIcon))
+    if (InRec(pauseIcon))
     {
-        pause = true;
+        DrawRectangleLinesEx(pauseIcon, 1, ColorAlpha(WHITE,0.3) );
+
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) // Pause the game
+        {
+            pause = true;
+        }
     }
 }
 
