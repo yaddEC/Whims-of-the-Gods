@@ -13,6 +13,7 @@ Game::Game()
     maxHp = 20;
     money = 500;
     round = 0;
+    timer = 600;
     showTurretRange = false;
 
     map.Init();
@@ -421,6 +422,7 @@ void Game::UpdateAndDraw()
             {
                 gameOver = true;
             }
+
             backUI(); 
 
             if (turret.size() > 0 && !turret.back()->active)
@@ -459,6 +461,12 @@ void Game::UpdateAndDraw()
                 }
             }
 
+            if(round==1 && timer!=0 && timer%60==0)  // TEST WAVE 1
+            {
+                enemy.push_back(new Warrior);
+                enemy.back()->sourceTexture = warriorEnemy;
+            }
+
             if (IsKeyPressed(KEY_SPACE)) // TEST enemy spawner
             {
                 enemy.push_back(new Warrior);
@@ -488,6 +496,8 @@ void Game::UpdateAndDraw()
                 start = false;
             }
         }
+
+        FrameTimer(timer);
     }
     else
     {
