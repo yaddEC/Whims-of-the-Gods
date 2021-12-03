@@ -336,7 +336,7 @@ public:
             }
             if (timer == 0)
             {
-                speed = 1;
+                 speed = 1;
                 
                 bool selfHeal = true;
                 for (Enemy *t : enemy)
@@ -378,6 +378,8 @@ public:
     }
     virtual ~Enemy()
     {
+        for (int *t : PrevTiles)
+        delete t;
     }
 };
 

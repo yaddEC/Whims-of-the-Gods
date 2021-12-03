@@ -300,6 +300,7 @@ void Game::backUI()
             if (GetTile(GetMousePosition()) == GetTile(t->pos))
             {
                 money += t->price / 2;
+                delete t;
                 turret.erase(turret.begin() + a);
                 break;
             }
@@ -325,6 +326,7 @@ void Game::backUI()
             turret.back()->colorZone = RED;
             if (IsMouseButtonUp(MOUSE_LEFT_BUTTON))
             {
+                delete turret.back();
                 turret.pop_back();
                 pointSelected = false;
             }
@@ -404,11 +406,13 @@ void Game::UpdateAndDraw()
             enemy[t]->UpdateAndDraw(map, round, enemy);
             if (enemy[t]->hp <= 0)
             {
+                delete enemy[t];
                 enemy.erase(enemy.begin() + t);
                 money += enemy[t]->reward;
             }
             else if (enemy[t]->posTile == map.Despawn.mTilePos)
             {
+                delete enemy[t];
                 enemy.erase(enemy.begin() + t);
             }
             
