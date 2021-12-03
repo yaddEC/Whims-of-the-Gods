@@ -46,17 +46,16 @@ public:
 class Entity
 {
     public:
-    
-    float rotation = 0.0f;
+    Entity();
+    float rotation;
     Rectangle sourceTexture;
-    bool active = false;
+    bool active;
     int hp;
     Vector2 pos;
-    int posTile=0;
+    int posTile;
 
     virtual void UpdateAndDraw()
     {
-
     }
 };
 

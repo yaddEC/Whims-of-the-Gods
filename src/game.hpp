@@ -4,20 +4,17 @@
 #include <raylib.h>
 #include "entities/turret.hpp"
 #include "entities/enemy.hpp"
-#include "entities/tower.hpp"
-
-
 
 class Game
 {
 public:
-    bool quit = false;
-    bool start = false;
-    bool pause = false;
-    int money = 500;
+    bool quit;
+    bool start;
+    bool pause;
+    int money;
     int timer;
     int round;
-    bool showTurretRange = false;
+    bool showTurretRange;
     Rectangle classicTurret;
     Rectangle slowingTurret;
     Rectangle explosiveTurret;

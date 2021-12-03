@@ -5,6 +5,13 @@ static bool jackActive = false;
 
 Game::Game()
 {
+        quit = false;
+    start = false;
+    pause = false;
+    money = 500;
+    round = 0;
+    showTurretRange = false;
+
     map.Init();
     DefSpawn(map.Spawn.mPos);
 
@@ -19,9 +26,6 @@ Game::Game()
     warriorEnemy = {map.texture[247].mPos.x, map.texture[247].mPos.y, SIZE, SIZE};
     healerEnemy = {map.texture[245].mPos.x, map.texture[245].mPos.y, SIZE, SIZE};
     berserkerEnemy = {map.texture[246].mPos.x, map.texture[246].mPos.y, SIZE, SIZE};
-
-    //menuScreen.model = LoadTexture("assets/menu_screen.png");
-    //pauseScreen.model = LoadTexture("assets/pause_screen.png");
 }
 
 bool Button(int x, int y, float width, float height, const char *name, Color color)
@@ -433,12 +437,16 @@ void Game::UpdateAndDraw()
     }
     else
     {
+        DrawRectangle(0,0,1280,768, ColorAlpha(BLACK, 0.3));
         if (Button(440, 200, 400, 100, "RESUME", GRAY))
         {
             pause = false;
         }
         if (Button(440, 400, 400, 100, "MENU", GRAY))
         {
+
+            this->~Game();
+            new(this) Game();
             pause = false;
             start = false;
         }
