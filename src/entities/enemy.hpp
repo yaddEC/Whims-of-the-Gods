@@ -2,7 +2,7 @@
 #include "entity.hpp"
 bool checkTile(int tile, std::vector<int *> PrevTiles);
 
-void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b = nullptr, int PrevTile = 999, Tile *c = nullptr, std::vector<int *> PrevTiles = {}, Tile *d = nullptr);
+void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b = nullptr, int PrevTile = 999, Tile *c = nullptr, std::vector<int > PrevTiles = {}, Tile *d = nullptr);
 
 class Enemy : public Entity
 {
@@ -11,7 +11,7 @@ public:
 
     int radius;
     int damage;
-    std::vector<int *> PrevTiles;
+    std::vector<int > PrevTiles;
     int hp;
     int maxHp;
     int prevTile;

@@ -111,6 +111,6 @@ SlowingTurret::SlowingTurret()
 ExplosiveTurret::ExplosiveTurret()
 {
     damage = 20;
-    price = 200;
+    price = 300;
     attackSpeed = 1;
 }

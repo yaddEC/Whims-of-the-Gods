@@ -77,8 +77,8 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
                 {
                     if (map.tile[posTile + 1].value != 'O' && map.tile[posTile + 16].value != 'O' && map.tile[posTile - 16].value != 'O')
                     {
-                        PrevTiles.push_back(new int);
-                        PrevTiles.back() = &prevTile;
+                        PrevTiles.push_back(prevTile);
+                        
                         RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile + 16], prevTile, &map.tile[posTile - 16], PrevTiles);
                     }
                     else
@@ -105,8 +105,7 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
 
                     if (map.tile[posTile - 1].value != 'O' && map.tile[posTile + 16].value != 'O' && map.tile[posTile - 16].value != 'O')
                     {
-                        PrevTiles.push_back(new int);
-                        PrevTiles.back() = &prevTile;
+                        PrevTiles.push_back(prevTile);
                         RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 16], prevTile, &map.tile[posTile - 16], PrevTiles);
                     }
                     else
@@ -132,34 +131,29 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
                 {
                     if (map.tile[posTile - 1].value != 'O' && map.tile[posTile + 1].value != 'O' && map.tile[posTile + 16].value != 'O' && map.tile[posTile - 16].value != 'O')
                     {
-                        PrevTiles.push_back(new int);
-                        PrevTiles.back() = &prevTile;
+                        PrevTiles.push_back(prevTile);
                         RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile, &map.tile[posTile + 16], PrevTiles, &map.tile[posTile + 16]);
                     }
                     else
                     {
                         if (map.tile[posTile - 1].value != 'O' && map.tile[posTile + 1].value != 'O' && map.tile[posTile + 16].value != 'O')
                         {
-                            PrevTiles.push_back(new int);
-                            PrevTiles.back() = &prevTile;
+                           PrevTiles.push_back(prevTile);
                             RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile, &map.tile[posTile + 16], PrevTiles);
                         }
                         else if (map.tile[posTile - 1].value != 'O' && map.tile[posTile + 1].value != 'O' && map.tile[posTile - 16].value != 'O')
                         {
-                            PrevTiles.push_back(new int);
-                            PrevTiles.back() = &prevTile;
+                           PrevTiles.push_back(prevTile);
                             RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile, &map.tile[posTile - 16], PrevTiles);
                         }
                         else if (map.tile[posTile - 1].value != 'O' && map.tile[posTile + 16].value != 'O' && map.tile[posTile - 16].value != 'O')
                         {
-                            PrevTiles.push_back(new int);
-                            PrevTiles.back() = &prevTile;
+                           PrevTiles.push_back(prevTile);
                             RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 16], prevTile, &map.tile[posTile - 16], PrevTiles);
                         }
                         else if (map.tile[posTile + 1].value != 'O' && map.tile[posTile + 16].value != 'O' && map.tile[posTile - 16].value != 'O')
                         {
-                            PrevTiles.push_back(new int);
-                            PrevTiles.back() = &prevTile;
+                            PrevTiles.push_back(prevTile);
                             RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile + 16], prevTile, &map.tile[posTile - 16], PrevTiles);
                         }
                         else
@@ -224,8 +218,7 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
                 {
                     if (map.tile[posTile - 1].value != 'O' && map.tile[posTile + 1].value != 'O' && map.tile[posTile - 16].value != 'O')
                     {
-                        PrevTiles.push_back(new int);
-                        PrevTiles.back() = &prevTile;
+                        PrevTiles.push_back(prevTile);
                         RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile, &map.tile[posTile - 16], PrevTiles);
                     }
                     else
@@ -281,8 +274,7 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
             {
                 if (map.tile[posTile - 1].value != 'O' && map.tile[posTile + 1].value != 'O' && map.tile[posTile + 16].value != 'O')
                 {
-                    PrevTiles.push_back(new int);
-                    PrevTiles.back() = &prevTile;
+                   PrevTiles.push_back(prevTile);
                     RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile, &map.tile[posTile + 16], PrevTiles);
                 }
                 else
@@ -371,8 +363,7 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
 
 Enemy::~Enemy()
 {
-    for (int *t : PrevTiles)
-        delete t;
+   PrevTiles.clear();
 }
 
 Warrior::Warrior()

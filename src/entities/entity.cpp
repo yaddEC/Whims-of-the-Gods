@@ -9,17 +9,17 @@ Entity::Entity()
     posTile=0;
 }
 
-bool checkTile(int tile, std::vector<int *> PrevTiles)
+bool checkTile(int tile, std::vector<int > PrevTiles)
 {
-    for (int *i : PrevTiles)
+    for (int i : PrevTiles)
     {
-        if (*i == tile)
+        if (i == tile)
             return false;
     }
     return true;
 }
 
-void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, int PrevTile, Tile *c, std::vector<int *> PrevTiles, Tile *d)
+void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, int PrevTile, Tile *c, std::vector<int > PrevTiles, Tile *d)
 {
     srand(time(0));
     int i = 0;
