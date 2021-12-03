@@ -336,13 +336,14 @@ public:
             }
             if (timer == 0)
             {
-                
+                speed = 1;
                 
                 bool selfHeal = true;
                 for (Enemy *t : enemy)
                 {
                     if (t != this && t->hp < t->maxHp && collCirclex2(t->pos, 50.0f, pos, radius))
                     {
+                        speed = 0.7f;
                         t->hp += 10;
                         timer=60;
                         if (t->hp > t->maxHp)
