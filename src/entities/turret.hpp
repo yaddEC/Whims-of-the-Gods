@@ -14,9 +14,11 @@ public:
     int target;
     int damage;
     int price;
+    int updatePrice;
     float attackSpeed;
     Vector2 explosionPos;
     float slowEffect;
+    bool showTurretUpgrade;
     int timer;
     Color colorZone;
 

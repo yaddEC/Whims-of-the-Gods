@@ -47,4 +47,4 @@ bool InRec(int x, int y, float width, float height);
 
 bool InRec(Rectangle rec);
 
-bool Button(int x, int y, float width, float height, const char *name, Color color);
+bool Button(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color);

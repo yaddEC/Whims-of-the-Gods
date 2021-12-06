@@ -7,6 +7,7 @@ Turret::Turret()
     slowEffect = 1;
     timer = 0;
     colorZone = DARKBLUE;
+    showTurretUpgrade = false;
 }
 
 void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos)
@@ -97,6 +98,7 @@ ClassicTurret::ClassicTurret()
 {
     damage = 10;
     price = 50;
+    updatePrice = price/2;
     attackSpeed = 2;
 }
 
@@ -104,6 +106,7 @@ SlowingTurret::SlowingTurret()
 {
     damage = 5;
     price = 150;
+    updatePrice = price/2;
     attackSpeed = 6;
     slowEffect = 0.5f;
 }
@@ -112,5 +115,6 @@ ExplosiveTurret::ExplosiveTurret()
 {
     damage = 20;
     price = 300;
+    updatePrice = price/2;
     attackSpeed = 1;
 }

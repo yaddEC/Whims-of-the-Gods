@@ -13,7 +13,7 @@ Game::Game()
     maxHp = 20;
     money = 500;
     round = 0;
-    timer = 600;
+    timer = 0;
     showTurretRange = false;
 
     map.Init();
@@ -32,13 +32,15 @@ Game::Game()
     berserkerEnemy = {map.texture[246].mPos.x, map.texture[246].mPos.y, SIZE, SIZE};
 }
 
-bool Button(int x, int y, float width, float height, const char *name, Color color)
+bool Button(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color)
 {
     bool res = false;
 
+    DrawRectangle(x, y, width, height, color);
+
     if (InRec(x, y, width, height))
     {
-        DrawRectangle(x, y, width, height, ColorAlpha(LIGHTGRAY, 0.7));
+        DrawRectangle(x, y, width, height, ColorAlpha(WHITE, 0.5));
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
@@ -47,9 +49,8 @@ bool Button(int x, int y, float width, float height, const char *name, Color col
             DrawRectangle(x, y, width, height, RED);
         }
     }
-    else
-        DrawRectangle(x, y, width, height, color);
-    DrawText(name, x + 0.35 * width, y + 0.3 * height, GetFontDefault().baseSize * 3, RAYWHITE);
+
+    DrawText(name, x + nameSpacing * width, y + 0.25 * height, GetFontDefault().baseSize * nameSize, RAYWHITE);
     DrawRectangleLines(x, y, width, height, DARKGRAY);
 
     return res;
@@ -57,11 +58,11 @@ bool Button(int x, int y, float width, float height, const char *name, Color col
 
 void Game::Menu()
 {
-    if (Button(440, 200, 400, 100, "START", GRAY))
+    if (Button(440, 200, 400, 100, "START", 0.35f, 3, GRAY))
     {
         start = true;
     }
-    if (Button(440, 400, 400, 100, "QUIT", GRAY))
+    if (Button(440, 400, 400, 100, "QUIT", 0.35f, 3, GRAY))
     {
         quit = true;
     }
@@ -400,14 +401,20 @@ void Game::frontUI()
     DrawTexturePro(map.tilesheet, source, dest, origin, 0, GOLD);
 
     // Health bar
-    DrawRectangle(1040, 720, 225, 30, DARKBROWN);    
-    
-    DrawRectangle(1040, 720, hp * 225 / maxHp, 30, ColorAlpha(GREEN, hp/(float)maxHp));
-    DrawRectangle(1040, 720, hp * 225 / maxHp, 30, ColorAlpha(YELLOW, (1.0f - 2*std::abs(0.5f - (hp/(float)maxHp)))));
-    DrawRectangle(1040, 720, hp * 225 / maxHp, 30, ColorAlpha(RED, 1.0f - (hp/(float)maxHp)));
-    
+    DrawRectangle(1040, 720, 225, 30, DARKBROWN);
+
+    DrawRectangle(1040, 720, hp * 225 / maxHp, 30, ColorAlpha(GREEN, hp / (float)maxHp));
+    DrawRectangle(1040, 720, hp * 225 / maxHp, 30, ColorAlpha(YELLOW, (1.0f - 2 * std::abs(0.5f - (hp / (float)maxHp)))));
+    DrawRectangle(1040, 720, hp * 225 / maxHp, 30, ColorAlpha(RED, 1.0f - (hp / (float)maxHp)));
+
     DrawRectangleLines(1040, 720, 225, 30, WHITE);
     DrawText(TextFormat("%i / %i", hp, maxHp), 1050, 727, GetFontDefault().baseSize * 2, WHITE);
+
+    if (timer == 0 && enemy.size() == 0 && Button(400, 700, 224, 50, "Ready", 0.3f, 3, GREEN))
+    {
+        round++;
+        timer = 600;
+    }
 }
 
 void Game::UpdateAndDraw()
@@ -423,7 +430,7 @@ void Game::UpdateAndDraw()
                 gameOver = true;
             }
 
-            backUI(); 
+            backUI();
 
             if (turret.size() > 0 && !turret.back()->active)
             {
@@ -432,12 +439,49 @@ void Game::UpdateAndDraw()
             for (Turret *t : turret)
 
             {
-                if (turret.back()->active && InRec(t->pos.x - 32, t->pos.y - 32, SIZE, SIZE))
+                t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->id + 295].mPos);
+
+                if (t->showTurretUpgrade)  // Draw upgrade button
                 {
-                    DrawCircleV(t->pos, t->range, ColorAlpha(t->colorZone, 0.3)); // Draw turret range
+                    Color buttonColor = GREEN;
+                    if (t->updatePrice > t->price * 2) // Max Level Button
+                    {
+                        DrawRectangle(t->pos.x - 70, t->pos.y - 20, 140, 30, GRAY);
+                        DrawText("MAX LEVEL", t->pos.x - 60, t->pos.y - 13, GetFontDefault().baseSize * 2, WHITE);
+                    }
+                    else
+                    {
+                        if (t->updatePrice > money)  // Not enough money Button
+                        {
+                            DrawRectangle(t->pos.x - 70, t->pos.y - 20, 140, 30, GRAY);
+                            DrawText("Upgrade", t->pos.x - 63, t->pos.y - 13, GetFontDefault().baseSize * 1.7, WHITE);
+                        }
+                        else if (Button(t->pos.x - 70, t->pos.y - 20, 140, 30, "Upgrade", 0.05, 1.7, buttonColor)) // enough money Button
+                        {
+                            money -= t->updatePrice;
+                            t->range += 20;
+                            t->updatePrice *= 2;
+                        }
+                        DrawText(TextFormat("%i", t->updatePrice), t->pos.x + 30, t->pos.y - 14, GetFontDefault().baseSize * 2, GOLD);
+                        Rectangle source = {map.texture[287].mPos.x, map.texture[287].mPos.y, SIZE, SIZE};
+                        Rectangle dest = {t->pos.x, t->pos.y - 22, SIZE / 2, SIZE / 2};
+                        Vector2 origin = {0, 0};
+                        DrawTexturePro(map.tilesheet, source, dest, origin, 0, GOLD);
+                    }
                 }
 
-                t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->id + 295].mPos);
+                if (turret.back()->active && InRec(t->pos.x - 32, t->pos.y - 32, SIZE, SIZE))
+                {
+                    DrawCircleLines(t->pos.x, t->pos.y, t->range, t->colorZone); // Draw turret range
+                    if ((IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && t->showTurretUpgrade == false) || t->showTurretUpgrade) //Turn true showTurretRange
+                    {
+                        t->showTurretUpgrade = true;
+                    }
+                }
+                else
+                {
+                    t->showTurretUpgrade = false;
+                }
             }
 
             for (long unsigned int t = 0; t < enemy.size(); t++)
@@ -461,11 +505,32 @@ void Game::UpdateAndDraw()
                 }
             }
 
-            if(round==1 && timer!=0 && timer%60==0)  // TEST WAVE 1
+            if (round == 1 && timer != 0 && timer % 120 == 0) // TEST WAVE 1
             {
                 enemy.push_back(new Warrior);
                 enemy.back()->sourceTexture = warriorEnemy;
             }
+
+            else if (round == 2 && timer != 0 && timer % 60 == 0) // TEST WAVE 2
+            {
+                enemy.push_back(new Warrior);
+                enemy.back()->sourceTexture = warriorEnemy;
+            }
+
+            else if (round == 3 && timer != 0 && timer % 60 == 0) // TEST WAVE 3
+            {
+                if(timer>500)
+                {
+                    enemy.push_back(new Berserker);
+                    enemy.back()->sourceTexture = berserkerEnemy;
+                }
+                else
+                {
+                    enemy.push_back(new Warrior);
+                    enemy.back()->sourceTexture = warriorEnemy;
+                }
+            }
+
 
             if (IsKeyPressed(KEY_SPACE)) // TEST enemy spawner
             {
@@ -478,16 +543,18 @@ void Game::UpdateAndDraw()
                 round++;
             }
 
+            FrameTimer(timer);
+
             frontUI();
         }
         else
         {
             DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 0.3));
-            if (Button(440, 200, 400, 100, "RESUME", GRAY))
+            if (Button(440, 200, 400, 100, "RESUME", 0.35f, 3, GRAY))
             {
                 pause = false;
             }
-            if (Button(440, 400, 400, 100, "MENU", GRAY))
+            if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY))
             {
 
                 this->~Game();
@@ -496,13 +563,11 @@ void Game::UpdateAndDraw()
                 start = false;
             }
         }
-
-        FrameTimer(timer);
     }
     else
     {
         DrawRectangleGradientV(0, 0, 1280, 1500, BLACK, MAROON);
-        if (Button(440, 400, 400, 100, "MENU", GRAY))
+        if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY))
         {
 
             this->~Game();
