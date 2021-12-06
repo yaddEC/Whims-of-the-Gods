@@ -15,6 +15,7 @@ public:
     Vector2 mPos;
     char value;
     bool active;
+    bool road;
     Tile();
     ~Tile();
 
@@ -39,7 +40,7 @@ public:
     Tile Despawn;
     Tilemap();
     void Init();
-    void Draw();
+    void Draw(int round);
     ~Tilemap();
 };
 

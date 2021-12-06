@@ -78,6 +78,7 @@ void Tile::Init(int i, int mapWidth, char val)
 
     mTilePos = i;
     active = false;
+    road = false;
     value = val;
     mPos.x = (i % mapWidth) * mWidthTile;
     mPos.y = static_cast<int>(i / mapWidth) * mWidthTile;
@@ -112,18 +113,18 @@ Tilemap::Tilemap()
 
     plan =
         {
-            "IIIIOOOOOOOOOOOO"
-            "OOOIOOOOOOOOOOOO"
-            "OOOIOOOOOOOOOOOO"
-            "OOOIOOOOOOOOOOOO"
-            "OOOLIIIIIIIIIIOO"
-            "OOOIOOOOOOOOOIOO"
-            "OOOIOOOOOOOOOIOO"
-            "OOO>IIIIIIIIIVOO"
-            "OOOOOOOOOOOOOIOO"
-            "OOOOOOOOOOOOOIOO"
-            "OOOOOOOOOOOOOIOO"
-            "OOOOOOOOOOOOOIII"};
+            "IIIIlOOOOOOOOOOO"
+            "__)IlOOOOOOOOOOO"
+            "OO|IlOOOOOOOOOOO"
+            "OO|I[---------}O"
+            "OO|L>IIIIIIIIIlO"
+            "OO|V(_______)IlO"
+            "OO|I[-------]IlO"
+            "OO|>IIIIIIIIIVlO"
+            "OO{_________)IlO"
+            "OOOOOOOOOOOO|IlO"
+            "OOOOOOOOOOOO|I[-"
+            "OOOOOOOOOOOO|III"};
 }
 
 Tilemap::~Tilemap()
@@ -146,40 +147,103 @@ void Tilemap::Init()
     }
 }
 
-void Tilemap::Draw()
+void Tilemap::Draw(int round)
 {
 
     for (int i = 0; i < total; i++)
     {
-        switch (tile[i].value)
+        if (Spawn.mTilePos == tile[i].mTilePos)
         {
-        case 'I':
-            tile[i].Draw(tilesheet, texture[50]);
-            break;
-        case 'L':
-            tile[i].Draw(tilesheet, texture[50]);
-            break;
-        case 'T':
-            tile[i].Draw(tilesheet, texture[50]);
-            break;
-        case 'A':
-            tile[i].Draw(tilesheet, texture[50]);
-            break;
-        case 'V':
-            tile[i].Draw(tilesheet, texture[50]);
-            break;
-        case '>':
-            tile[i].Draw(tilesheet, texture[50]);
-            break;
-        case '<':
-            tile[i].Draw(tilesheet, texture[50]);
-            break;
-        case '-':
-            tile[i].Draw(tilesheet, texture[1]);
-            break;
-        case 'O':
-            tile[i].Draw(tilesheet, texture[24]);
-            break;
+            tile[i].Draw(tilesheet, texture[64]);
+            tile[i].road = true;
+        }
+        else if (Despawn.mTilePos == tile[i].mTilePos)
+        {
+            tile[i].Draw(tilesheet, texture[63]);
+            tile[i].road = true;
+        }
+        else
+
+        {
+            switch (tile[i].value)
+            {
+            case '_':
+                tile[i].Draw(tilesheet, texture[116]);
+                break;
+            case '{':
+                tile[i].Draw(tilesheet, texture[115]);
+                break;
+            case ']':
+                tile[i].Draw(tilesheet, texture[96]);
+                break;
+            case '[':
+                tile[i].Draw(tilesheet, texture[95]);
+                break;
+            case '}':
+                tile[i].Draw(tilesheet, texture[71]);
+                break;
+            case '-':
+                tile[i].Draw(tilesheet, texture[70]);
+                break;
+            case 'l':
+                tile[i].Draw(tilesheet, texture[94]);
+                break;
+            case '|':
+                tile[i].Draw(tilesheet, texture[92]);
+                break;
+            case ')':
+                tile[i].Draw(tilesheet, texture[73]);
+                break;
+            case '(':
+                tile[i].Draw(tilesheet, texture[72]);
+                break;
+            case 'I':
+                tile[i].Draw(tilesheet, texture[93]);
+                tile[i].road = true;
+                break;
+            case 'L':
+
+                if (round > 20)
+                {
+                    tile[i].Draw(tilesheet, texture[62]);
+                }
+
+                else if (round % 2 == 1 || round == 0)
+                {
+                    tile[i].Draw(tilesheet, texture[65]);
+                }
+                else
+                {
+                    tile[i].Draw(tilesheet, texture[68]);
+                }
+
+                tile[i].road = true;
+                break;
+            case 'T':
+                tile[i].Draw(tilesheet, texture[50]);
+                tile[i].road = true;
+                break;
+            case 'A':
+                tile[i].Draw(tilesheet, texture[50]);
+                tile[i].road = true;
+                break;
+            case 'V':
+                tile[i].Draw(tilesheet, texture[50]);
+                tile[i].road = true;
+                break;
+            case '>':
+                tile[i].Draw(tilesheet, texture[50]);
+                tile[i].road = true;
+                break;
+            case '<':
+                tile[i].Draw(tilesheet, texture[50]);
+                tile[i].road = true;
+                break;
+
+            case 'O':
+                tile[i].Draw(tilesheet, texture[24]);
+                break;
+            }
         }
     }
 }
@@ -339,7 +403,7 @@ void Game::backUI()
             turret.back()->pos = GetMousePosition();
         }
 
-        if ((GetMousePosition().x >= 1024 || GetMousePosition().x <= 0 || GetMousePosition().y >= 768 || GetMousePosition().y <= 0) || map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].value != 'O')
+        if ((GetMousePosition().x >= 1024 || GetMousePosition().x <= 0 || GetMousePosition().y >= 768 || GetMousePosition().y <= 0) || map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].road != false)
         {
             turret.back()->colorZone = RED;
             if (IsMouseButtonUp(MOUSE_LEFT_BUTTON))
@@ -419,7 +483,7 @@ void Game::frontUI()
 
 void Game::UpdateAndDraw()
 {
-    map.Draw();
+    map.Draw(round);
 
     if (!gameOver)
     {
@@ -429,7 +493,6 @@ void Game::UpdateAndDraw()
             {
                 gameOver = true;
             }
-
             backUI();
 
             if (turret.size() > 0 && !turret.back()->active)

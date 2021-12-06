@@ -90,6 +90,8 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
         DrawTexturePro(tilesheet, source, dest, origin, rotation, WHITE);
     }
     Rectangle destRec = {pos.x, pos.y, SIZE, SIZE};
+    if (active)
+        DrawTexturePro(tilesheet, {1280, 448, 64, 64}, destRec, {SIZE / 2, SIZE / 2}, 0, LIGHTGRAY);
 
     DrawTexturePro(tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, WHITE); // Draw turret
 }
