@@ -12,8 +12,10 @@ Enemy::Enemy()
     radius = 10.0f;
     prevTile = 0;
     timer = 0;
+    healTimer = 0;
     slowingTimer = 0;
     slowingCoef = 1;
+    active=true;
 
     pos.x = Spawn.x + 32;
     pos.y = Spawn.y + 32;
@@ -78,25 +80,37 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
                     if (map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true && map.tile[posTile - 16].road == true)
                     {
                         PrevTiles.push_back(prevTile);
-                        
+
                         RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile + 16], prevTile, &map.tile[posTile - 16], PrevTiles);
                     }
                     else
                     {
                         if (map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true)
+                        {
                             RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile + 16], prevTile);
+                        }
                         else if (map.tile[posTile + 1].road == true && map.tile[posTile - 16].road == true)
+                        {
                             RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile - 16], prevTile);
+                        }
                         else if (map.tile[posTile + 16].road == true && map.tile[posTile - 16].road == true)
+                        {
                             RandDirChooser(direction, pos, &map.tile[posTile + 16], &map.tile[posTile - 16], prevTile);
+                        }
                         else
                         {
                             if (map.tile[posTile + 1].road == true)
+                            {
                                 RandDirChooser(direction, pos, &map.tile[posTile + 1]);
+                            }
                             else if (map.tile[posTile + 16].road == true)
+                            {
                                 RandDirChooser(direction, pos, &map.tile[posTile + 16]);
+                            }
                             else if (map.tile[posTile - 16].road == true)
+                            {
                                 RandDirChooser(direction, pos, &map.tile[posTile - 16]);
+                            }
                         }
                     }
                 }
@@ -111,19 +125,31 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
                     else
                     {
                         if (map.tile[posTile - 1].road == true && map.tile[posTile + 16].road == true)
+                        {
                             RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 16], prevTile);
+                        }
                         else if (map.tile[posTile - 1].road == true && map.tile[posTile - 16].road == true)
+                        {
                             RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile - 16], prevTile);
+                        }
                         else if (map.tile[posTile + 16].road == true && map.tile[posTile - 16].road == true)
+                        {
                             RandDirChooser(direction, pos, &map.tile[posTile + 16], &map.tile[posTile - 16], prevTile);
+                        }
                         else
                         {
                             if (map.tile[posTile - 1].road == true)
+                            {
                                 RandDirChooser(direction, pos, &map.tile[posTile - 1]);
+                            }
                             else if (map.tile[posTile + 16].road == true)
+                            {
                                 RandDirChooser(direction, pos, &map.tile[posTile + 16]);
+                            }
                             else if (map.tile[posTile - 16].road == true)
+                            {
                                 RandDirChooser(direction, pos, &map.tile[posTile - 16]);
+                            }
                         }
                     }
                 }
@@ -138,17 +164,17 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
                     {
                         if (map.tile[posTile - 1].road == true && map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true)
                         {
-                           PrevTiles.push_back(prevTile);
+                            PrevTiles.push_back(prevTile);
                             RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile, &map.tile[posTile + 16], PrevTiles);
                         }
                         else if (map.tile[posTile - 1].road == true && map.tile[posTile + 1].road == true && map.tile[posTile - 16].road == true)
                         {
-                           PrevTiles.push_back(prevTile);
+                            PrevTiles.push_back(prevTile);
                             RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile, &map.tile[posTile - 16], PrevTiles);
                         }
                         else if (map.tile[posTile - 1].road == true && map.tile[posTile + 16].road == true && map.tile[posTile - 16].road == true)
                         {
-                           PrevTiles.push_back(prevTile);
+                            PrevTiles.push_back(prevTile);
                             RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 16], prevTile, &map.tile[posTile - 16], PrevTiles);
                         }
                         else if (map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true && map.tile[posTile - 16].road == true)
@@ -159,27 +185,47 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
                         else
                         {
                             if (map.tile[posTile - 1].road == true && map.tile[posTile + 1].road == true)
+                            {
                                 RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile);
+                            }
                             else if (map.tile[posTile - 1].road == true && map.tile[posTile + 16].road == true)
+                            {
                                 RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 16], prevTile);
+                            }
                             else if (map.tile[posTile - 1].road == true && map.tile[posTile - 16].road == true)
+                            {
                                 RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile - 16], prevTile);
+                            }
                             else if (map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true)
+                            {
                                 RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile + 16], prevTile);
+                            }
                             else if (map.tile[posTile + 1].road == true && map.tile[posTile - 16].road == true)
+                            {
                                 RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile - 16], prevTile);
+                            }
                             else if (map.tile[posTile + 16].road == true && map.tile[posTile - 16].road == true)
+                            {
                                 RandDirChooser(direction, pos, &map.tile[posTile + 16], &map.tile[posTile - 16], prevTile);
+                            }
                             else
                             {
                                 if (map.tile[posTile + 1].road == true)
+                                {
                                     RandDirChooser(direction, pos, &map.tile[posTile + 1]);
+                                }
                                 else if (map.tile[posTile - 1].road == true)
+                                {
                                     RandDirChooser(direction, pos, &map.tile[posTile - 1]);
+                                }
                                 else if (map.tile[posTile + 16].road == true)
+                                {
                                     RandDirChooser(direction, pos, &map.tile[posTile + 16]);
+                                }
                                 else if (map.tile[posTile - 16].road == true)
+                                {
                                     RandDirChooser(direction, pos, &map.tile[posTile - 16]);
+                                }
                             }
                         }
                     }
@@ -190,28 +236,38 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
                 if (posTile % 16 == 0) // if first of line we cant do -1
                 {
                     if (map.tile[posTile + 1].road == true && map.tile[posTile - 16].road == true)
+                    {
                         RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile - 16], prevTile);
+                    }
                     else
                     {
                         if (map.tile[posTile + 1].road == true)
+                        {
                             RandDirChooser(direction, pos, &map.tile[posTile + 1]);
+                        }
                         else if (map.tile[posTile - 16].road == true)
+                        {
                             RandDirChooser(direction, pos, &map.tile[posTile - 16]);
+                        }
                     }
                 }
                 else if ((posTile % 16) + 15 == 15) //if last of line we cant do +1
                 {
 
                     if (map.tile[posTile - 1].road == true && map.tile[posTile - 16].road == true)
+                    {
                         RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile - 16], prevTile);
-
+                    }
                     else
                     {
                         if (map.tile[posTile - 1].road == true)
+                        {
                             RandDirChooser(direction, pos, &map.tile[posTile - 1]);
-
+                        }
                         else if (map.tile[posTile - 16].road == true)
+                        {
                             RandDirChooser(direction, pos, &map.tile[posTile - 16]);
+                        }
                     }
                 }
                 else // if neither of those we can do +1 / -1
@@ -224,20 +280,31 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
                     else
                     {
                         if (map.tile[posTile - 1].road == true && map.tile[posTile + 1].road == true)
+                        {
                             RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile);
+                        }
                         else if (map.tile[posTile - 1].road == true && map.tile[posTile - 16].road == true)
+                        {
                             RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile - 16], prevTile);
-
+                        }
                         else if (map.tile[posTile + 1].road == true && map.tile[posTile - 16].road == true)
+                        {
                             RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile - 16], prevTile);
+                        }
                         else
                         {
                             if (map.tile[posTile + 1].road == true)
+                            {
                                 RandDirChooser(direction, pos, &map.tile[posTile + 1]);
+                            }
                             else if (map.tile[posTile - 1].road == true)
+                            {
                                 RandDirChooser(direction, pos, &map.tile[posTile - 1]);
+                            }
                             else if (map.tile[posTile - 16].road == true)
+                            {
                                 RandDirChooser(direction, pos, &map.tile[posTile - 16]);
+                            }
                         }
                     }
                 }
@@ -248,53 +315,74 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
             if (posTile % 16 == 0) // if first of line we cant do -1
             {
                 if (map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true)
+                {
                     RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile + 16], prevTile);
-
+                }
                 else
                 {
                     if (map.tile[posTile + 1].road == true)
+                    {
                         RandDirChooser(direction, pos, &map.tile[posTile + 1]);
+                    }
                     else if (map.tile[posTile + 16].road == true)
+                    {
                         RandDirChooser(direction, pos, &map.tile[posTile + 16]);
+                    }
                 }
             }
             else if ((posTile % 16) + 15 == 15) //if last of line we cant do +1
             {
                 if (map.tile[posTile - 1].road == true && map.tile[posTile + 16].road == true)
+                {
                     RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 16], prevTile);
+                }
                 else
                 {
                     if (map.tile[posTile - 1].road == true)
+                    {
                         RandDirChooser(direction, pos, &map.tile[posTile - 1]);
+                    }
                     else if (map.tile[posTile + 16].road == true)
+                    {
                         RandDirChooser(direction, pos, &map.tile[posTile + 16]);
+                    }
                 }
             }
             else // if neither of those we can do +1 / -1
             {
                 if (map.tile[posTile - 1].road == true && map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true)
                 {
-                   PrevTiles.push_back(prevTile);
+                    PrevTiles.push_back(prevTile);
                     RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile, &map.tile[posTile + 16], PrevTiles);
                 }
                 else
                 {
                     if (map.tile[posTile - 1].road == true && map.tile[posTile + 1].road == true)
+                    {
                         RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile);
+                    }
                     else if (map.tile[posTile - 1].road == true && map.tile[posTile + 16].road == true)
+                    {
                         RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 16], prevTile);
-
+                    }
                     else if (map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true)
+                    {
                         RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile + 16], prevTile);
-
+                    }
                     else
                     {
                         if (map.tile[posTile + 1].road == true)
+                        {
                             RandDirChooser(direction, pos, &map.tile[posTile + 1]);
+                        }
                         else if (map.tile[posTile - 1].road == true)
+                        {
                             RandDirChooser(direction, pos, &map.tile[posTile - 1]);
+                        }
                         else if (map.tile[posTile - 16].road == true)
+                        {
                             RandDirChooser(direction, pos, &map.tile[posTile - 16]);
+                        }
                     }
                 }
             }
@@ -303,6 +391,7 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
 
     FrameTimer(slowingTimer);
     FrameTimer(timer);
+    FrameTimer(healTimer);
 
     if (slowingTimer == 0 && slowingCoef != 1)
     {
@@ -314,22 +403,22 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
     if (maxHp == 30)
     {
 
-        if (timer > 30)
+        if (healTimer > 30)
         {
-            DrawCircleLines(pos.x, pos.y, 50.0f, ColorAlpha(YELLOW, 0.5f / 30.f * (timer - 30.0f)));
+            DrawCircleLines(pos.x, pos.y, 50.0f, ColorAlpha(YELLOW, 0.5f / 30.f * (healTimer - 30.0f)));
         }
-        if (timer == 0)
+        if (healTimer == 0)
         {
             speed = 1;
 
             bool selfHeal = true;
             for (Enemy *t : enemy)
             {
-                if (t != this && t->hp < t->maxHp && collCirclex2(t->pos, 50.0f, pos, radius))
+                if (t != this && t->active && collCirclex2(t->pos, 50.0f, pos, radius))
                 {
                     speed = 0.7f;
                     t->hp += 10;
-                    timer = 60;
+                    healTimer = 60;
                     if (t->hp > t->maxHp)
                     {
                         t->hp = t->maxHp;
@@ -340,7 +429,7 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
             if (hp < maxHp && selfHeal)
             {
                 hp += 10;
-                timer = 60;
+                healTimer = 60;
                 if (hp > maxHp)
                 {
                     hp = maxHp;
@@ -355,7 +444,20 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
     {
         rotation = -rotation;
     }
-    DrawTexturePro(map.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, WHITE);
+
+    if (slowingTimer > 0)
+    {
+        DrawTexturePro(map.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, SKYBLUE);
+    }
+    else
+    {
+        DrawTexturePro(map.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, WHITE);
+    }
+
+    if(timer > 0)
+    {
+        DrawTexturePro(map.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, ColorAlpha(RED, 0.5));
+    }
     DrawRectangle(pos.x - 20, pos.y + 20, 40, 10, ColorAlpha(BLACK, 0.5));
     DrawRectangle(pos.x - 20, pos.y + 20, hp * 40 / maxHp, 10, GREEN);
     DrawRectangleLines(pos.x - 21, pos.y + 20, 42, 10, BLACK);
@@ -363,12 +465,11 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
 
 Enemy::~Enemy()
 {
-   PrevTiles.clear();
+    PrevTiles.clear();
 }
 
 Warrior::Warrior()
 {
-    color = RED;
     damage = 2;
     speed = 0.8;
     hp = 60;
@@ -378,7 +479,6 @@ Warrior::Warrior()
 
 Healer::Healer()
 {
-    color = VIOLET;
     damage = 1;
     speed = 1;
     hp = 30;
@@ -388,7 +488,6 @@ Healer::Healer()
 
 Berserker::Berserker()
 {
-    color = MAROON;
     damage = 5;
     speed = 0.6;
     hp = 120;

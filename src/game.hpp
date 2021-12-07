@@ -40,6 +40,7 @@ public:
     void frontUI();
     void UpdateAndDrawTurret();
     void UpdateAndDrawEnemy();
+    void EnemyDestroyedAnimation(Enemy* &e);
     ~Game();
 };
 

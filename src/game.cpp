@@ -56,6 +56,13 @@ bool Button(int x, int y, float width, float height, const char *name, float nam
     return res;
 }
 
+void Game::EnemyDestroyedAnimation(Enemy *&e)
+{
+
+    // ADD ANIMATION HERE
+
+}
+
 void Game::Menu()
 {
     if (Button(440, 200, 400, 100, "START", 0.35f, 3, GRAY))
@@ -504,7 +511,7 @@ void Game::UpdateAndDraw()
             {
                 t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->id + 295].mPos);
 
-                if (t->showTurretUpgrade)  // Draw upgrade button
+                if (t->showTurretUpgrade) // Draw upgrade button
                 {
                     Color buttonColor = GREEN;
                     if (t->updatePrice > t->price * 2) // Max Level Button
@@ -514,7 +521,7 @@ void Game::UpdateAndDraw()
                     }
                     else
                     {
-                        if (t->updatePrice > money)  // Not enough money Button
+                        if (t->updatePrice > money) // Not enough money Button
                         {
                             DrawRectangle(t->pos.x - 70, t->pos.y - 20, 140, 30, GRAY);
                             DrawText("Upgrade", t->pos.x - 63, t->pos.y - 13, GetFontDefault().baseSize * 1.7, WHITE);
@@ -535,7 +542,7 @@ void Game::UpdateAndDraw()
 
                 if (turret.back()->active && InRec(t->pos.x - 32, t->pos.y - 32, SIZE, SIZE))
                 {
-                    DrawCircleLines(t->pos.x, t->pos.y, t->range, t->colorZone); // Draw turret range
+                    DrawCircleLines(t->pos.x, t->pos.y, t->range, t->colorZone);                                            // Draw turret range
                     if ((IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && t->showTurretUpgrade == false) || t->showTurretUpgrade) //Turn true showTurretRange
                     {
                         t->showTurretUpgrade = true;
@@ -549,18 +556,31 @@ void Game::UpdateAndDraw()
 
             for (long unsigned int t = 0; t < enemy.size(); t++)
             {
-                enemy[t]->UpdateAndDraw(map, round, enemy);
-                if (enemy[t]->hp <= 0)
+                if (enemy[t]->posTile == map.Despawn.mTilePos)
                 {
-                    money += enemy[t]->reward;
+                    hp -= enemy[t]->damage;
                     Enemy *tmp = enemy[t];
                     enemy.erase(enemy.begin() + t);
                     delete tmp;
                     t--;
                 }
-                else if (enemy[t]->posTile == map.Despawn.mTilePos)
+                else if (enemy[t]->active)
                 {
-                    hp -= enemy[t]->damage;
+                    enemy[t]->UpdateAndDraw(map, round, enemy);
+                    if (enemy[t]->hp <= 0)
+                    {
+                        enemy[t]->timer = 60;
+                        enemy[t]->active = false;
+                    }
+                }
+                else if (enemy[t]->timer > 0)
+                {
+                    EnemyDestroyedAnimation(enemy[t]);
+                    FrameTimer(enemy[t]->timer);
+                }
+                else
+                {
+                    money += enemy[t]->reward;
                     Enemy *tmp = enemy[t];
                     enemy.erase(enemy.begin() + t);
                     delete tmp;
@@ -582,7 +602,7 @@ void Game::UpdateAndDraw()
 
             else if (round == 3 && timer != 0 && timer % 60 == 0) // TEST WAVE 3
             {
-                if(timer>500)
+                if (timer > 500)
                 {
                     enemy.push_back(new Berserker);
                     enemy.back()->sourceTexture = berserkerEnemy;
@@ -593,7 +613,6 @@ void Game::UpdateAndDraw()
                     enemy.back()->sourceTexture = warriorEnemy;
                 }
             }
-
 
             if (IsKeyPressed(KEY_SPACE)) // TEST enemy spawner
             {

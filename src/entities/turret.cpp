@@ -17,13 +17,24 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
         FrameTimer(timer);
         if (id == 3 && timer > 0)
         {
-            DrawCircle(explosionPos.x, explosionPos.y, 50.0f, ColorAlpha(ORANGE, 0.5f / 30.f * (timer - 30.0f)));
+            DrawCircleV(explosionPos, 50.0f, ColorAlpha(RED, 0.25f / 30.f * (timer - 30.0f)));
+            DrawCircleV(explosionPos, 20.0f, ColorAlpha(ORANGE, 0.3f / 30.f * (timer - 30.0f)));
+            float radius = (60 - timer)*2;
+
+            DrawCircle(explosionPos.x, explosionPos.y + radius, 3, ColorAlpha(ORANGE, (timer-30)/30.0f));
+            DrawCircle(explosionPos.x, explosionPos.y - radius, 3, ColorAlpha(ORANGE, (timer-30)/30.0f));
+            DrawCircle(explosionPos.x + radius, explosionPos.y, 3, ColorAlpha(ORANGE, (timer-30)/30.0f));
+            DrawCircle(explosionPos.x - radius, explosionPos.y, 3, ColorAlpha(ORANGE, (timer-30)/30.0f));
+            DrawCircle(explosionPos.x + cos(45 * DEG2RAD) * radius, explosionPos.y + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer-30)/30.0f));
+            DrawCircle(explosionPos.x - cos(45 * DEG2RAD) * radius, explosionPos.y + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer-30)/30.0f));
+            DrawCircle(explosionPos.x + cos(45 * DEG2RAD) * radius, explosionPos.y - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer-30)/30.0f));
+            DrawCircle(explosionPos.x - cos(45 * DEG2RAD) * radius, explosionPos.y - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer-30)/30.0f));
         }
         int nearestEnemyId = -1;
         int nearestEnemyDistance = -1;
         for (auto j = 0u; target == -1 && j < enemy.size(); j++) // Check every enemy if turret has no current target
         {
-            if (enemy[j]->hp > 0)
+            if (enemy[j]->active)
             {
 
                 float normTurretEnemy = norm(vector(enemy[j]->pos, Vector2{pos.x, pos.y}));
@@ -54,6 +65,7 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
             {
                 timer = 60 / attackSpeed;
                 enemy[target]->hp -= damage;
+                enemy[target]->timer = 5;
                 if (id == 2)
                 {
                     enemy[target]->slowingTimer = 30;
@@ -63,9 +75,10 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
                 {
                     for (Enemy *e : enemy)
                     {
-                        if (e != enemy[target] && collCirclex2(enemy[target]->pos, 50.0f, e->pos, e->radius))
+                        if (e != enemy[target] && e->active && collCirclex2(enemy[target]->pos, 50.0f, e->pos, e->radius))
                         {
                             e->hp -= damage;
+                            e->timer = 5;
                         }
                         explosionPos = enemy[target]->pos;
                     }
@@ -91,8 +104,9 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
     }
     Rectangle destRec = {pos.x, pos.y, SIZE, SIZE};
     if (active)
+    {
         DrawTexturePro(tilesheet, {1280, 448, 64, 64}, destRec, {SIZE / 2, SIZE / 2}, 0, LIGHTGRAY);
-
+    }
     DrawTexturePro(tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, WHITE); // Draw turret
 }
 
@@ -100,7 +114,7 @@ ClassicTurret::ClassicTurret()
 {
     damage = 10;
     price = 50;
-    updatePrice = price/2;
+    updatePrice = price / 2;
     attackSpeed = 2;
 }
 
@@ -108,7 +122,7 @@ SlowingTurret::SlowingTurret()
 {
     damage = 5;
     price = 150;
-    updatePrice = price/2;
+    updatePrice = price / 2;
     attackSpeed = 6;
     slowEffect = 0.5f;
 }
@@ -117,6 +131,6 @@ ExplosiveTurret::ExplosiveTurret()
 {
     damage = 20;
     price = 300;
-    updatePrice = price/2;
+    updatePrice = price / 2;
     attackSpeed = 1;
 }

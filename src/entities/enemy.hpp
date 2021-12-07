@@ -16,12 +16,12 @@ public:
     int maxHp;
     int prevTile;
     int timer;
+    int healTimer;
     float speed;
     int slowingTimer;
     float slowingCoef;
     Vector2 direction;
     int reward;
-    Color color; // TEMPORAIRE
 
     void UpdateAndDraw(Tilemap &map, int round,std::vector<Enemy *> &enemy);
     

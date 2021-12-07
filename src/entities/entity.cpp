@@ -6,20 +6,22 @@ Entity::Entity()
 {
     rotation = 0.0f;
     active = false;
-    posTile=0;
+    posTile = 0;
 }
 
-bool checkTile(int tile, std::vector<int > PrevTiles)
+bool checkTile(int tile, std::vector<int> PrevTiles)
 {
     for (int i : PrevTiles)
     {
         if (i == tile)
+        {
             return false;
+        }
     }
     return true;
 }
 
-void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, int PrevTile, Tile *c, std::vector<int > PrevTiles, Tile *d)
+void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, int PrevTile, Tile *c, std::vector<int> PrevTiles, Tile *d)
 {
     srand(time(0));
     int i = 0;
@@ -27,24 +29,37 @@ void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, int PrevT
     bool check = false;
     check = false;
     if (b != nullptr)
+    {
         i++;
+    }
     if (c != nullptr)
+    {
         i++;
+    }
     if (d != nullptr)
+    {
         i++;
+    }
     if (i == 0)
+    {
         random = 0;
+    }
     else
+    {
         random = (rand() % i) + 1;
+    }
     if (random < 2)
     {
         while (!check)
         {
             if (i == 0)
+            {
                 random = 0;
+            }
             else
-                random = (rand() % 2) ;
-    
+            {
+                random = (rand() % 2);
+            }
             switch (random)
             {
             case 0:
@@ -72,10 +87,13 @@ void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, int PrevT
         {
 
             if (i == 0)
+            {
                 random = 0;
+            }
             else
-                random = (rand() % i) ;
-               
+            {
+                random = (rand() % i);
+            }
             switch (random)
             {
             case 0:
@@ -151,7 +169,3 @@ void FrameTimer(int &timer)
         timer--;
     }
 }
-
-
-
-
