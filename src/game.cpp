@@ -1,7 +1,11 @@
 #include "game.hpp"
 
+#define FPS 60
+
 static bool pointSelected = false;
 static bool jackActive = false;
+static int spawnTimer = 600;
+static int maxEnemies = 10;
 
 Game::Game()
 {
@@ -60,7 +64,18 @@ void Game::EnemyDestroyedAnimation(Enemy *&e)
 {
 
     // ADD ANIMATION HERE
+}
 
+void Game::DrawTextWave()
+{
+    if (timer > 480)
+    {
+        DrawText(TextFormat("WAVE %i", round), 370, 350, 80, WHITE);
+    }
+    else
+    {
+        DrawText(TextFormat("WAVE %i", round), 370, 350, 80, ColorAlpha(WHITE, (timer - 420.0f) / (float)FPS));
+    }
 }
 
 void Game::Menu()
@@ -484,7 +499,11 @@ void Game::frontUI()
     if (timer == 0 && enemy.size() == 0 && Button(400, 700, 224, 50, "Ready", 0.3f, 3, GREEN))
     {
         round++;
-        timer = 600;
+        timer = spawnTimer;
+        if (round > 5)
+        {
+            maxEnemies += 2;
+        }
     }
 }
 
@@ -554,7 +573,7 @@ void Game::UpdateAndDraw()
                 }
             }
 
-            for (long unsigned int t = 0; t < enemy.size(); t++)
+            for (long unsigned int t = 0; t < enemy.size(); t++) // DESTROY ENEMY CONDITIONS
             {
                 if (enemy[t]->posTile == map.Despawn.mTilePos)
                 {
@@ -569,7 +588,7 @@ void Game::UpdateAndDraw()
                     enemy[t]->UpdateAndDraw(map, round, enemy);
                     if (enemy[t]->hp <= 0)
                     {
-                        enemy[t]->timer = 60;
+                        enemy[t]->timer = FPS;
                         enemy[t]->active = false;
                     }
                 }
@@ -588,29 +607,93 @@ void Game::UpdateAndDraw()
                 }
             }
 
-            if (round == 1 && timer != 0 && timer % 120 == 0) // TEST WAVE 1
+            if (timer > 420)
             {
-                enemy.push_back(new Warrior);
-                enemy.back()->sourceTexture = warriorEnemy;
+                DrawTextWave();
             }
 
-            else if (round == 2 && timer != 0 && timer % 60 == 0) // TEST WAVE 2
+            if (timer != 0 && round != 0) // WAVES
             {
-                enemy.push_back(new Warrior);
-                enemy.back()->sourceTexture = warriorEnemy;
-            }
-
-            else if (round == 3 && timer != 0 && timer % 60 == 0) // TEST WAVE 3
-            {
-                if (timer > 500)
-                {
-                    enemy.push_back(new Berserker);
-                    enemy.back()->sourceTexture = berserkerEnemy;
-                }
-                else
+                if (round == 1 && timer % (2 * FPS) == 0) // TEST WAVE 1
                 {
                     enemy.push_back(new Warrior);
                     enemy.back()->sourceTexture = warriorEnemy;
+                }
+
+                else if (round == 2 && timer % FPS == 0) // TEST WAVE 2
+                {
+                    enemy.push_back(new Warrior);
+                    enemy.back()->sourceTexture = warriorEnemy;
+                }
+
+                else if (round == 3 && timer % FPS == 0) // TEST WAVE 3
+                {
+                    if (timer >= spawnTimer - (2 * FPS))
+                    {
+                        enemy.push_back(new Berserker);
+                        enemy.back()->sourceTexture = berserkerEnemy;
+                    }
+                    else if (timer % 120 == 0)
+                    {
+                        enemy.push_back(new Warrior);
+                        enemy.back()->sourceTexture = warriorEnemy;
+                    }
+                }
+
+                else if (round == 4 && timer % 60 == 0) // TEST WAVE 4
+                {
+                    if (timer > spawnTimer - (5 * FPS))
+                    {
+                        enemy.push_back(new Berserker);
+                        enemy.back()->sourceTexture = berserkerEnemy;
+                    }
+                    else if (timer % 120 == 0)
+                    {
+                        enemy.push_back(new Warrior);
+                        enemy.back()->sourceTexture = warriorEnemy;
+                    }
+                }
+
+                else if (round == 5 && timer % FPS == 0) // TEST WAVE 5
+                {
+                    if (timer >= spawnTimer - (2 * FPS))
+                    {
+                        enemy.push_back(new Berserker);
+                        enemy.back()->sourceTexture = berserkerEnemy;
+                    }
+                    else if (timer > 60)
+                    {
+                        enemy.push_back(new Warrior);
+                        enemy.back()->sourceTexture = warriorEnemy;
+                    }
+                    else
+                    {
+                        enemy.push_back(new Healer);
+                        enemy.back()->sourceTexture = healerEnemy;
+                    }
+                }
+                else if (round > 5 && timer % (spawnTimer / maxEnemies) == 0)
+                {
+
+                    int random = rand() % 10;
+
+                    if (random < 3)
+                    {
+                        enemy.push_back(new Berserker);
+                        enemy.back()->sourceTexture = berserkerEnemy;
+                    }
+
+                    else if (random < 5)
+                    {
+                        enemy.push_back(new Healer);
+                        enemy.back()->sourceTexture = healerEnemy;
+                    }
+
+                    else
+                    {
+                        enemy.push_back(new Warrior);
+                        enemy.back()->sourceTexture = warriorEnemy;
+                    }
                 }
             }
 
