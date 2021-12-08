@@ -11,7 +11,6 @@ Enemy::Enemy()
 {
     radius = 10.0f;
     prevTile = 0;
-    timer = 0;
     healTimer = 0;
     slowingTimer = 0;
     slowingCoef = 1;
@@ -127,7 +126,7 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
         }
     }
 
-    Rectangle destRec{(int)pos.x, (int)pos.y, SIZE, SIZE};
+    Rectangle destRec{float((int)pos.x), float((int)pos.y), SIZE, SIZE};
     
 
     if (slowingTimer > 0)

@@ -5,7 +5,6 @@ Turret::Turret()
     range = 100.0f;
     target = -1;
     slowEffect = 1;
-    timer = 0;
     colorZone = DARKBLUE;
     showTurretUpgrade = false;
 }

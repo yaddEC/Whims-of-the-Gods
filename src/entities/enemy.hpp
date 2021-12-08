@@ -10,11 +10,9 @@ public:
     Enemy();
 
     int radius;
-    int damage;
     int hp;
     int maxHp;
     int prevTile;
-    int timer;
     int healTimer;
     float speed;
     int slowingTimer;

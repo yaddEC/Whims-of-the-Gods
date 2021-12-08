@@ -7,6 +7,7 @@ Entity::Entity()
     rotation = 0.0f;
     active = false;
     posTile = 0;
+    timer = 0;
 }
 
 

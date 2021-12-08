@@ -607,7 +607,7 @@ void Game::UpdateAndDraw()
                 }
             }
 
-            if (timer > 420)
+            if (timer > spawnTimer-(FPS*3))
             {
                 DrawTextWave();
             }
@@ -633,7 +633,7 @@ void Game::UpdateAndDraw()
                         enemy.push_back(new Berserker);
                         enemy.back()->sourceTexture = berserkerEnemy;
                     }
-                    else if (timer % 120 == 0)
+                    else if (timer % (2 * FPS) == 0)
                     {
                         enemy.push_back(new Warrior);
                         enemy.back()->sourceTexture = warriorEnemy;
@@ -647,7 +647,7 @@ void Game::UpdateAndDraw()
                         enemy.push_back(new Berserker);
                         enemy.back()->sourceTexture = berserkerEnemy;
                     }
-                    else if (timer % 120 == 0)
+                    else if (timer % (2 * FPS) == 0)
                     {
                         enemy.push_back(new Warrior);
                         enemy.back()->sourceTexture = warriorEnemy;
@@ -661,7 +661,7 @@ void Game::UpdateAndDraw()
                         enemy.push_back(new Berserker);
                         enemy.back()->sourceTexture = berserkerEnemy;
                     }
-                    else if (timer > 60)
+                    else if (timer > FPS)
                     {
                         enemy.push_back(new Warrior);
                         enemy.back()->sourceTexture = warriorEnemy;

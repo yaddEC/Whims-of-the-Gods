@@ -51,6 +51,8 @@ class Entity
     Entity();
     float rotation;
     Rectangle sourceTexture;
+    int damage;
+    int timer;
     bool active;
     int hp;
     Vector2 pos;
