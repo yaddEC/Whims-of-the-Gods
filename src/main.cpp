@@ -20,7 +20,7 @@ int main(void)
 
         if (game.start) // if button start is pressed
         {
-            if (!IsSoundPlaying(game.gameSounds.secondTheme))
+            if (!IsSoundPlaying(game.gameSounds.secondTheme) && game.hp>0)
             {
                 PlaySound(game.gameSounds.secondTheme);
             }

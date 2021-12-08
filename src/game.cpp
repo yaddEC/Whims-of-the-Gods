@@ -516,10 +516,6 @@ void Game::UpdateAndDraw()
     {
         if (!pause)
         {
-            if (hp <= 0)
-            {
-                gameOver = true;
-            }
             backUI();
 
             if (turret.size() > 0 && !turret.back()->active)
@@ -712,6 +708,13 @@ void Game::UpdateAndDraw()
             FrameTimer(timer);
 
             frontUI();
+
+            if (hp <= 0)
+            {
+                StopSound(gameSounds.secondTheme);
+                PlaySound(gameSounds.gameOver);
+                gameOver = true;
+            }
         }
         else
         {
@@ -736,7 +739,7 @@ void Game::UpdateAndDraw()
         DrawText(TextFormat("WAVE %i", round), 550, 200, 40, LIGHTGRAY);
         if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY, gameSounds.button))
         {
-
+            StopSound(gameSounds.gameOver);
             this->~Game();
             new (this) Game();
             pause = false;

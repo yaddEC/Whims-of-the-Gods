@@ -7,6 +7,7 @@ public:
     Sound secondTheme;
     Sound button;
     Sound sellTurret;
+    Sound gameOver;
     GameSounds();
     ~GameSounds();
 };

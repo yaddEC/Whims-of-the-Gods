@@ -13,11 +13,17 @@ GameSounds::GameSounds()
 
     sellTurret = LoadSound("assets/sellSound.ogg"); 
     SetSoundVolume(sellTurret, 0.5);
+
+    gameOver = LoadSound("assets/gameOverTheme.wav"); 
+    SetSoundVolume(gameOver, 0.5);
 }
 GameSounds::~GameSounds()
 {
     UnloadSound(mainTheme);
     UnloadSound(secondTheme);
+    UnloadSound(button);
+    UnloadSound(sellTurret);
+    UnloadSound(gameOver);
 }
 
 
@@ -35,6 +41,7 @@ TurretSounds::TurretSounds()
 TurretSounds::~TurretSounds()
 {
     UnloadSound(classic);
+    UnloadSound(slowing);
     UnloadSound(explosion);
 }
 
