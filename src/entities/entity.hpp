@@ -4,6 +4,7 @@
 #include <vector>
 #include <cmath>
 #include <mathematics.hpp>
+#include "../sounds.hpp"
 
 class Tile
 {

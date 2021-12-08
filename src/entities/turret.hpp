@@ -9,7 +9,13 @@ bool InRec(Rectangle rec);
 class Turret : public Entity
 {
 public:
-    int id;
+    enum Type
+    {
+        CLASSIC=1,
+        SLOWING,
+        EXPLOSIVE
+    };
+    Type id;
     float range;
     int target;
     int price;
@@ -20,7 +26,7 @@ public:
     bool showTurretUpgrade;
     Color colorZone;
 
-    void UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos);
+    void UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, TurretSounds &turretSounds);
 
     Turret();
 

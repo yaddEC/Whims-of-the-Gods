@@ -36,7 +36,7 @@ Game::Game()
     berserkerEnemy = {map.texture[246].mPos.x, map.texture[246].mPos.y, SIZE, SIZE};
 }
 
-bool Button(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color)
+bool Button(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color, Sound &sound)
 {
     bool res = false;
 
@@ -48,7 +48,7 @@ bool Button(int x, int y, float width, float height, const char *name, float nam
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
-
+            PlaySound(sound);
             res = true;
             DrawRectangle(x, y, width, height, RED);
         }
@@ -80,11 +80,13 @@ void Game::DrawTextWave()
 
 void Game::Menu()
 {
-    if (Button(440, 200, 400, 100, "START", 0.35f, 3, GRAY))
+    if (Button(440, 200, 400, 100, "START", 0.35f, 3, GRAY, gameSounds.button))
     {
+
+        StopSound(gameSounds.mainTheme);
         start = true;
     }
-    if (Button(440, 400, 400, 100, "QUIT", 0.35f, 3, GRAY))
+    if (Button(440, 400, 400, 100, "QUIT", 0.35f, 3, GRAY, gameSounds.button))
     {
         quit = true;
     }
@@ -312,7 +314,6 @@ void Game::backUI()
             pointSelected = true;
             turret.push_back(new ClassicTurret);
             turret.back()->sourceTexture = classicTurret;
-            turret.back()->id = 1;
         }
     }
 
@@ -341,7 +342,6 @@ void Game::backUI()
             pointSelected = true;
             turret.push_back(new SlowingTurret);
             turret.back()->sourceTexture = slowingTurret;
-            turret.back()->id = 2;
         }
     }
 
@@ -370,7 +370,6 @@ void Game::backUI()
             pointSelected = true;
             turret.push_back(new ExplosiveTurret);
             turret.back()->sourceTexture = explosiveTurret;
-            turret.back()->id = 3;
         }
     }
 
@@ -403,6 +402,7 @@ void Game::backUI()
 
             if (GetTile(GetMousePosition()) == GetTile(t->pos))
             {
+                PlaySound(gameSounds.sellTurret);
                 money += t->price / 2;
                 delete t;
                 turret.erase(turret.begin() + a);
@@ -468,6 +468,7 @@ void Game::backUI()
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) // Pause the game
         {
+            PlaySound(gameSounds.button);
             pause = true;
         }
     }
@@ -496,7 +497,7 @@ void Game::frontUI()
     DrawRectangleLines(1040, 720, 225, 30, WHITE);
     DrawText(TextFormat("%i / %i", hp, maxHp), 1050, 727, GetFontDefault().baseSize * 2, WHITE);
 
-    if (timer == 0 && enemy.size() == 0 && Button(400, 700, 224, 50, "Ready", 0.3f, 3, GREEN))
+    if (timer == 0 && enemy.size() == 0 && Button(400, 700, 224, 50, "Ready", 0.3f, 3, GREEN, gameSounds.button))
     {
         round++;
         timer = spawnTimer;
@@ -528,7 +529,7 @@ void Game::UpdateAndDraw()
             for (Turret *t : turret)
 
             {
-                t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->id + 295].mPos);
+                t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->id + 295].mPos, turretSounds);
 
                 if (t->showTurretUpgrade) // Draw upgrade button
                 {
@@ -545,7 +546,7 @@ void Game::UpdateAndDraw()
                             DrawRectangle(t->pos.x - 70, t->pos.y - 20, 140, 30, GRAY);
                             DrawText("Upgrade", t->pos.x - 63, t->pos.y - 13, GetFontDefault().baseSize * 1.7, WHITE);
                         }
-                        else if (Button(t->pos.x - 70, t->pos.y - 20, 140, 30, "Upgrade", 0.05, 1.7, buttonColor)) // enough money Button
+                        else if (Button(t->pos.x - 70, t->pos.y - 20, 140, 30, "Upgrade", 0.05, 1.7, buttonColor, gameSounds.button)) // enough money Button
                         {
                             money -= t->updatePrice;
                             t->range += 20;
@@ -715,11 +716,11 @@ void Game::UpdateAndDraw()
         else
         {
             DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 0.3));
-            if (Button(440, 200, 400, 100, "RESUME", 0.35f, 3, GRAY))
+            if (Button(440, 200, 400, 100, "RESUME", 0.35f, 3, GRAY, gameSounds.button))
             {
                 pause = false;
             }
-            if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY))
+            if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY, gameSounds.button))
             {
 
                 this->~Game();
@@ -733,7 +734,7 @@ void Game::UpdateAndDraw()
     {
         DrawRectangleGradientV(0, 0, 1280, 1500, BLACK, MAROON);
         DrawText(TextFormat("WAVE %i", round), 550, 200, 40, LIGHTGRAY);
-        if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY))
+        if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY, gameSounds.button))
         {
 
             this->~Game();

@@ -31,6 +31,9 @@ public:
     Tile Spawn;
     Tile Despawn;
     Tilemap map;
+    GameSounds gameSounds;
+    TurretSounds turretSounds;
+    EnemySounds enemySounds;
     std::vector<Turret *> turret;
     std::vector<Enemy *> enemy;
     Game();
@@ -49,4 +52,4 @@ bool InRec(int x, int y, float width, float height);
 
 bool InRec(Rectangle rec);
 
-bool Button(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color);
+bool Button(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color, Sound &sound);

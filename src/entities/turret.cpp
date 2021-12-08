@@ -9,12 +9,12 @@ Turret::Turret()
     showTurretUpgrade = false;
 }
 
-void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos)
+void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, TurretSounds &turretSounds)
 {
     if (active) //if the turret is active
     {
         FrameTimer(timer);
-        if (id == 3 && timer > 0)
+        if (id == EXPLOSIVE && timer > 0)
         {
             DrawCircleV(explosionPos, 50.0f, ColorAlpha(RED, 0.25f / 30.f * (timer - 30.0f)));
             DrawCircleV(explosionPos, 20.0f, ColorAlpha(ORANGE, 0.3f / 30.f * (timer - 30.0f)));
@@ -65,13 +65,19 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
                 timer = 60 / attackSpeed;
                 enemy[target]->hp -= damage;
                 enemy[target]->timer = 5;
-                if (id == 2)
+                if (id == CLASSIC)
                 {
+                    PlaySound(turretSounds.classic);
+                }
+                if (id == SLOWING)
+                {
+                    PlaySound(turretSounds.slowing);
                     enemy[target]->slowingTimer = 30;
                     enemy[target]->slowingCoef = slowEffect;
                 }
-                else if (id == 3)
+                else if (id == EXPLOSIVE)
                 {
+                    PlaySound(turretSounds.explosion);
                     for (Enemy *e : enemy)
                     {
                         if (e != enemy[target] && e->active && collCirclex2(enemy[target]->pos, 50.0f, e->pos, e->radius))
@@ -110,6 +116,7 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
 
 ClassicTurret::ClassicTurret()
 {
+    id = CLASSIC;
     damage = 10;
     price = 50;
     updatePrice = price / 2;
@@ -118,6 +125,7 @@ ClassicTurret::ClassicTurret()
 
 SlowingTurret::SlowingTurret()
 {
+    id = SLOWING;
     damage = 5;
     price = 150;
     updatePrice = price / 2;
@@ -127,6 +135,7 @@ SlowingTurret::SlowingTurret()
 
 ExplosiveTurret::ExplosiveTurret()
 {
+    id = EXPLOSIVE;
     damage = 20;
     price = 300;
     updatePrice = price / 2;
