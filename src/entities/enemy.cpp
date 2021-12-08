@@ -15,7 +15,7 @@ Enemy::Enemy()
     healTimer = 0;
     slowingTimer = 0;
     slowingCoef = 1;
-    active=true;
+    active = true;
 
     pos.x = Spawn.x + 32;
     pos.y = Spawn.y + 32;
@@ -414,7 +414,7 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
             bool selfHeal = true;
             for (Enemy *t : enemy)
             {
-                if (t != this && t->active && t->hp<t->maxHp && collCirclex2(t->pos, 50.0f, pos, radius))
+                if (t != this && t->active && t->hp < t->maxHp && collCirclex2(t->pos, 50.0f, pos, radius))
                 {
                     speed = 0.7f;
                     t->hp += 10;
@@ -439,11 +439,7 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
     }
 
     Rectangle destRec{pos.x, pos.y, SIZE, SIZE};
-    rotation = -atan((direction.y) / (direction.x)) * RAD2DEG;
-    if (pos.y + direction.y)
-    {
-        rotation = -rotation;
-    }
+    rotation = atan(direction.y / direction.x) * RAD2DEG;
 
     if (slowingTimer > 0)
     {
@@ -454,7 +450,7 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
         DrawTexturePro(map.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, WHITE);
     }
 
-    if(timer > 0)
+    if (timer > 0)
     {
         DrawTexturePro(map.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, ColorAlpha(RED, 0.5));
     }

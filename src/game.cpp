@@ -732,6 +732,7 @@ void Game::UpdateAndDraw()
     else
     {
         DrawRectangleGradientV(0, 0, 1280, 1500, BLACK, MAROON);
+        DrawText(TextFormat("WAVE %i", round), 550, 200, 40, LIGHTGRAY);
         if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY))
         {
 
