@@ -22,7 +22,9 @@ Enemy::Enemy()
 }
 
 void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
-{
+{  
+    float rot;
+    Vector2 dirmem;
 
     if (posTile != GetTile(pos))
     {
@@ -30,363 +32,51 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
         posTile = GetTile(pos);
     }
 
-    if (map.tile[posTile].value == '>')
+    if ((map.tile[posTile].value == '>') || ((map.tile[posTile].value == 'L' && round < 20) && (round % 2 == 1)))
     {
-        RandDirChooser(direction, pos, &map.tile[posTile + 1]);
+        dirmem={1,0};
+        rot=0;
     }
+    else if ((map.tile[posTile].value == 'V') || ((map.tile[posTile].value == 'L' && round < 20) && (round % 2 == 0)))
+    {
+        dirmem={0,1};
+        rot=90;
+    }
+
     else if (map.tile[posTile].value == '<')
     {
-        RandDirChooser(direction, pos, &map.tile[posTile - 1]);
+        dirmem={-1,0};
+         rot=180;
     }
-    else if (map.tile[posTile].value == 'T' && round < 20)
-    {
-        if (round % 2 == 1)
-        {
-            RandDirChooser(direction, pos, &map.tile[posTile + 1]);
-        }
-        else
-        {
-            RandDirChooser(direction, pos, &map.tile[posTile - 1]);
-        }
-    }
-    else if (map.tile[posTile].value == 'L' && round < 20)
-    {
-        if (round % 2 == 1)
-        {
-            RandDirChooser(direction, pos, &map.tile[posTile + 1]);
-        }
-        else
-        {
-            RandDirChooser(direction, pos, &map.tile[posTile + 16]);
-        }
-    }
-    else if (map.tile[posTile].value == 'V')
-    {
-        RandDirChooser(direction, pos, &map.tile[posTile + 16]);
-    }
+
     else if (map.tile[posTile].value == 'A')
     {
-        RandDirChooser(direction, pos, &map.tile[posTile - 16]);
+        dirmem={0,-1};
+        rot=-90;
     }
     else
     {
+        
+                Tile nullTile = {};
+        nullTile.Init(999, 64, 'g');
+        Tile *leftTile = (map.tile[posTile - 1].road == true && posTile % map.width != 0) ? &map.tile[posTile - 1] : &nullTile;
+        Tile *rightTile= (map.tile[posTile + 1].road == true && (posTile % map.width) != 15) ? &map.tile[posTile + 1] : &nullTile;
+        Tile *forwardTile= (map.tile[posTile + map.width].road == true && posTile < 176) ? &map.tile[posTile + map.width] : &nullTile;
+        Tile *backwardTile= (map.tile[posTile - map.width].road == true && posTile > map.width) ? &map.tile[posTile - map.width] : &nullTile;
 
-        if (posTile > 16) // if not the first line we can do -16
+      
+        
+          
+        
+        if (static_cast<int>(pos.x) % 64 >= 30 && static_cast<int>(pos.x) % 64 <= 33 && static_cast<int>(pos.y) % 64 >= 30 && static_cast<int>(pos.y) % 64 <= 33)
         {
-            if (posTile < 176) // if not last line we can do +16
-            {
-                if (posTile % 16 == 0) // if first of line we cant do -1
-                {
-                    if (map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true && map.tile[posTile - 16].road == true)
-                    {
-                        PrevTiles.push_back(prevTile);
-
-                        RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile + 16], prevTile, &map.tile[posTile - 16], PrevTiles);
-                    }
-                    else
-                    {
-                        if (map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true)
-                        {
-                            RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile + 16], prevTile);
-                        }
-                        else if (map.tile[posTile + 1].road == true && map.tile[posTile - 16].road == true)
-                        {
-                            RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile - 16], prevTile);
-                        }
-                        else if (map.tile[posTile + 16].road == true && map.tile[posTile - 16].road == true)
-                        {
-                            RandDirChooser(direction, pos, &map.tile[posTile + 16], &map.tile[posTile - 16], prevTile);
-                        }
-                        else
-                        {
-                            if (map.tile[posTile + 1].road == true)
-                            {
-                                RandDirChooser(direction, pos, &map.tile[posTile + 1]);
-                            }
-                            else if (map.tile[posTile + 16].road == true)
-                            {
-                                RandDirChooser(direction, pos, &map.tile[posTile + 16]);
-                            }
-                            else if (map.tile[posTile - 16].road == true)
-                            {
-                                RandDirChooser(direction, pos, &map.tile[posTile - 16]);
-                            }
-                        }
-                    }
-                }
-                else if ((posTile % 16) + 15 == 15) //if last of line we cant do +1
-                {
-
-                    if (map.tile[posTile - 1].road == true && map.tile[posTile + 16].road == true && map.tile[posTile - 16].road == true)
-                    {
-                        PrevTiles.push_back(prevTile);
-                        RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 16], prevTile, &map.tile[posTile - 16], PrevTiles);
-                    }
-                    else
-                    {
-                        if (map.tile[posTile - 1].road == true && map.tile[posTile + 16].road == true)
-                        {
-                            RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 16], prevTile);
-                        }
-                        else if (map.tile[posTile - 1].road == true && map.tile[posTile - 16].road == true)
-                        {
-                            RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile - 16], prevTile);
-                        }
-                        else if (map.tile[posTile + 16].road == true && map.tile[posTile - 16].road == true)
-                        {
-                            RandDirChooser(direction, pos, &map.tile[posTile + 16], &map.tile[posTile - 16], prevTile);
-                        }
-                        else
-                        {
-                            if (map.tile[posTile - 1].road == true)
-                            {
-                                RandDirChooser(direction, pos, &map.tile[posTile - 1]);
-                            }
-                            else if (map.tile[posTile + 16].road == true)
-                            {
-                                RandDirChooser(direction, pos, &map.tile[posTile + 16]);
-                            }
-                            else if (map.tile[posTile - 16].road == true)
-                            {
-                                RandDirChooser(direction, pos, &map.tile[posTile - 16]);
-                            }
-                        }
-                    }
-                }
-                else // if neither of those we can do +1 / -1
-                {
-                    if (map.tile[posTile - 1].road == true && map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true && map.tile[posTile - 16].road == true)
-                    {
-                        PrevTiles.push_back(prevTile);
-                        RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile, &map.tile[posTile + 16], PrevTiles, &map.tile[posTile + 16]);
-                    }
-                    else
-                    {
-                        if (map.tile[posTile - 1].road == true && map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true)
-                        {
-                            PrevTiles.push_back(prevTile);
-                            RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile, &map.tile[posTile + 16], PrevTiles);
-                        }
-                        else if (map.tile[posTile - 1].road == true && map.tile[posTile + 1].road == true && map.tile[posTile - 16].road == true)
-                        {
-                            PrevTiles.push_back(prevTile);
-                            RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile, &map.tile[posTile - 16], PrevTiles);
-                        }
-                        else if (map.tile[posTile - 1].road == true && map.tile[posTile + 16].road == true && map.tile[posTile - 16].road == true)
-                        {
-                            PrevTiles.push_back(prevTile);
-                            RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 16], prevTile, &map.tile[posTile - 16], PrevTiles);
-                        }
-                        else if (map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true && map.tile[posTile - 16].road == true)
-                        {
-                            PrevTiles.push_back(prevTile);
-                            RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile + 16], prevTile, &map.tile[posTile - 16], PrevTiles);
-                        }
-                        else
-                        {
-                            if (map.tile[posTile - 1].road == true && map.tile[posTile + 1].road == true)
-                            {
-                                RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile);
-                            }
-                            else if (map.tile[posTile - 1].road == true && map.tile[posTile + 16].road == true)
-                            {
-                                RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 16], prevTile);
-                            }
-                            else if (map.tile[posTile - 1].road == true && map.tile[posTile - 16].road == true)
-                            {
-                                RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile - 16], prevTile);
-                            }
-                            else if (map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true)
-                            {
-                                RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile + 16], prevTile);
-                            }
-                            else if (map.tile[posTile + 1].road == true && map.tile[posTile - 16].road == true)
-                            {
-                                RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile - 16], prevTile);
-                            }
-                            else if (map.tile[posTile + 16].road == true && map.tile[posTile - 16].road == true)
-                            {
-                                RandDirChooser(direction, pos, &map.tile[posTile + 16], &map.tile[posTile - 16], prevTile);
-                            }
-                            else
-                            {
-                                if (map.tile[posTile + 1].road == true)
-                                {
-                                    RandDirChooser(direction, pos, &map.tile[posTile + 1]);
-                                }
-                                else if (map.tile[posTile - 1].road == true)
-                                {
-                                    RandDirChooser(direction, pos, &map.tile[posTile - 1]);
-                                }
-                                else if (map.tile[posTile + 16].road == true)
-                                {
-                                    RandDirChooser(direction, pos, &map.tile[posTile + 16]);
-                                }
-                                else if (map.tile[posTile - 16].road == true)
-                                {
-                                    RandDirChooser(direction, pos, &map.tile[posTile - 16]);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            else // if last line cant do +16
-            {
-                if (posTile % 16 == 0) // if first of line we cant do -1
-                {
-                    if (map.tile[posTile + 1].road == true && map.tile[posTile - 16].road == true)
-                    {
-                        RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile - 16], prevTile);
-                    }
-                    else
-                    {
-                        if (map.tile[posTile + 1].road == true)
-                        {
-                            RandDirChooser(direction, pos, &map.tile[posTile + 1]);
-                        }
-                        else if (map.tile[posTile - 16].road == true)
-                        {
-                            RandDirChooser(direction, pos, &map.tile[posTile - 16]);
-                        }
-                    }
-                }
-                else if ((posTile % 16) + 15 == 15) //if last of line we cant do +1
-                {
-
-                    if (map.tile[posTile - 1].road == true && map.tile[posTile - 16].road == true)
-                    {
-                        RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile - 16], prevTile);
-                    }
-                    else
-                    {
-                        if (map.tile[posTile - 1].road == true)
-                        {
-                            RandDirChooser(direction, pos, &map.tile[posTile - 1]);
-                        }
-                        else if (map.tile[posTile - 16].road == true)
-                        {
-                            RandDirChooser(direction, pos, &map.tile[posTile - 16]);
-                        }
-                    }
-                }
-                else // if neither of those we can do +1 / -1
-                {
-                    if (map.tile[posTile - 1].road == true && map.tile[posTile + 1].road == true && map.tile[posTile - 16].road == true)
-                    {
-                        PrevTiles.push_back(prevTile);
-                        RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile, &map.tile[posTile - 16], PrevTiles);
-                    }
-                    else
-                    {
-                        if (map.tile[posTile - 1].road == true && map.tile[posTile + 1].road == true)
-                        {
-                            RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile);
-                        }
-                        else if (map.tile[posTile - 1].road == true && map.tile[posTile - 16].road == true)
-                        {
-                            RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile - 16], prevTile);
-                        }
-                        else if (map.tile[posTile + 1].road == true && map.tile[posTile - 16].road == true)
-                        {
-                            RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile - 16], prevTile);
-                        }
-                        else
-                        {
-                            if (map.tile[posTile + 1].road == true)
-                            {
-                                RandDirChooser(direction, pos, &map.tile[posTile + 1]);
-                            }
-                            else if (map.tile[posTile - 1].road == true)
-                            {
-                                RandDirChooser(direction, pos, &map.tile[posTile - 1]);
-                            }
-                            else if (map.tile[posTile - 16].road == true)
-                            {
-                                RandDirChooser(direction, pos, &map.tile[posTile - 16]);
-                            }
-                        }
-                    }
-                }
-            }
+            RandDirChooser(dirmem, pos, leftTile, rightTile, forwardTile, backwardTile, prevTile,rot);
         }
-        else // if first line cant do -16
-        {
-            if (posTile % 16 == 0) // if first of line we cant do -1
-            {
-                if (map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true)
-                {
-                    RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile + 16], prevTile);
-                }
-                else
-                {
-                    if (map.tile[posTile + 1].road == true)
-                    {
-                        RandDirChooser(direction, pos, &map.tile[posTile + 1]);
-                    }
-                    else if (map.tile[posTile + 16].road == true)
-                    {
-                        RandDirChooser(direction, pos, &map.tile[posTile + 16]);
-                    }
-                }
-            }
-            else if ((posTile % 16) + 15 == 15) //if last of line we cant do +1
-            {
-                if (map.tile[posTile - 1].road == true && map.tile[posTile + 16].road == true)
-                {
-                    RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 16], prevTile);
-                }
-                else
-                {
-                    if (map.tile[posTile - 1].road == true)
-                    {
-                        RandDirChooser(direction, pos, &map.tile[posTile - 1]);
-                    }
-                    else if (map.tile[posTile + 16].road == true)
-                    {
-                        RandDirChooser(direction, pos, &map.tile[posTile + 16]);
-                    }
-                }
-            }
-            else // if neither of those we can do +1 / -1
-            {
-                if (map.tile[posTile - 1].road == true && map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true)
-                {
-                    PrevTiles.push_back(prevTile);
-                    RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile, &map.tile[posTile + 16], PrevTiles);
-                }
-                else
-                {
-                    if (map.tile[posTile - 1].road == true && map.tile[posTile + 1].road == true)
-                    {
-                        RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 1], prevTile);
-                    }
-                    else if (map.tile[posTile - 1].road == true && map.tile[posTile + 16].road == true)
-                    {
-                        RandDirChooser(direction, pos, &map.tile[posTile - 1], &map.tile[posTile + 16], prevTile);
-                    }
-                    else if (map.tile[posTile + 1].road == true && map.tile[posTile + 16].road == true)
-                    {
-                        RandDirChooser(direction, pos, &map.tile[posTile + 1], &map.tile[posTile + 16], prevTile);
-                    }
-                    else
-                    {
-                        if (map.tile[posTile + 1].road == true)
-                        {
-                            RandDirChooser(direction, pos, &map.tile[posTile + 1]);
-                        }
-                        else if (map.tile[posTile - 1].road == true)
-                        {
-                            RandDirChooser(direction, pos, &map.tile[posTile - 1]);
-                        }
-                        else if (map.tile[posTile - 16].road == true)
-                        {
-                            RandDirChooser(direction, pos, &map.tile[posTile - 16]);
-                        }
-                    }
-                }
-            }
-        }
+    }
+    if (static_cast<int>(pos.x) % 64 >= 30 && static_cast<int>(pos.x) % 64 <= 33 && static_cast<int>(pos.y) % 64 >= 30 && static_cast<int>(pos.y) % 64 <= 33)
+    {
+        direction = dirmem;
+        rotation = rot;
     }
 
     FrameTimer(slowingTimer);
@@ -402,7 +92,6 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
 
     if (maxHp == 30)
     {
-
         if (healTimer > 30)
         {
             DrawCircleLines(pos.x, pos.y, 50.0f, ColorAlpha(YELLOW, 0.5f / 30.f * (healTimer - 30.0f)));
@@ -439,7 +128,7 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
     }
 
     Rectangle destRec{pos.x, pos.y, SIZE, SIZE};
-    rotation = atan(direction.y / direction.x) * RAD2DEG;
+    
 
     if (slowingTimer > 0)
     {
@@ -461,7 +150,6 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
 
 Enemy::~Enemy()
 {
-    PrevTiles.clear();
 }
 
 Warrior::Warrior()

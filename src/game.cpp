@@ -126,10 +126,10 @@ Tile::~Tile()
 
 Tilemap::Tilemap()
 {
-    mHeight = 12;
-    mWidth = 16;
+    height = 12;
+    width = 16;
 
-    total = mHeight * mWidth;
+    total = height * width;
     tile = new Tile[total];
     tilesheet = LoadTexture("assets/towerDefense_tilesheet.png");
 
@@ -159,7 +159,7 @@ void Tilemap::Init()
 {
     for (int i = 0; i < total; i++)
     {
-        tile[i].Init(i, mWidth, plan[i]);
+        tile[i].Init(i, width, plan[i]);
     }
     Spawn = tile[0];
     Despawn = tile[191];
@@ -588,6 +588,7 @@ void Game::UpdateAndDraw()
                     enemy[t]->UpdateAndDraw(map, round, enemy);
                     if (enemy[t]->hp <= 0)
                     {
+                        money += enemy[t]->reward;
                         enemy[t]->timer = FPS;
                         enemy[t]->active = false;
                     }
@@ -599,7 +600,6 @@ void Game::UpdateAndDraw()
                 }
                 else
                 {
-                    money += enemy[t]->reward;
                     Enemy *tmp = enemy[t];
                     enemy.erase(enemy.begin() + t);
                     delete tmp;

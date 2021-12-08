@@ -28,11 +28,12 @@ class Tilemap
 {
 private:
     const char *plan;
-    int mHeight;
-    int mWidth;
+    int height;
+   
     int total;
 
 public:
+    int width;
     Tile *tile;
     Texture2D tilesheet;
     Tile texture[368];

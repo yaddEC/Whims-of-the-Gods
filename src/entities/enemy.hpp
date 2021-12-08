@@ -1,8 +1,8 @@
 #pragma once
 #include "entity.hpp"
-bool checkTile(int tile, std::vector<int *> PrevTiles);
 
-void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b = nullptr, int PrevTile = 999, Tile *c = nullptr, std::vector<int > PrevTiles = {}, Tile *d = nullptr);
+
+void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, Tile *c, Tile *d, int PrevTile,float &rotation);
 
 class Enemy : public Entity
 {
@@ -11,7 +11,6 @@ public:
 
     int radius;
     int damage;
-    std::vector<int > PrevTiles;
     int hp;
     int maxHp;
     int prevTile;
@@ -21,7 +20,9 @@ public:
     int slowingTimer;
     float slowingCoef;
     Vector2 direction;
+    int looking;
     int reward;
+    Color color;
 
     void UpdateAndDraw(Tilemap &map, int round,std::vector<Enemy *> &enemy);
     

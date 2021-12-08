@@ -9,126 +9,80 @@ Entity::Entity()
     posTile = 0;
 }
 
-bool checkTile(int tile, std::vector<int> PrevTiles)
-{
-    for (int i : PrevTiles)
-    {
-        if (i == tile)
-        {
-            return false;
-        }
-    }
-    return true;
-}
 
-void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, int PrevTile, Tile *c, std::vector<int> PrevTiles, Tile *d)
+void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, Tile *c, Tile *d, int PrevTile,float &rotation)
 {
     srand(time(0));
     int i = 0;
     int random;
     bool check = false;
     check = false;
-    if (b != nullptr)
+    if (a->value != 'g')
     {
         i++;
     }
-    if (c != nullptr)
-    {
-        i++;
-    }
-    if (d != nullptr)
-    {
-        i++;
-    }
-    if (i == 0)
-    {
-        random = 0;
-    }
-    else
-    {
-        random = (rand() % i) + 1;
-    }
-    if (random < 2)
-    {
-        while (!check)
-        {
-            if (i == 0)
-            {
-                random = 0;
-            }
-            else
-            {
-                random = (rand() % 2);
-            }
-            switch (random)
-            {
-            case 0:
-                if (PrevTile != a->mTilePos)
-                {
-                    DirGet(pos, a->mPos, direction);
-                    check = true;
-                }
-                break;
-            case 1:
-                if (PrevTile != b->mTilePos)
-                {
-                    DirGet(pos, b->mPos, direction);
-                    check = true;
-                }
-                break;
-            default:
-                break;
-            }
-        }
-    }
-    else
-    {
-        while (!check)
-        {
 
-            if (i == 0)
-            {
-                random = 0;
-            }
-            else
-            {
-                random = (rand() % i);
-            }
+    if (b->value != 'g')
+    {
+        i++;
+    }
+    if (c->value != 'g')
+    {
+        i++;
+    }
+    if (d->value != 'g')
+    {
+        i++;
+    }
+    
+    
+        random = rand()%4;
+    
+    
+        while (!check)
+        {
+                random = rand()%4;
+
             switch (random)
             {
             case 0:
-                if (checkTile(a->mTilePos, PrevTiles) && PrevTile != a->mTilePos)
+            
+                if ( PrevTile != a->mTilePos &&  a->value!='g')
                 {
-                    DirGet(pos, a->mPos, direction);
+                    direction={-1,0};
                     check = true;
+                    rotation=180;
                 }
                 break;
             case 1:
-                if (checkTile(b->mTilePos, PrevTiles) && PrevTile != b->mTilePos)
+                if ( PrevTile != b->mTilePos &&  b->value!='g')
                 {
-                    DirGet(pos, b->mPos, direction);
+                    direction={1,0};
                     check = true;
+                    rotation=0;
                 }
                 break;
             case 2:
-                if (checkTile(c->mTilePos, PrevTiles) && PrevTile != c->mTilePos)
+                if ( PrevTile != c->mTilePos &&  c->value!='g')
                 {
-                    DirGet(pos, c->mPos, direction);
+                    direction={0,1};
                     check = true;
+                    rotation=90;
                 }
                 break;
             case 3:
-                if (checkTile(d->mTilePos, PrevTiles) && PrevTile != d->mTilePos)
+                if ( PrevTile != d->mTilePos &&  d->value!='g')
                 {
-                    DirGet(pos, d->mPos, direction);
+                    direction={0,-1};
                     check = true;
+                    rotation=-90;
                 }
                 break;
             default:
                 break;
             }
         }
-    }
+    
 }
 
 bool InRec(int x, int y, float width, float height)
