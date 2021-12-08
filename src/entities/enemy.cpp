@@ -127,7 +127,7 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
         }
     }
 
-    Rectangle destRec{pos.x, pos.y, SIZE, SIZE};
+    Rectangle destRec{(int)pos.x, (int)pos.y, SIZE, SIZE};
     
 
     if (slowingTimer > 0)
