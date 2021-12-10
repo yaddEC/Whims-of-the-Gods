@@ -26,7 +26,7 @@ public:
     bool showTurretUpgrade;
     Color colorZone;
 
-    void UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, TurretSounds &turretSounds);
+    void UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, TurretSounds &turretSounds, bool soundEffect);
 
     Turret();
 

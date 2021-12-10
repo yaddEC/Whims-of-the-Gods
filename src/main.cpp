@@ -16,11 +16,22 @@ int main(void)
     while (!WindowShouldClose() && !game.quit)
     {
         BeginDrawing();
-        ClearBackground(RAYWHITE);
+        ClearBackground(BEIGE);
+
+        if (game.music)  // activate/desactivate music
+        {
+            SetSoundVolume(game.gameSounds.mainTheme, 0.5f);
+            SetSoundVolume(game.gameSounds.secondTheme, 0.5f);
+        }
+        else
+        {
+            SetSoundVolume(game.gameSounds.mainTheme, 0);
+            SetSoundVolume(game.gameSounds.secondTheme, 0);
+        }
 
         if (game.start) // if button start is pressed
         {
-            if (!IsSoundPlaying(game.gameSounds.secondTheme) && game.hp>0)
+            if (!IsSoundPlaying(game.gameSounds.secondTheme) && game.hp > 0)
             {
                 PlaySound(game.gameSounds.secondTheme);
             }

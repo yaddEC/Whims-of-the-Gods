@@ -3,19 +3,14 @@
 GameSounds::GameSounds()
 {
     mainTheme = LoadSound("assets/mainTheme.mp3"); 
-    SetSoundVolume(mainTheme, 0.5);
 
     secondTheme = LoadSound("assets/secondTheme.mp3"); 
-    SetSoundVolume(secondTheme, 0.5);
 
     button = LoadSound("assets/buttonSound.wav"); 
-    SetSoundVolume(button, 0.5);
 
     sellTurret = LoadSound("assets/sellSound.ogg"); 
-    SetSoundVolume(sellTurret, 0.5);
 
     gameOver = LoadSound("assets/gameOverTheme.wav"); 
-    SetSoundVolume(gameOver, 0.5);
 }
 GameSounds::~GameSounds()
 {

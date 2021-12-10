@@ -9,7 +9,7 @@ Turret::Turret()
     showTurretUpgrade = false;
 }
 
-void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, TurretSounds &turretSounds)
+void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, TurretSounds &turretSounds, bool soundEffect)
 {
     if (active) //if the turret is active
     {
@@ -65,19 +65,25 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
                 timer = 60 / attackSpeed;
                 enemy[target]->hp -= damage;
                 enemy[target]->timer = 5;
-                if (id == CLASSIC)
+                if (id == CLASSIC && soundEffect)
                 {
                     PlaySound(turretSounds.classic);
                 }
                 if (id == SLOWING)
                 {
-                    PlaySound(turretSounds.slowing);
+                    if(soundEffect)
+                    {
+                        PlaySound(turretSounds.slowing);
+                    }
                     enemy[target]->slowingTimer = 30;
                     enemy[target]->slowingCoef = slowEffect;
                 }
                 else if (id == EXPLOSIVE)
                 {
-                    PlaySound(turretSounds.explosion);
+                    if(soundEffect)
+                    {
+                        PlaySound(turretSounds.explosion);
+                    }
                     for (Enemy *e : enemy)
                     {
                         if (e != enemy[target] && e->active && collCirclex2(enemy[target]->pos, 50.0f, e->pos, e->radius))
