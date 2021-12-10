@@ -20,7 +20,7 @@ Game::Game()
     soundEffect = true;
     hp = 20;
     maxHp = 20;
-    money = 500;
+    money = 100;
     round = 0;
     timer = 0;
     timerFadeScreen = FPS;
@@ -299,10 +299,14 @@ void Game::backUI()
     else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && jackActive)
     {
         map.tile[GetTile(GetMousePosition())].active = false;
-        if(map.tile[GetTile(GetMousePosition())].environment!=0)
+        if (map.tile[GetTile(GetMousePosition())].environment != 0)
         {
-            map.tile[GetTile(GetMousePosition())].environment=0;
-            money+=rand()%15;
+            if (soundEffect)
+            {
+                PlaySound(gameSounds.sellTurret);
+            }
+            map.tile[GetTile(GetMousePosition())].environment = 0;
+            money += rand() % 15;
         }
         int a = 0;
         for (Turret *t : turret)

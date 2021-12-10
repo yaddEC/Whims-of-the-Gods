@@ -15,7 +15,7 @@ int main(void)
 
     // Main game loop
     while (!WindowShouldClose() && !game.quit)
-    
+    {
         BeginDrawing();
         ClearBackground(BEIGE);
 
