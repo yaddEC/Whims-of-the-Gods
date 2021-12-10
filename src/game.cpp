@@ -71,10 +71,10 @@ void Game::SoundButton(Rectangle dest, bool &type)
     if (InRec(dest))
     {
         DrawRectangleRec(dest, ColorAlpha(LIGHTGRAY, 0.5f));
-        if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             type = !type;
-            if(soundEffect)
+            if (soundEffect)
             {
                 PlaySound(gameSounds.button);
             }
@@ -136,8 +136,6 @@ void Game::Menu()
     DrawText("Sound Effects", 670, 570, 20, WHITE);
 }
 
-
-
 void Game::backUI()
 {
     const Rectangle classicTurretIcon = (Rectangle){1110, 152, SIZE, SIZE};
@@ -184,7 +182,7 @@ void Game::backUI()
     }
 
     //UpdateAndDrawUI Slow turret
-    if (money < 150)
+    if (money < 150 || round < 3)
     {
         priceColor = slowingColor = textureColor = LIGHTGRAY;
     }
@@ -196,23 +194,35 @@ void Game::backUI()
     dest = {slowingTurretIcon.x - 5, slowingTurretIcon.y + 62, SIZE / 2, SIZE / 2};
     DrawTexturePro(map.tilesheet, source, dest, origin, 0, priceColor);
 
+    if (round < 3)
+    {
+        DrawTexturePro(map.tilesheet, {map.texture[284].x, map.texture[284].y, SIZE, SIZE}, slowingTurretIcon, origin, 0, WHITE);
+    }
     if (InRec(slowingTurretIcon))
     {
-        DrawText("Slowing Turret", 1070, 550, 20, GREEN);
-        DrawText("Damage: Low", 1050, 600, 20, BLACK);
-        DrawText("Attack Speed: High", 1050, 630, 20, BLACK);
-        DrawText("Special:  Slows", 1050, 655, 19, BLACK);
-
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 150) // Buy and place new slowing turret
+        if (round < 3)
         {
-            pointSelected = true;
-            turret.push_back(new SlowingTurret);
-            turret.back()->sourceTexture = slowingTurret;
+            DrawText("Unlockable at", 1045, 600, 20, BLACK);
+            DrawText("wave 3", 1190, 600, 20, GOLD);
+        }
+        else
+        {
+            DrawText("Slowing Turret", 1070, 550, 20, GREEN);
+            DrawText("Damage: Low", 1050, 600, 20, BLACK);
+            DrawText("Attack Speed: High", 1050, 630, 20, BLACK);
+            DrawText("Special:  Slows", 1050, 655, 19, BLACK);
+
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 150) // Buy and place new slowing turret
+            {
+                pointSelected = true;
+                turret.push_back(new SlowingTurret);
+                turret.back()->sourceTexture = slowingTurret;
+            }
         }
     }
 
     //UpdateAndDrawUI Explosive turret
-    if (money < 300)
+    if (money < 300 || round < 5)
     {
         priceColor = explosiveColor = textureColor = LIGHTGRAY;
     }
@@ -224,18 +234,30 @@ void Game::backUI()
     dest = {explosiveTurretIcon.x - 5, explosiveTurretIcon.y + 62, SIZE / 2, SIZE / 2};
     DrawTexturePro(map.tilesheet, source, dest, origin, 0, priceColor);
 
+    if (round < 5)
+    {
+        DrawTexturePro(map.tilesheet, {map.texture[284].x, map.texture[284].y, SIZE, SIZE}, explosiveTurretIcon, origin, 0, WHITE);
+    }
     if (InRec(explosiveTurretIcon))
     {
-        DrawText("Explosive Turret", 1060, 550, 20, ORANGE);
-        DrawText("Damage: High", 1050, 600, 20, BLACK);
-        DrawText("Attack Speed: Low", 1050, 630, 20, BLACK);
-        DrawText("Special:  Area Damage", 1050, 655, 19, BLACK);
-
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 300) // Buy and place new explosive turret
+        if (round < 5)
         {
-            pointSelected = true;
-            turret.push_back(new ExplosiveTurret);
-            turret.back()->sourceTexture = explosiveTurret;
+            DrawText("Unlockable at", 1045, 600, 20, BLACK);
+            DrawText("wave 5", 1190, 600, 20, GOLD);
+        }
+        else
+        {
+            DrawText("Explosive Turret", 1060, 550, 20, ORANGE);
+            DrawText("Damage: High", 1050, 600, 20, BLACK);
+            DrawText("Attack Speed: Low", 1050, 630, 20, BLACK);
+            DrawText("Special:  Area Damage", 1050, 655, 19, BLACK);
+
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 300) // Buy and place new explosive turret
+            {
+                pointSelected = true;
+                turret.push_back(new ExplosiveTurret);
+                turret.back()->sourceTexture = explosiveTurret;
+            }
         }
     }
 
