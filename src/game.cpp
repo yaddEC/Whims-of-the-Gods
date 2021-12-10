@@ -23,6 +23,7 @@ Game::Game()
     money = 500;
     round = 0;
     timer = 0;
+    timerFadeScreen = FPS;
     showTurretRange = false;
 
     map.Init();
@@ -70,20 +71,16 @@ bool Game::Button(int x, int y, float width, float height, const char *name, flo
 
 bool Game::DynamicButton(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color)
 {
-    
-    
-    if(parTimer)
+
+    if (parTimer)
     {
-         return Button(x+(frameCounter-30)/4, y+(frameCounter-30)/4, width+30-frameCounter/2, height+30-frameCounter/2, name, nameSpacing-0.05+(frameCounter/2*0.001666), nameSize+1.2-(frameCounter/2*0.04), color); 
+        return Button(x + (frameCounter - 30) / 4, y + (frameCounter - 30) / 4, width + 30 - frameCounter / 2, height + 30 - frameCounter / 2, name, nameSpacing - 0.05 + (frameCounter / 2 * 0.001666), nameSize + 1.2 - (frameCounter / 2 * 0.04), color);
     }
     else
     {
-        return Button(x-(frameCounter-30)/4, y-(frameCounter-30)/4, width+(frameCounter/2), height+frameCounter/2, name, nameSpacing-(frameCounter/2*0.001666), nameSize+(frameCounter/2*0.04), color);  
-       
+        return Button(x - (frameCounter - 30) / 4, y - (frameCounter - 30) / 4, width + (frameCounter / 2), height + frameCounter / 2, name, nameSpacing - (frameCounter / 2 * 0.001666), nameSize + (frameCounter / 2 * 0.04), color);
     }
-    
-
-} 
+}
 void Game::SoundButton(Rectangle dest, bool &type)
 {
 
@@ -139,8 +136,7 @@ void Game::Menu()
 {
     if (Button(440, 200, 400, 100, "START", 0.35f, 3, GRAY))
     {
-
-        StopSound(gameSounds.mainTheme);
+        StopMusicStream(gameSounds.mainTheme);
         start = true;
     }
     if (Button(440, 400, 400, 100, "QUIT", 0.35f, 3, GRAY))
@@ -429,15 +425,15 @@ void Game::frontUI()
 void Game::UpdateAndDraw()
 {
     FrameTimer(frameCounter);
-    if(frameCounter==0)
+    if (frameCounter == 0)
     {
-        frameCounter=60;
+        frameCounter = 60;
         secondTimer++;
     }
-    if(secondTimer%2)
-    parTimer=true;
+    if (secondTimer % 2)
+        parTimer = true;
     else
-    parTimer=false;
+        parTimer = false;
     map.Draw(round);
 
     if (!gameOver)
@@ -639,10 +635,10 @@ void Game::UpdateAndDraw()
 
             if (hp <= 0)
             {
-                StopSound(gameSounds.secondTheme);
+                StopMusicStream(gameSounds.secondTheme);
                 if (music)
                 {
-                    PlaySound(gameSounds.gameOver);
+                    PlayMusicStream(gameSounds.gameOver);
                 }
                 gameOver = true;
             }
@@ -650,11 +646,31 @@ void Game::UpdateAndDraw()
         else
         {
             DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 0.3));
+
+            SoundButton({480, 600, SIZE * 1.5f, SIZE * 1.5f}, music);
+            SoundButton({700, 600, SIZE * 1.5f, SIZE * 1.5f}, soundEffect);
+
+            DrawText("Music", 498, 570, 20, WHITE);
+            DrawText("Sound Effects", 670, 570, 20, WHITE);
+
             if (Button(440, 200, 400, 100, "RESUME", 0.35f, 3, GRAY))
             {
                 pause = false;
             }
-            if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY))
+            if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY) && timerFadeScreen == FPS)
+            {
+                timerFadeScreen--;
+            }
+            else if (timerFadeScreen < FPS && timerFadeScreen > 0)
+            {
+                if (music)
+                {
+                    SetMusicVolume(gameSounds.secondTheme, 0.5 - (0.5 - (timerFadeScreen * 0.5 / (float)(FPS))));
+                }
+                DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
+                FrameTimer(timerFadeScreen);
+            }
+            else if (timerFadeScreen <= 0)
             {
                 bool currentMucic = music;
                 bool currentSound = soundEffect;
@@ -663,23 +679,34 @@ void Game::UpdateAndDraw()
                 this->music = currentMucic;
                 this->soundEffect = currentSound;
             }
-
-            SoundButton({480, 600, SIZE * 1.5f, SIZE * 1.5f}, music);
-            SoundButton({700, 600, SIZE * 1.5f, SIZE * 1.5f}, soundEffect);
-
-            DrawText("Music", 498, 570, 20, WHITE);
-            DrawText("Sound Effects", 670, 570, 20, WHITE);
         }
     }
     else
     {
         DrawRectangleGradientV(0, 0, 1280, 1500, BLACK, MAROON);
-        DrawText(TextFormat("WAVE %i", round), 550, 200, 40, LIGHTGRAY);
-        if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY))
+        DrawText(TextFormat("WAVE %i", round), 540, 200, 40, LIGHTGRAY);
+        UpdateMusicStream(gameSounds.gameOver);
+        if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY) && timerFadeScreen == FPS)
         {
-            StopSound(gameSounds.gameOver);
+            timerFadeScreen--;
+        }
+        else if (timerFadeScreen < FPS && timerFadeScreen > 0)
+        {
+            if (music)
+            {
+                SetMusicVolume(gameSounds.gameOver, 0.5 - (0.5 - (timerFadeScreen * 0.5 / (float)(FPS))));
+            }
+            DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
+            FrameTimer(timerFadeScreen);
+        }
+        else if (timerFadeScreen <= 0)
+        {
+            bool currentMucic = music;
+            bool currentSound = soundEffect;
             this->~Game();
             new (this) Game();
+            this->music = currentMucic;
+            this->soundEffect = currentSound;
         }
     }
 }

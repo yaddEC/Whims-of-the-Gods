@@ -10,30 +10,31 @@ int main(void)
     SetConfigFlags(FLAG_VSYNC_HINT);
     InitWindow(screenWidth, screenHeight, "Whim Of The Gods");
     InitAudioDevice();
+
     Game game = {};
 
     // Main game loop
     while (!WindowShouldClose() && !game.quit)
-    {
+    
         BeginDrawing();
         ClearBackground(BEIGE);
 
         if (game.music)  // activate/desactivate music
         {
-            SetSoundVolume(game.gameSounds.mainTheme, 0.5f);
-            SetSoundVolume(game.gameSounds.secondTheme, 0.5f);
+            SetMusicVolume(game.gameSounds.mainTheme, 0.5f);
+            SetMusicVolume(game.gameSounds.secondTheme, 0.5f);
         }
         else
         {
-            SetSoundVolume(game.gameSounds.mainTheme, 0);
-            SetSoundVolume(game.gameSounds.secondTheme, 0);
+            SetMusicVolume(game.gameSounds.mainTheme, 0);
+            SetMusicVolume(game.gameSounds.secondTheme, 0);
         }
 
         if (game.start) // if button start is pressed
         {
-            if (!IsSoundPlaying(game.gameSounds.secondTheme) && game.hp > 0)
+            if (!IsMusicStreamPlaying(game.gameSounds.secondTheme) && game.hp > 0)
             {
-                PlaySound(game.gameSounds.secondTheme);
+                PlayMusicStream(game.gameSounds.secondTheme);
             }
             DrawRectangle(1024, 0, 256, 768, BROWN);
             DrawRectangle(1030, 530, 245, 170, ColorAlpha(DARKBROWN, 0.5));
@@ -41,12 +42,15 @@ int main(void)
         }
         else // print menu
         {
-            if (!IsSoundPlaying(game.gameSounds.mainTheme))
+            if (!IsMusicStreamPlaying(game.gameSounds.mainTheme))
             {
-                PlaySound(game.gameSounds.mainTheme);
+                PlayMusicStream(game.gameSounds.mainTheme);
             }
             game.Menu();
         }
+
+        UpdateMusicStream(game.gameSounds.mainTheme);
+        UpdateMusicStream(game.gameSounds.secondTheme);
 
         DrawFPS(10, 10);
 

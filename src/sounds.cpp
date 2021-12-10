@@ -2,23 +2,21 @@
 
 GameSounds::GameSounds()
 {
-    mainTheme = LoadSound("assets/mainTheme.mp3"); 
-
-    secondTheme = LoadSound("assets/secondTheme.mp3"); 
+    mainTheme = LoadMusicStream("assets/mainTheme.mp3"); 
+    secondTheme = LoadMusicStream("assets/secondTheme.mp3"); 
+    gameOver = LoadMusicStream("assets/gameOverTheme.mp3"); 
 
     button = LoadSound("assets/buttonSound.wav"); 
-
     sellTurret = LoadSound("assets/sellSound.ogg"); 
 
-    gameOver = LoadSound("assets/gameOverTheme.wav"); 
 }
 GameSounds::~GameSounds()
 {
-    UnloadSound(mainTheme);
-    UnloadSound(secondTheme);
+    UnloadMusicStream(mainTheme);
+    UnloadMusicStream(secondTheme);
+    UnloadMusicStream(gameOver);
     UnloadSound(button);
     UnloadSound(sellTurret);
-    UnloadSound(gameOver);
 }
 
 

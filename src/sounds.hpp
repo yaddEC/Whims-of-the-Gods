@@ -3,11 +3,11 @@
 class GameSounds
 {
 public:
-    Sound mainTheme;
-    Sound secondTheme;
+    Music mainTheme;
+    Music secondTheme;
     Sound button;
     Sound sellTurret;
-    Sound gameOver;
+    Music gameOver;
     GameSounds();
     ~GameSounds();
 };

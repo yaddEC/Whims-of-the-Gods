@@ -19,6 +19,7 @@ public:
     int maxHp;
     int money;
     int timer;
+    int timerFadeScreen;
     int round;
     bool showTurretRange;
     Rectangle classicTurret;
