@@ -124,10 +124,12 @@ void Tilemap::Draw(int round)
             case 'L': 
             if (round > 20)
             {
+            tile[i].road = true;
             id = 62;
             }
             else if (round % 2 == 1 || round == 0)
             {
+            tile[i].road = true;
             id = 65;
             }
             else

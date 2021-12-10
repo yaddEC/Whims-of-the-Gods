@@ -5,6 +5,9 @@
 static bool pointSelected = false;
 static bool jackActive = false;
 static int spawnTimer = 600;
+static int frameCounter = 60;
+static int secondTimer = 0;
+static bool parTimer = false;
 static int maxEnemies = 10;
 
 Game::Game()
@@ -58,6 +61,24 @@ bool Button(int x, int y, float width, float height, const char *name, float nam
     DrawRectangleLines(x, y, width, height, DARKGRAY);
 
     return res;
+}
+
+bool DynamicButton(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color, Sound &sound)
+{
+    
+    
+    if(parTimer)
+    {
+         return Button(x+(frameCounter-30)/4, y+(frameCounter-30)/4, width+30-frameCounter/2, height+30-frameCounter/2, name, nameSpacing-0.05+(frameCounter/2*0.001666), nameSize+1.2-(frameCounter/2*0.04), color, sound); 
+    }
+    else
+    {
+        return Button(x-(frameCounter-30)/4, y-(frameCounter-30)/4, width+(frameCounter/2), height+frameCounter/2, name, nameSpacing-(frameCounter/2*0.001666), nameSize+(frameCounter/2*0.04), color, sound);  
+       
+    }
+    
+
+   
 }
 
 void Game::EnemyDestroyedAnimation(Enemy *&e)
@@ -319,7 +340,7 @@ void Game::frontUI()
     DrawRectangleLines(1040, 720, 225, 30, WHITE);
     DrawText(TextFormat("%i / %i", hp, maxHp), 1050, 727, GetFontDefault().baseSize * 2, WHITE);
 
-    if (timer == 0 && enemy.size() == 0 && Button(400, 700, 224, 50, "Ready", 0.3f, 3, GREEN, gameSounds.button))
+    if (timer == 0 && enemy.size() == 0 && DynamicButton(400, 685, 224, 50, "Ready", 0.3f, 3, GREEN, gameSounds.button))
     {
         round++;
         timer = spawnTimer;
@@ -332,6 +353,16 @@ void Game::frontUI()
 
 void Game::UpdateAndDraw()
 {
+    FrameTimer(frameCounter);
+    if(frameCounter==0)
+    {
+        frameCounter=60;
+        secondTimer++;
+    }
+    if(secondTimer%2)
+    parTimer=true;
+    else
+    parTimer=false;
     map.Draw(round);
 
     if (!gameOver)
