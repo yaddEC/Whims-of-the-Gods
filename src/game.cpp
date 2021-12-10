@@ -183,6 +183,7 @@ void Tilemap::Draw(int round)
         }
         else if (Despawn.mTilePos == tile[i].mTilePos)
         {
+             tile[i].Draw(tilesheet, texture[93]);
             tile[i].Draw(tilesheet, texture[63]);
             tile[i].road = true;
         }
