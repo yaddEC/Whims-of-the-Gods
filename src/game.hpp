@@ -4,6 +4,7 @@
 #include <raylib.h>
 #include "entities/turret.hpp"
 #include "entities/enemy.hpp"
+#include "entities/tile.hpp"
 
 class Game
 {
