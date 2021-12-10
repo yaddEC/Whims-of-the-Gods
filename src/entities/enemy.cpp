@@ -56,8 +56,7 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
     else
     {
         
-                Tile nullTile = {};
-        nullTile.Init(999, 64, 'g');
+        Tile nullTile(999, 64, 'g');
         Tile *leftTile = (map.tile[posTile - 1].road == true && posTile % map.width != 0) ? &map.tile[posTile - 1] : &nullTile;
         Tile *rightTile= (map.tile[posTile + 1].road == true && (posTile % map.width) != 15) ? &map.tile[posTile + 1] : &nullTile;
         Tile *forwardTile= (map.tile[posTile + map.width].road == true && posTile < 176) ? &map.tile[posTile + map.width] : &nullTile;

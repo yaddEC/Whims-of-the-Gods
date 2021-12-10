@@ -23,17 +23,17 @@ Game::Game()
     map.Init();
     DefSpawn(map.Spawn.mPos);
 
-    pauseSource = {map.texture[107].mPos.x, map.texture[107].mPos.y, SIZE, SIZE};
+    pauseSource = {map.texture[107].x, map.texture[107].y, SIZE, SIZE};
 
     jackhammer.model = LoadTexture("assets/jackhammer.png");
 
-    classicTurret = {map.texture[250].mPos.x, map.texture[250].mPos.y, SIZE, SIZE};
-    slowingTurret = {map.texture[249].mPos.x, map.texture[249].mPos.y, SIZE, SIZE};
-    explosiveTurret = {map.texture[226].mPos.x, map.texture[226].mPos.y, SIZE, SIZE};
+    classicTurret = {map.texture[250].x, map.texture[250].y, SIZE, SIZE};
+    slowingTurret = {map.texture[249].x, map.texture[249].y, SIZE, SIZE};
+    explosiveTurret = {map.texture[226].x, map.texture[226].y, SIZE, SIZE};
 
-    warriorEnemy = {map.texture[247].mPos.x, map.texture[247].mPos.y, SIZE, SIZE};
-    healerEnemy = {map.texture[245].mPos.x, map.texture[245].mPos.y, SIZE, SIZE};
-    berserkerEnemy = {map.texture[246].mPos.x, map.texture[246].mPos.y, SIZE, SIZE};
+    warriorEnemy = {map.texture[247].x, map.texture[247].y, SIZE, SIZE};
+    healerEnemy = {map.texture[245].x, map.texture[245].y, SIZE, SIZE};
+    berserkerEnemy = {map.texture[246].x, map.texture[246].y, SIZE, SIZE};
 }
 
 bool Button(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color, Sound &sound)
@@ -94,25 +94,24 @@ void Game::Menu()
 
 Tile::Tile()
 {
-    mWidthTile = SIZE;
+    
 }
 
-void Tile::Init(int i, int mapWidth, char val)
+Tile::Tile(int i, int mapWidth, char val)
 {
-
+    mWidthTile = SIZE;
     mTilePos = i;
     active = false;
     road = false;
     value = val;
     mPos.x = (i % mapWidth) * mWidthTile;
-    mPos.y = static_cast<int>(i / mapWidth) * mWidthTile;
+    mPos.y = (i / mapWidth) * mWidthTile;
 }
 
-void Tile::Draw(Texture2D tilesheet, Tile frame)
+void Tile::Draw(Texture2D tilesheet, Vector2 frame)
 {
-
-    Rectangle source = {frame.mPos.x, frame.mPos.y, SIZE, SIZE};
-    Rectangle dest = {mPos.x, mPos.y, SIZE, SIZE};
+    Rectangle source = {frame.x, frame.y, SIZE, SIZE};
+    Rectangle dest{float((int)mPos.x), float((int)mPos.y), SIZE, SIZE};
     Vector2 origin = {0, 0};
     DrawTexturePro(tilesheet, source, dest, origin, 0, WHITE);
 
@@ -132,7 +131,6 @@ Tilemap::Tilemap()
     width = 16;
 
     total = height * width;
-    tile = new Tile[total];
     tilesheet = LoadTexture("assets/towerDefense_tilesheet.png");
 
     plan =
@@ -154,122 +152,118 @@ Tilemap::Tilemap()
 Tilemap::~Tilemap()
 {
 
-    delete[] tile;
+    tile.clear();
 }
 
 void Tilemap::Init()
 {
+
+    Tile temp;
     for (int i = 0; i < total; i++)
     {
-        tile[i].Init(i, width, plan[i]);
+        temp = Tile(i, width, plan[i]);
+        tile.push_back(temp);
     }
+
+
     Spawn = tile[0];
     Despawn = tile[191];
-    for (int i = 0; i < 368; i++)
+    for (int i = 0; i < 299; i++)
     {
-        texture[i].Init(i, 23, 'a');
+        texture[i].x = (i % 23) * 64;
+        texture[i].y = (i / 23) * 64;
     }
 }
 
 void Tilemap::Draw(int round)
 {
-
+    int id = 0;
     for (int i = 0; i < total; i++)
     {
         if (Spawn.mTilePos == tile[i].mTilePos)
         {
-            tile[i].Draw(tilesheet, texture[64]);
+
+            id = 64;
             tile[i].road = true;
         }
         else if (Despawn.mTilePos == tile[i].mTilePos)
         {
-             tile[i].Draw(tilesheet, texture[93]);
-            tile[i].Draw(tilesheet, texture[63]);
+            id = 63;
+            tile[i].Draw(tilesheet, texture[50]);
             tile[i].road = true;
         }
         else
 
         {
+
+            ;
             switch (tile[i].value)
             {
             case '_':
-                tile[i].Draw(tilesheet, texture[116]);
+                id = 116;
                 break;
             case '{':
-                tile[i].Draw(tilesheet, texture[115]);
+                id = 115;
                 break;
             case ']':
-                tile[i].Draw(tilesheet, texture[96]);
+                id = 96;
                 break;
             case '[':
-                tile[i].Draw(tilesheet, texture[95]);
+                id = 95;
                 break;
             case '}':
-                tile[i].Draw(tilesheet, texture[71]);
+                id = 71;
                 break;
             case '-':
-                tile[i].Draw(tilesheet, texture[70]);
+                id = 70;
                 break;
             case 'l':
-                tile[i].Draw(tilesheet, texture[94]);
+                id = 94;
                 break;
             case '|':
-                tile[i].Draw(tilesheet, texture[92]);
+                id = 92;
                 break;
             case ')':
-                tile[i].Draw(tilesheet, texture[73]);
+                id = 73;
                 break;
             case '(':
-                tile[i].Draw(tilesheet, texture[72]);
+                id = 72;
                 break;
             case 'I':
-                tile[i].Draw(tilesheet, texture[93]);
-                tile[i].road = true;
-                break;
-            case 'L':
-
-                if (round > 20)
-                {
-                    tile[i].Draw(tilesheet, texture[62]);
-                }
-
-                else if (round % 2 == 1 || round == 0)
-                {
-                    tile[i].Draw(tilesheet, texture[65]);
-                }
-                else
-                {
-                    tile[i].Draw(tilesheet, texture[68]);
-                }
-
-                tile[i].road = true;
-                break;
-            case 'T':
-                tile[i].Draw(tilesheet, texture[50]);
+                id = 50;
                 tile[i].road = true;
                 break;
             case 'A':
-                tile[i].Draw(tilesheet, texture[50]);
+                id = 50;
                 tile[i].road = true;
                 break;
             case 'V':
-                tile[i].Draw(tilesheet, texture[50]);
+                id = 50;
                 tile[i].road = true;
                 break;
             case '>':
-                tile[i].Draw(tilesheet, texture[50]);
+                id = 50;
                 tile[i].road = true;
                 break;
             case '<':
-                tile[i].Draw(tilesheet, texture[50]);
+                id = 50;
                 tile[i].road = true;
                 break;
-
             case 'O':
-                tile[i].Draw(tilesheet, texture[24]);
+                id = 24;
+                break;
+            case 'L':
+                if (round > 20)
+                    id = 62;
+                else if (round % 2 == 1 || round == 0)
+                    id = 65;
+                else
+                    id = 68;
+                tile[i].road = true;
                 break;
             }
         }
+        tile[i].Draw(tilesheet, texture[id]);
     }
 }
 
@@ -300,7 +294,7 @@ void Game::backUI()
     DrawTexturePro(map.tilesheet, classicTurret, classicTurretIcon, origin, 0, textureColor);
 
     DrawText("50", classicTurretIcon.x + 25, classicTurretIcon.y + 70, GetFontDefault().baseSize * 2, priceColor);
-    Rectangle source = {map.texture[287].mPos.x, map.texture[287].mPos.y, SIZE, SIZE};
+    Rectangle source = {map.texture[287].x, map.texture[287].y, SIZE, SIZE};
     Rectangle dest = {classicTurretIcon.x - 5, classicTurretIcon.y + 62, SIZE / 2, SIZE / 2};
     DrawTexturePro(map.tilesheet, source, dest, origin, 0, priceColor);
 
@@ -483,7 +477,7 @@ void Game::frontUI()
     }
 
     DrawText(TextFormat("%i", money), 60, 730, GetFontDefault().baseSize * 3, GOLD);
-    Rectangle source = {map.texture[287].mPos.x, map.texture[287].mPos.y, SIZE, SIZE};
+    Rectangle source = {map.texture[287].x, map.texture[287].y, SIZE, SIZE};
     Rectangle dest = {10, 710, SIZE, SIZE};
     Vector2 origin = {0, 0};
     DrawTexturePro(map.tilesheet, source, dest, origin, 0, GOLD);
@@ -526,7 +520,7 @@ void Game::UpdateAndDraw()
             for (Turret *t : turret)
 
             {
-                t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->id + 295].mPos, turretSounds);
+                t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->id + 295], turretSounds);
 
                 if (t->showTurretUpgrade) // Draw upgrade button
                 {
@@ -550,7 +544,7 @@ void Game::UpdateAndDraw()
                             t->updatePrice *= 2;
                         }
                         DrawText(TextFormat("%i", t->updatePrice), t->pos.x + 30, t->pos.y - 14, GetFontDefault().baseSize * 2, GOLD);
-                        Rectangle source = {map.texture[287].mPos.x, map.texture[287].mPos.y, SIZE, SIZE};
+                        Rectangle source = {map.texture[287].x, map.texture[287].y, SIZE, SIZE};
                         Rectangle dest = {t->pos.x, t->pos.y - 22, SIZE / 2, SIZE / 2};
                         Vector2 origin = {0, 0};
                         DrawTexturePro(map.tilesheet, source, dest, origin, 0, GOLD);
@@ -605,7 +599,7 @@ void Game::UpdateAndDraw()
                 }
             }
 
-            if (timer > spawnTimer-(FPS*3))
+            if (timer > spawnTimer - (FPS * 3))
             {
                 DrawTextWave();
             }

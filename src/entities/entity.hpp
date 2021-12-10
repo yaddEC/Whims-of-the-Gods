@@ -12,17 +12,17 @@ private:
     int mWidthTile;
 
 public:
-    int mTilePos;
-    Vector2 mPos;
+    int mTilePos; // draw tile id
+    Vector2 mPos; // pos on the map
     char value;
     bool active;
     bool road;
     Tile();
     ~Tile();
 
-    void Init(int i, int mapWidth, char val);
+    Tile(int i, int mapWidth, char val);
 
-    void Draw(Texture2D tilesheet, Tile frame);
+    void Draw(Texture2D tilesheet, Vector2 frame);
 };
 
 class Tilemap
@@ -30,14 +30,14 @@ class Tilemap
 private:
     const char *plan;
     int height;
-   
+    
     int total;
 
 public:
     int width;
-    Tile *tile;
+    std::vector<Tile> tile; // use std::vector<Tile>   (texture.resize(...))
     Texture2D tilesheet;
-    Tile texture[368];
+    Vector2 texture[368];
     Tile Spawn;
     Tile Despawn;
     Tilemap();
