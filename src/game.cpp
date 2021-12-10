@@ -303,6 +303,11 @@ void Game::backUI()
     else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && jackActive)
     {
         map.tile[GetTile(GetMousePosition())].active = false;
+        if(map.tile[GetTile(GetMousePosition())].environment!=0)
+        {
+            map.tile[GetTile(GetMousePosition())].environment=0;
+            money+=rand()%15;
+        }
         int a = 0;
         for (Turret *t : turret)
         {

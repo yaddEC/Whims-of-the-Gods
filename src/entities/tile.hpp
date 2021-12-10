@@ -1,6 +1,7 @@
 #pragma once
 #include "entity.hpp"
 
+
 class Tile
 {
 private:
@@ -12,6 +13,7 @@ public:
     char value;
     bool active;
     bool road;
+    int environment;
     Tile();
     ~Tile();
 

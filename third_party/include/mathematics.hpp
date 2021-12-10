@@ -2,6 +2,7 @@
 #include <cmath>
 #include <vector>
 #include <raylib.h>
+#include <time.h>
 
 #define SIZE 64.0f
 
