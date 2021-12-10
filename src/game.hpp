@@ -13,6 +13,8 @@ public:
     bool start;
     bool pause;
     bool gameOver;
+    bool music;
+    bool soundEffect;
     int hp;
     int maxHp;
     int money;
@@ -44,8 +46,11 @@ public:
     void frontUI();
     void UpdateAndDrawTurret();
     void UpdateAndDrawEnemy();
+    bool Button(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color);
+    bool DynamicButton(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color);
+    void SoundButton(Rectangle dest, bool &type);
     void DrawTextWave();
-    void EnemyDestroyedAnimation(Enemy* &e);
+    void EnemyDestroyedAnimation(Enemy *&e);
     ~Game();
 };
 
