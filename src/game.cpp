@@ -320,6 +320,8 @@ void Game::Credit()
             DrawText("DECHAUX Yann", 550, height, 20, BLACK);
             DrawText("HENO Matias", 550, height + 20, 20, BLACK);
         }
+        DrawText("KOJIMA Hideo", 550, creditHeight + 1050, 20, BLACK);
+
         creditHeight -= 5;
         if (creditHeight < -1100)
         {
@@ -337,11 +339,12 @@ void Game::Credit()
         DrawText("KFOURY Dimitry", 550, height + 60, 20, BLACK);
         DrawText("SANTAMARIA Ramon", 550, height + 80, 20, BLACK);
         DrawText("SAKURAI Masahiro", 550, height + 100, 20, BLACK);
+        DrawText("Every MGP2", 550, height + 120, 20, BLACK);
         DrawText("Musics", 600, height + 300, 30, BLACK);
         DrawText("Menu:  Tower defense style music loop by DST", 400, height + 350, 20, BLACK);
         DrawText("Game:  Return of Tower Defense Theme by DST", 400, height + 390, 20, BLACK);
         DrawText("Credits:  \"Blueberries\" composed, performed, mixed and mastered by Viktor Kraus", 260, height + 430, 20, BLACK);
-        creditHeight -= 5;
+        creditHeight -= 2;
         if (creditHeight < -500)
         {
             titleID++;
