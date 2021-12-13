@@ -15,6 +15,10 @@ public:
     bool gameOver;
     bool music;
     bool soundEffect;
+
+    bool credit;
+    int creditHeight;
+    
     int hp;
     int maxHp;
     int money;
@@ -53,6 +57,7 @@ public:
     std::vector<Enemy *> enemy;
     Game();
     void Menu();
+    void Credit();
     void UpdateAndDraw();
     void backUI();
     void frontUI();

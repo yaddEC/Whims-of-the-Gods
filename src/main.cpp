@@ -40,6 +40,10 @@ int main(void)
             DrawRectangle(1030, 530, 245, 170, ColorAlpha(DARKBROWN, 0.5));
             game.UpdateAndDraw();
         }
+        else if(game.credit)
+        {
+            game.Credit();
+        }
         else // print menu
         {
             if (!IsMusicStreamPlaying(game.gameSounds.mainTheme))

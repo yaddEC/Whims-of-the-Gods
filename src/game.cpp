@@ -12,6 +12,8 @@ static int maxEnemies = 10;
 
 Game::Game()
 {
+    credit = false;
+    creditHeight = 780;
     quit = false;
     start = false;
     pause = false;
@@ -151,7 +153,7 @@ void Game::DrawTextWave()
     }
     else
     {
-        DrawText(TextFormat("WAVE %i", round), 370, 350, 80, ColorAlpha(WHITE, (timer - 420.0f) / (float)FPS));
+        DrawText(TextFormat("WAVE %i", round), 370, 350, 80, ColorAlpha(WHITE, (timer - FPS * 2) / (float)FPS));
     }
 }
 
@@ -207,12 +209,33 @@ void Game::Menu()
     {
         quit = true;
     }
+    if (IsKeyPressed(KEY_C))
+    {
+        credit = true;
+    }
 
     SoundButton({520, 700, 48, 48}, music);
     SoundButton({720, 700, 48, 48}, soundEffect);
 
     DrawText("Music", 517, 670, 20, WHITE);
     DrawText("Sound", 715, 670, 20, WHITE);
+}
+
+void Game::Credit()
+{
+    DrawText("Caprice des dieux inc", 500, creditHeight, 20, BLACK);
+    for (int i = 0; i < 50; i+=2)
+    {
+        int height = creditHeight + 50 + (20 * i);
+        DrawText("DECHAUX Yann", 550, height, 20, BLACK);
+        DrawText("HENO Matias", 550, height+20 , 20, BLACK);
+    }
+
+    creditHeight -= 5;
+    if (creditHeight < -1100)
+    {
+        creditHeight = 780;
+    }
 }
 
 void Game::backUI()
@@ -350,9 +373,12 @@ void Game::backUI()
 
     if (InRec(jackHammerIcon))
     {
-        DrawText("Sell Turret", 1080, 550, 20, SKYBLUE);
-        DrawText("Recover half the", 1060, 600, 20, BLACK);
-        DrawText("turret's price", 1070, 630, 20, BLACK);
+        DrawText("Sell Turret", 1090, 550, 20, SKYBLUE);
+        DrawText("Recover half the", 1070, 580, 19, BLACK);
+        DrawText("turret's price", 1080, 600, 19, BLACK);
+
+        DrawText("Destroy Things", 1070, 630, 20, SKYBLUE);
+        DrawText("Gain some money", 1077, 660, 19, BLACK);
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) // Buy and place new slowing turret
         {
