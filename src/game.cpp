@@ -338,8 +338,7 @@ void Game::Credit()
         DrawText("LECAYE Henri", 550, height + 40, 20, BLACK);
         DrawText("KFOURY Dimitry", 550, height + 60, 20, BLACK);
         DrawText("SANTAMARIA Ramon", 550, height + 80, 20, BLACK);
-        DrawText("SAKURAI Masahiro", 550, height + 100, 20, BLACK);
-        DrawText("Every MGP2", 550, height + 120, 20, BLACK);
+        DrawText("Every MGP2", 550, height + 100, 20, BLACK);
         DrawText("Musics", 600, height + 300, 30, BLACK);
         DrawText("Menu:  Tower defense style music loop by DST", 400, height + 350, 20, BLACK);
         DrawText("Game:  Return of Tower Defense Theme by DST", 400, height + 390, 20, BLACK);
