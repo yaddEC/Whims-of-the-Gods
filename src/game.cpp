@@ -10,6 +10,9 @@ static int secondTimer = 0;
 static bool parTimer = false;
 static int maxEnemies = 10;
 
+static int moneyTimer = 0;
+static int moneyGain = 0;
+
 Game::Game()
 {
     credit = false;
@@ -532,24 +535,31 @@ void Game::backUI()
                 PlaySound(gameSounds.sellTurret);
             }
             map.tile[GetTile(GetMousePosition())].environment = 9;
-            money += rand() % 15;
+            moneyTimer = FPS*2;
+            moneyGain = rand() % 15;
+            money += moneyGain;
         }
-        int a = 0;
-        for (Turret *t : turret)
+        else
         {
-
-            if (GetTile(GetMousePosition()) == GetTile(t->pos))
+            int a = 0;
+            for (Turret *t : turret)
             {
-                if (soundEffect)
+
+                if (GetTile(GetMousePosition()) == GetTile(t->pos))
                 {
-                    PlaySound(gameSounds.sellTurret);
+                    if (soundEffect)
+                    {
+                        PlaySound(gameSounds.sellTurret);
+                    }
+                    moneyTimer = FPS*2;
+                    moneyGain = t->price / 2;
+                    money += moneyGain;
+                    delete t;
+                    turret.erase(turret.begin() + a);
+                    break;
                 }
-                money += t->price / 2;
-                delete t;
-                turret.erase(turret.begin() + a);
-                break;
+                a++;
             }
-            a++;
         }
         jackActive = !jackActive;
     }
@@ -622,15 +632,21 @@ void Game::frontUI()
 {
     if (jackActive)
     {
-        DrawTexture(jackhammer.model, GetMousePosition().x - 48 / 2, GetMousePosition().y, WHITE);
+        DrawTexture(jackhammer.model, GetMousePosition().x - 48 / 2, GetMousePosition().y, WHITE);  
     }
 
-    DrawText(TextFormat("%i", money), 60, 730, GetFontDefault().baseSize * 3, GOLD);
-    Rectangle source = {map.texture[287].x, map.texture[287].y, SIZE, SIZE};
+    DrawText(TextFormat("%i", money), 60, 730, GetFontDefault().baseSize * 3, GOLD);  // Money UI
+    Rectangle source = {map.texture[287].x, map.texture[287].y, SIZE, SIZE};  
     Rectangle dest = {10, 710, SIZE, SIZE};
     Vector2 origin = {0, 0};
     DrawTexturePro(map.tilesheet, source, dest, origin, 0, GOLD);
 
+    if(moneyTimer>0)
+    {
+        
+        DrawText(TextFormat("+%i", moneyGain), 42, 700, GetFontDefault().baseSize * 3, ColorAlpha(GOLD, moneyTimer/(float)(FPS/2))); // Money gain indicator
+    }
+    
     // Health bar
     DrawRectangle(1040, 720, 225, 30, DARKBROWN);
 
@@ -739,7 +755,9 @@ void Game::UpdateAndDraw()
                     enemy[t]->UpdateAndDraw(map, round, enemy);
                     if (enemy[t]->hp <= 0)
                     {
-                        money += enemy[t]->reward;
+                        moneyTimer = FPS*2;
+                        moneyGain = enemy[t]->reward;
+                        money += moneyGain;
                         enemy[t]->timer = FPS * 2;
                         enemy[t]->active = false;
                     }
@@ -860,6 +878,7 @@ void Game::UpdateAndDraw()
             }
 
             FrameTimer(timer);
+            FrameTimer(moneyTimer);
 
             frontUI();
 
