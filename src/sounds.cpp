@@ -5,6 +5,7 @@ GameSounds::GameSounds()
     mainTheme = LoadMusicStream("assets/mainTheme.mp3"); 
     secondTheme = LoadMusicStream("assets/secondTheme.mp3"); 
     gameOver = LoadMusicStream("assets/gameOverTheme.mp3"); 
+    creditsTheme = LoadMusicStream("assets/creditsTheme.mp3"); 
 
     button = LoadSound("assets/buttonSound.wav"); 
     sellTurret = LoadSound("assets/sellSound.ogg"); 
@@ -15,6 +16,7 @@ GameSounds::~GameSounds()
     UnloadMusicStream(mainTheme);
     UnloadMusicStream(secondTheme);
     UnloadMusicStream(gameOver);
+    UnloadMusicStream(creditsTheme);
     UnloadSound(button);
     UnloadSound(sellTurret);
 }

@@ -14,6 +14,54 @@ Game::Game()
 {
     credit = false;
     creditHeight = 780;
+    creditTitle = {"Special Thanks",
+                   "Caprice des dieux inc",
+                   "Writers",
+                   "Narrative Consultants",
+                   "Performance Capture & Voice Over Director ",
+                   "Stunt Coordinators",
+                   "Casting",
+                   "Cinematography &Visual ",
+                   "Historian",
+                   "Military Advisors",
+                   "Motion Capture Personnel",
+                   "Audio Location Recording",
+                   "Executive Team",
+                   "Planning Team",
+                   "Consumer marketing",
+                   "Corporate communication",
+                   "Franchise Editorial",
+                   "Finance",
+                   "Global Analytics - Machine Learning",
+                   "Global Digital and Americas Commercial",
+                   "Global Experiential Marketing",
+                   "GIS",
+                   "Global IT",
+                   "Global Media",
+                   "Global Partnership",
+                   "Human Ressources",
+                   "Labs",
+                   "Revenue Team",
+                   "Legal Team - USA",
+                   "Legal Team - EU",
+                   "Legal Team - EMEA",
+                   "Legal Team - ASIA PACIFIC",
+                   "LIVE OPS ANALYTICS",
+                   "Marketing Creative",
+                   "Market insight /Competitive intelligence",
+                   "Player Insights",
+                   "Product Management",
+                   "Product Marketing",
+                   "Live Services",
+                   "Production Management Group",
+                   "Public Relations",
+                   "Publishing Operations",
+                   "Talent Acauisition",
+                   "Quality Assurance",
+                   "Technical Requirement Group",
+                   "Technology"};
+    titleID = 0;
+
     quit = false;
     start = false;
     pause = false;
@@ -194,7 +242,9 @@ void Game::Menu()
         secondTimer++;
     }
     if (secondTimer % 2)
+    {
         parTimer = true;
+    }
     else
         parTimer = false;
 
@@ -204,13 +254,21 @@ void Game::Menu()
     scrollingFirst -= 1.2f;
 
     if (scrollingFive <= -five.width * 2)
+    {
         scrollingFive = 0;
+    }
     if (scrollingThird <= -third.width * 2)
+    {
         scrollingThird = 0;
+    }
     if (scrollingSecond <= -second.width * 2)
+    {
         scrollingSecond = 0;
+    }
     if (scrollingFirst <= -first.width * 2)
+    {
         scrollingFirst = 0;
+    }
 
     DrawTextureEx(five, (Vector2){scrollingFive, 20}, 0.0f, 2.0f, WHITE);
     DrawTextureEx(five, (Vector2){five.width * 2 + scrollingFive, 20}, 0.0f, 2.0f, WHITE);
@@ -236,8 +294,9 @@ void Game::Menu()
     {
         quit = true;
     }
-    if (IsKeyPressed(KEY_C))
+    if (Button(1050, 700, 150, 35, "CREDITS", 0.2f, 2, GRAY))
     {
+        StopMusicStream(gameSounds.mainTheme);
         credit = true;
     }
 
@@ -250,18 +309,68 @@ void Game::Menu()
 
 void Game::Credit()
 {
-    DrawText("Caprice des dieux inc", 500, creditHeight, 20, BLACK);
-    for (int i = 0; i < 50; i+=2)
+    if (Button(1050, 700, 200, 50, "MENU", 0.32f, 3, GRAY))
     {
-        int height = creditHeight + 50 + (20 * i);
-        DrawText("DECHAUX Yann", 550, height, 20, BLACK);
-        DrawText("HENO Matias", 550, height+20 , 20, BLACK);
+        timerFadeScreen--;
+    }
+    else if (timerFadeScreen < FPS && timerFadeScreen > 0)
+    {
+        if (music)
+        {
+            SetMusicVolume(gameSounds.creditsTheme, 0.5 - (0.5 - (timerFadeScreen * 0.5 / (float)(FPS))));
+        }
+        DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
+        FrameTimer(timerFadeScreen);
+    }
+    else if (timerFadeScreen <= 0)
+    {
+        titleID = 0;
+        creditHeight = 768;
+        timerFadeScreen = FPS;
+        StopMusicStream(gameSounds.creditsTheme);
+        credit = false;
     }
 
-    creditHeight -= 5;
-    if (creditHeight < -1100)
+    if (titleID > 45)
     {
-        creditHeight = 780;
+        titleID = 0;
+    }
+    if (titleID != 0)
+    {
+        DrawText(TextFormat("%s", creditTitle[titleID]), 500, creditHeight, 30, BLACK);
+        for (int i = 0; i < 50; i += 2)
+        {
+            int height = creditHeight + 50 + (20 * i);
+            DrawText("DECHAUX Yann", 550, height, 20, BLACK);
+            DrawText("HENO Matias", 550, height + 20, 20, BLACK);
+        }
+        creditHeight -= 5;
+        if (creditHeight < -1100)
+        {
+            titleID++;
+            creditHeight = 780;
+        }
+    }
+    else
+    {
+        DrawText(TextFormat("%s", creditTitle[titleID]), 500, creditHeight, 30, BLACK);
+        int height = creditHeight + 50;
+        DrawText("GALINDO Paul", 550, height, 20, BLACK);
+        DrawText("RAMPIN Stephane", 550, height + 20, 20, BLACK);
+        DrawText("LECAYE Henri", 550, height + 40, 20, BLACK);
+        DrawText("KFOURY Dimitry", 550, height + 60, 20, BLACK);
+        DrawText("SANTAMARIA Ramon", 550, height + 80, 20, BLACK);
+        DrawText("SAKURAI Masahiro", 550, height + 100, 20, BLACK);
+        DrawText("Musics", 600, height + 300, 30, BLACK);
+        DrawText("Menu:  Tower defense style music loop by DST", 400, height + 350, 20, BLACK);
+        DrawText("Game:  Return of Tower Defense Theme by DST", 400, height + 390, 20, BLACK);
+        DrawText("Credits:  \"Blueberries\" composed, performed, mixed and mastered by Viktor Kraus", 260, height + 430, 20, BLACK);
+        creditHeight -= 5;
+        if (creditHeight < -500)
+        {
+            titleID++;
+            creditHeight = 780;
+        }
     }
 }
 

@@ -8,6 +8,7 @@ public:
     Sound button;
     Sound sellTurret;
     Music gameOver;
+    Music creditsTheme;
     GameSounds();
     ~GameSounds();
 };

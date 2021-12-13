@@ -4,7 +4,6 @@
 #include <raylib.h>
 #include "entities/turret.hpp"
 #include "entities/enemy.hpp"
-#include "entities/tile.hpp"
 
 class Game
 {
@@ -18,7 +17,9 @@ public:
 
     bool credit;
     int creditHeight;
-    
+    std::vector<const char*> creditTitle;
+    int titleID;
+
     int hp;
     int maxHp;
     int money;
@@ -41,12 +42,12 @@ public:
     float scrollingThird;
     float scrollingSecond;
     float scrollingFirst;
-    Texture2D five ;
-    Texture2D fourth ;
-    Texture2D third ;
+    Texture2D five;
+    Texture2D fourth;
+    Texture2D third;
     Texture2D second;
-    Texture2D first ;
-    Texture2D title ;
+    Texture2D first;
+    Texture2D title;
     Tile Spawn;
     Tile Despawn;
     Tilemap map;

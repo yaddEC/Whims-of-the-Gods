@@ -23,11 +23,15 @@ int main(void)
         {
             SetMusicVolume(game.gameSounds.mainTheme, 0.5f);
             SetMusicVolume(game.gameSounds.secondTheme, 0.5f);
+            SetMusicVolume(game.gameSounds.gameOver, 0.5f);
+            SetMusicVolume(game.gameSounds.creditsTheme, 0.5f);
         }
         else
         {
             SetMusicVolume(game.gameSounds.mainTheme, 0);
             SetMusicVolume(game.gameSounds.secondTheme, 0);
+            SetMusicVolume(game.gameSounds.gameOver, 0);
+            SetMusicVolume(game.gameSounds.creditsTheme, 0);
         }
 
         if (game.start) // if button start is pressed
@@ -42,6 +46,10 @@ int main(void)
         }
         else if(game.credit)
         {
+            if (!IsMusicStreamPlaying(game.gameSounds.creditsTheme))
+            {
+                PlayMusicStream(game.gameSounds.creditsTheme);
+            }
             game.Credit();
         }
         else // print menu
@@ -55,6 +63,7 @@ int main(void)
 
         UpdateMusicStream(game.gameSounds.mainTheme);
         UpdateMusicStream(game.gameSounds.secondTheme);
+        UpdateMusicStream(game.gameSounds.creditsTheme);
 
         DrawFPS(10, 10);
 
