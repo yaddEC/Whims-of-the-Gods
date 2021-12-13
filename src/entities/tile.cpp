@@ -80,7 +80,7 @@ void Tilemap::Init()
         temp = Tile(i, width, plan[i]);
 
         tile.push_back(temp);
-        tile.back().environment = 0;
+        tile.back().environment = 9;
     }
 
     Spawn = tile[0];
@@ -201,7 +201,7 @@ void Tilemap::Draw(int round)
         }
 
         tile[i].Draw(tilesheet, texture[id]);
-        if (tile[i].environment != 0)
+        if (tile[i].environment != 9)
         {
             tile[i].Draw(tilesheet, texture[130 + tile[i].environment]);
         }

@@ -142,7 +142,34 @@ void Game::SoundButton(Rectangle dest, bool &type)
 void Game::EnemyDestroyedAnimation(Enemy *&e)
 {
 
-    // ADD ANIMATION HERE
+Rectangle source;
+    if(e->damage==5)
+    {
+        source = {map.texture[269].x, map.texture[269].y, SIZE, SIZE};
+        if(e->timer>60 || e->timer%3==0)
+        {
+            DrawTexturePro(map.tilesheet, source, {e->pos.x-32,e->pos.y-32,64,64}, {0, 0}, 0, WHITE);
+        }
+    }
+    else if (e->damage==2)
+    {
+
+        source = {map.texture[270].x, map.texture[270].y, SIZE, SIZE};
+        if(e->timer>60 || e->timer%3==0)
+        {
+            DrawTexturePro(map.tilesheet, source, {e->pos.x-32,e->pos.y-32,64,64}, {0, 0}, 0, WHITE);
+        }
+
+    }
+    else
+    {
+        source = {map.texture[268].x, map.texture[268].y, SIZE, SIZE};
+        if(e->timer>60 || e->timer%3==0)
+        {
+            DrawTexturePro(map.tilesheet, source, {e->pos.x-32,e->pos.y-32,64,64}, {0, 0}, 0, WHITE);
+        }
+
+    }
 }
 
 void Game::DrawTextWave()
@@ -389,13 +416,13 @@ void Game::backUI()
     else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && jackActive)
     {
         map.tile[GetTile(GetMousePosition())].active = false;
-        if (map.tile[GetTile(GetMousePosition())].environment != 0)
+        if (map.tile[GetTile(GetMousePosition())].environment != 9)
         {
             if (soundEffect)
             {
                 PlaySound(gameSounds.sellTurret);
             }
-            map.tile[GetTile(GetMousePosition())].environment = 0;
+            map.tile[GetTile(GetMousePosition())].environment = 9;
             money += rand() % 15;
         }
         int a = 0;
@@ -604,7 +631,7 @@ void Game::UpdateAndDraw()
                     if (enemy[t]->hp <= 0)
                     {
                         money += enemy[t]->reward;
-                        enemy[t]->timer = FPS;
+                        enemy[t]->timer = FPS*2;
                         enemy[t]->active = false;
                     }
                 }
