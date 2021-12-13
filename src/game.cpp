@@ -190,33 +190,31 @@ void Game::SoundButton(Rectangle dest, bool &type)
 void Game::EnemyDestroyedAnimation(Enemy *&e)
 {
 
-Rectangle source;
-    if(e->damage==5)
+    Rectangle source;
+    if (e->damage == 5)
     {
         source = {map.texture[269].x, map.texture[269].y, SIZE, SIZE};
-        if(e->timer>60 || e->timer%3==0)
+        if (e->timer > 60 || e->timer % 3 == 0)
         {
-            DrawTexturePro(map.tilesheet, source, {e->pos.x-32,e->pos.y-32,64,64}, {0, 0}, 0, WHITE);
+            DrawTexturePro(map.tilesheet, source, {e->pos.x - 32, e->pos.y - 32, 64, 64}, {0, 0}, 0, WHITE);
         }
     }
-    else if (e->damage==2)
+    else if (e->damage == 2)
     {
 
         source = {map.texture[270].x, map.texture[270].y, SIZE, SIZE};
-        if(e->timer>60 || e->timer%3==0)
+        if (e->timer > 60 || e->timer % 3 == 0)
         {
-            DrawTexturePro(map.tilesheet, source, {e->pos.x-32,e->pos.y-32,64,64}, {0, 0}, 0, WHITE);
+            DrawTexturePro(map.tilesheet, source, {e->pos.x - 32, e->pos.y - 32, 64, 64}, {0, 0}, 0, WHITE);
         }
-
     }
     else
     {
         source = {map.texture[268].x, map.texture[268].y, SIZE, SIZE};
-        if(e->timer>60 || e->timer%3==0)
+        if (e->timer > 60 || e->timer % 3 == 0)
         {
-            DrawTexturePro(map.tilesheet, source, {e->pos.x-32,e->pos.y-32,64,64}, {0, 0}, 0, WHITE);
+            DrawTexturePro(map.tilesheet, source, {e->pos.x - 32, e->pos.y - 32, 64, 64}, {0, 0}, 0, WHITE);
         }
-
     }
 }
 
@@ -309,28 +307,6 @@ void Game::Menu()
 
 void Game::Credit()
 {
-    if (Button(1050, 700, 200, 50, "MENU", 0.32f, 3, GRAY))
-    {
-        timerFadeScreen--;
-    }
-    else if (timerFadeScreen < FPS && timerFadeScreen > 0)
-    {
-        if (music)
-        {
-            SetMusicVolume(gameSounds.creditsTheme, 0.5 - (0.5 - (timerFadeScreen * 0.5 / (float)(FPS))));
-        }
-        DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
-        FrameTimer(timerFadeScreen);
-    }
-    else if (timerFadeScreen <= 0)
-    {
-        titleID = 0;
-        creditHeight = 768;
-        timerFadeScreen = FPS;
-        StopMusicStream(gameSounds.creditsTheme);
-        credit = false;
-    }
-
     if (titleID > 45)
     {
         titleID = 0;
@@ -371,6 +347,28 @@ void Game::Credit()
             titleID++;
             creditHeight = 780;
         }
+    }
+
+    if (Button(1050, 700, 150, 35, "MENU", 0.3f, 2, GRAY))
+    {
+        timerFadeScreen--;
+    }
+    else if (timerFadeScreen < FPS && timerFadeScreen > 0)
+    {
+        if (music)
+        {
+            SetMusicVolume(gameSounds.creditsTheme, 0.5 - (0.5 - (timerFadeScreen * 0.5 / (float)(FPS))));
+        }
+        DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
+        FrameTimer(timerFadeScreen);
+    }
+    else if (timerFadeScreen <= 0)
+    {
+        titleID = 0;
+        creditHeight = 768;
+        timerFadeScreen = FPS;
+        StopMusicStream(gameSounds.creditsTheme);
+        credit = false;
     }
 }
 
@@ -740,7 +738,7 @@ void Game::UpdateAndDraw()
                     if (enemy[t]->hp <= 0)
                     {
                         money += enemy[t]->reward;
-                        enemy[t]->timer = FPS*2;
+                        enemy[t]->timer = FPS * 2;
                         enemy[t]->active = false;
                     }
                 }
