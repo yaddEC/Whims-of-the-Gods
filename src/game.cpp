@@ -25,6 +25,17 @@ Game::Game()
     timer = 0;
     timerFadeScreen = FPS;
     showTurretRange = false;
+    title = LoadTexture("assets/title.png");
+    five = LoadTexture("assets/5_plan.png");
+    fourth = LoadTexture("assets/4_plan.png");
+    third = LoadTexture("assets/3_plan.png");
+    second = LoadTexture("assets/2_plan.png");
+    first = LoadTexture("assets/1_plan.png");
+    scrollingFive = 0.0f;
+    scrollingFourth = 0.0f;
+    scrollingThird = 0.0f;
+    scrollingSecond = 0.0f;
+    scrollingFirst = 0.0f;
 
     map.Init();
     DefSpawn(map.Spawn.mPos);
@@ -67,6 +78,18 @@ bool Game::Button(int x, int y, float width, float height, const char *name, flo
     DrawRectangleLines(x, y, width, height, DARKGRAY);
 
     return res;
+}
+
+void DynamicTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint)
+{
+    if (parTimer)
+    {
+        DrawTexturePro(texture, source, {dest.x + (frameCounter - 30) / 4, dest.y + (frameCounter - 30) / 4, dest.width + 30 - frameCounter / 2, dest.height + 30 - frameCounter / 2}, origin, rotation, tint);
+    }
+    else
+    {
+        DrawTexturePro(texture, source, {dest.x - (frameCounter - 30) / 4, dest.y - (frameCounter - 30) / 4, dest.width + (frameCounter / 2), dest.height + frameCounter / 2}, origin, rotation, tint);
+    }
 }
 
 bool Game::DynamicButton(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color)
@@ -134,21 +157,62 @@ void Game::DrawTextWave()
 
 void Game::Menu()
 {
-    if (Button(440, 200, 400, 100, "START", 0.35f, 3, GRAY))
+
+    FrameTimer(frameCounter);
+    if (frameCounter == 0)
+    {
+        frameCounter = 60;
+        secondTimer++;
+    }
+    if (secondTimer % 2)
+        parTimer = true;
+    else
+        parTimer = false;
+
+    scrollingFive -= 0.1f;
+    scrollingThird -= 0.5f;
+    scrollingSecond -= 0.8f;
+    scrollingFirst -= 1.2f;
+
+    if (scrollingFive <= -five.width * 2)
+        scrollingFive = 0;
+    if (scrollingThird <= -third.width * 2)
+        scrollingThird = 0;
+    if (scrollingSecond <= -second.width * 2)
+        scrollingSecond = 0;
+    if (scrollingFirst <= -first.width * 2)
+        scrollingFirst = 0;
+
+    DrawTextureEx(five, (Vector2){scrollingFive, 20}, 0.0f, 2.0f, WHITE);
+    DrawTextureEx(five, (Vector2){five.width * 2 + scrollingFive, 20}, 0.0f, 2.0f, WHITE);
+
+    DrawTextureEx(fourth, (Vector2){1066, 369}, 0.0f, 2.0f, WHITE);
+
+    DrawTextureEx(third, (Vector2){scrollingThird, 429}, 0.0f, 2.0f, WHITE);
+    DrawTextureEx(third, (Vector2){third.width * 2 + scrollingThird, 429}, 0.0f, 2.0f, WHITE);
+
+    DrawTextureEx(second, (Vector2){scrollingSecond, 429}, 0.0f, 2.0f, WHITE);
+    DrawTextureEx(second, (Vector2){second.width * 2 + scrollingSecond, 429}, 0.0f, 2.0f, WHITE);
+
+    DrawTextureEx(first, (Vector2){scrollingFirst, 339}, 0.0f, 2.0f, WHITE);
+    DrawTextureEx(first, (Vector2){first.width * 2 + scrollingFirst, 339}, 0.0f, 2.0f, WHITE);
+    DynamicTexturePro(title, {0, 0, (float)title.width, (float)title.height}, {320, 124, (float)title.width, (float)title.height}, {0, 0}, 0, WHITE);
+
+    if (Button(545, 535, 200, 50, "START", 0.22f, 3, GRAY))
     {
         StopMusicStream(gameSounds.mainTheme);
         start = true;
     }
-    if (Button(440, 400, 400, 100, "QUIT", 0.35f, 3, GRAY))
+    if (Button(545, 590, 200, 50, "QUIT", 0.32f, 3, GRAY))
     {
         quit = true;
     }
 
-    SoundButton({480, 600, SIZE * 1.5f, SIZE * 1.5f}, music);
-    SoundButton({700, 600, SIZE * 1.5f, SIZE * 1.5f}, soundEffect);
+    SoundButton({520, 700, 48, 48}, music);
+    SoundButton({720, 700, 48, 48}, soundEffect);
 
-    DrawText("Music", 498, 570, 20, WHITE);
-    DrawText("Sound Effects", 670, 570, 20, WHITE);
+    DrawText("Music", 517, 670, 20, WHITE);
+    DrawText("Sound", 715, 670, 20, WHITE);
 }
 
 void Game::backUI()
@@ -717,6 +781,7 @@ void Game::UpdateAndDraw()
 
 Game::~Game()
 {
+
     for (Turret *t : turret)
         delete t;
     for (Enemy *e : enemy)

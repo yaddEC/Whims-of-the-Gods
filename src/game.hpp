@@ -32,6 +32,17 @@ public:
     TextureObject jackhammer;
     TextureObject menuScreen;
     TextureObject pauseScreen;
+    float scrollingFive;
+    float scrollingFourth;
+    float scrollingThird;
+    float scrollingSecond;
+    float scrollingFirst;
+    Texture2D five ;
+    Texture2D fourth ;
+    Texture2D third ;
+    Texture2D second;
+    Texture2D first ;
+    Texture2D title ;
     Tile Spawn;
     Tile Despawn;
     Tilemap map;

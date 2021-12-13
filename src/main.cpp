@@ -17,7 +17,7 @@ int main(void)
     while (!WindowShouldClose() && !game.quit)
     {
         BeginDrawing();
-        ClearBackground(BEIGE);
+        ClearBackground(GetColor(0x8db3c6ff));
 
         if (game.music)  // activate/desactivate music
         {
@@ -54,6 +54,7 @@ int main(void)
 
         DrawFPS(10, 10);
 
+        
         EndDrawing();
     }
 
