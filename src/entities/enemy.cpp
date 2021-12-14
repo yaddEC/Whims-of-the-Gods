@@ -5,6 +5,7 @@ static Vector2 Spawn;
 void DefSpawn(Vector2 pos)
 {
     Spawn = pos;
+    
 }
 
 Enemy::Enemy()
@@ -21,7 +22,7 @@ Enemy::Enemy()
 }
 
 void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
-{  
+{
     float rot;
     Vector2 dirmem;
 
@@ -33,42 +34,38 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
 
     if ((map.tile[posTile].value == '>') || ((map.tile[posTile].value == 'L' && round < 20) && (round % 2 == 1)))
     {
-        dirmem={1,0};
-        rot=0;
+        dirmem = {1, 0};
+        rot = 0;
     }
     else if ((map.tile[posTile].value == 'V') || ((map.tile[posTile].value == 'L' && round < 20) && (round % 2 == 0)))
     {
-        dirmem={0,1};
-        rot=90;
+        dirmem = {0, 1};
+        rot = 90;
     }
 
     else if (map.tile[posTile].value == '<')
     {
-        dirmem={-1,0};
-         rot=180;
+        dirmem = {-1, 0};
+        rot = 180;
     }
 
     else if (map.tile[posTile].value == 'A')
     {
-        dirmem={0,-1};
-        rot=-90;
+        dirmem = {0, -1};
+        rot = -90;
     }
     else
     {
-        
+
         Tile nullTile(999, 64, 'g');
         Tile *leftTile = (map.tile[posTile - 1].road == true && posTile % map.width != 0) ? &map.tile[posTile - 1] : &nullTile;
-        Tile *rightTile= (map.tile[posTile + 1].road == true && (posTile % map.width) != 15) ? &map.tile[posTile + 1] : &nullTile;
-        Tile *forwardTile= (map.tile[posTile + map.width].road == true && posTile < 176) ? &map.tile[posTile + map.width] : &nullTile;
-        Tile *backwardTile= (map.tile[posTile - map.width].road == true && posTile > map.width) ? &map.tile[posTile - map.width] : &nullTile;
+        Tile *rightTile = (map.tile[posTile + 1].road == true && (posTile % map.width) != 15) ? &map.tile[posTile + 1] : &nullTile;
+        Tile *forwardTile = (map.tile[posTile + map.width].road == true && posTile < 176) ? &map.tile[posTile + map.width] : &nullTile;
+        Tile *backwardTile = (map.tile[posTile - map.width].road == true && posTile > map.width) ? &map.tile[posTile - map.width] : &nullTile;
 
-      
-        
-          
-        
         if (static_cast<int>(pos.x) % 64 >= 30 && static_cast<int>(pos.x) % 64 <= 33 && static_cast<int>(pos.y) % 64 >= 30 && static_cast<int>(pos.y) % 64 <= 33)
         {
-            RandDirChooser(dirmem, pos, leftTile, rightTile, forwardTile, backwardTile, prevTile,rot);
+            RandDirChooser(dirmem, pos, leftTile, rightTile, forwardTile, backwardTile, prevTile, rot);
         }
     }
     if (static_cast<int>(pos.x) % 64 >= 30 && static_cast<int>(pos.x) % 64 <= 33 && static_cast<int>(pos.y) % 64 >= 30 && static_cast<int>(pos.y) % 64 <= 33)
@@ -126,7 +123,6 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
     }
 
     Rectangle destRec{float((int)pos.x), float((int)pos.y), SIZE, SIZE};
-    
 
     if (slowingTimer > 0)
     {
@@ -141,9 +137,13 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
     {
         DrawTexturePro(map.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, ColorAlpha(RED, 0.5));
     }
-    DrawRectangle(pos.x - 20, pos.y + 20, 40, 10, ColorAlpha(BLACK, 0.5));
-    DrawRectangle(pos.x - 20, pos.y + 20, hp * 40 / maxHp, 10, GREEN);
-    DrawRectangleLines(pos.x - 21, pos.y + 20, 42, 10, BLACK);
+  
+    if (direction.x != 0 || direction.y!=0)
+    {
+        DrawRectangle(pos.x - 20, pos.y + 20, 40, 10, ColorAlpha(BLACK, 0.5));
+        DrawRectangle(pos.x - 20, pos.y + 20, hp * 40 / maxHp, 10, GREEN);
+        DrawRectangleLines(pos.x - 21, pos.y + 20, 42, 10, BLACK);
+    }
 }
 
 Enemy::~Enemy()

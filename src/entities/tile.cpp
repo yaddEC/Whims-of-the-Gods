@@ -31,10 +31,7 @@ void Tile::Draw(Texture2D tilesheet, Vector2 frame)
     Vector2 origin = {0, 0};
     DrawTexturePro(tilesheet, source, dest, origin, 0, WHITE);
 
-    if (GetTile(GetMousePosition()) == mTilePos && GetMousePosition().x < 1024 && GetMousePosition().x > 0 && GetMousePosition().y < 768 && GetMousePosition().y > 0)
-    {
-        DrawRectangleLines(mPos.x, mPos.y, SIZE, SIZE, ColorAlpha(WHITE, 0.5));
-    }
+    
 }
 
 Tile::~Tile()

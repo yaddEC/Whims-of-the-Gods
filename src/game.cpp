@@ -4,8 +4,10 @@
 
 static bool pointSelected = false;
 static bool jackActive = false;
+static float opacityZone = 0.4;
 static int spawnTimer = 600;
 static int frameCounter = 60;
+static int animationTimer = 300;
 static int secondTimer = 0;
 static bool parTimer = false;
 static int maxEnemies = 10;
@@ -73,7 +75,7 @@ Game::Game()
     soundEffect = true;
     hp = 20;
     maxHp = 20;
-    money = 100;
+    money = 1000;
     round = 0;
     timer = 0;
     timerFadeScreen = FPS;
@@ -369,6 +371,7 @@ void Game::Credit()
     }
     else if (timerFadeScreen <= 0)
     {
+        DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
         titleID = 0;
         creditHeight = 768;
         timerFadeScreen = FPS;
@@ -510,6 +513,11 @@ void Game::backUI()
         DrawTexture(jackhammer.model, jackHammerIcon.x + 6, jackHammerIcon.y + 10, WHITE);
     }
 
+    if (GetMousePosition().x < 1024 && GetMousePosition().x > 0 && GetMousePosition().y < 768 && GetMousePosition().y > 0)
+    {
+        DrawRectangleLines(map.tile[GetTile(GetMousePosition())].mPos.x, map.tile[GetTile(GetMousePosition())].mPos.y, SIZE, SIZE, ColorAlpha(WHITE, opacityZone));
+    }
+
     if (InRec(jackHammerIcon))
     {
         DrawText("Sell Turret", 1090, 550, 20, SKYBLUE);
@@ -535,7 +543,7 @@ void Game::backUI()
                 PlaySound(gameSounds.sellTurret);
             }
             map.tile[GetTile(GetMousePosition())].environment = 9;
-            moneyTimer = FPS*2;
+            moneyTimer = FPS * 2;
             moneyGain = rand() % 15;
             money += moneyGain;
         }
@@ -551,7 +559,7 @@ void Game::backUI()
                     {
                         PlaySound(gameSounds.sellTurret);
                     }
-                    moneyTimer = FPS*2;
+                    moneyTimer = FPS * 2;
                     moneyGain = t->price / 2;
                     money += moneyGain;
                     delete t;
@@ -603,7 +611,7 @@ void Game::backUI()
     {
         for (long unsigned int i = 0; i < turret.size(); i++)
         {
-            DrawCircleV(turret[i]->pos, turret[i]->range, ColorAlpha(turret[i]->colorZone, 0.3)); // Draw turret range
+            DrawCircleV(turret[i]->pos, turret[i]->range, ColorAlpha(turret[i]->colorZone, opacityZone)); // Draw turret range
         }
     }
 
@@ -615,7 +623,7 @@ void Game::backUI()
     DrawTexturePro(map.tilesheet, pauseSource, pauseIcon, origin, 0, WHITE);
     if (InRec(pauseIcon))
     {
-        DrawRectangleLinesEx(pauseIcon, 1, ColorAlpha(WHITE, 0.3));
+        DrawRectangleLinesEx(pauseIcon, 1, ColorAlpha(WHITE, opacityZone));
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) // Pause the game
         {
@@ -632,21 +640,21 @@ void Game::frontUI()
 {
     if (jackActive)
     {
-        DrawTexture(jackhammer.model, GetMousePosition().x - 48 / 2, GetMousePosition().y, WHITE);  
+        DrawTexture(jackhammer.model, GetMousePosition().x - 48 / 2, GetMousePosition().y, WHITE);
     }
 
-    DrawText(TextFormat("%i", money), 60, 730, GetFontDefault().baseSize * 3, GOLD);  // Money UI
-    Rectangle source = {map.texture[287].x, map.texture[287].y, SIZE, SIZE};  
+    DrawText(TextFormat("%i", money), 60, 730, GetFontDefault().baseSize * 3, GOLD); // Money UI
+    Rectangle source = {map.texture[287].x, map.texture[287].y, SIZE, SIZE};
     Rectangle dest = {10, 710, SIZE, SIZE};
     Vector2 origin = {0, 0};
     DrawTexturePro(map.tilesheet, source, dest, origin, 0, GOLD);
 
-    if(moneyTimer>0)
+    if (moneyTimer > 0)
     {
-        
-        DrawText(TextFormat("+%i", moneyGain), 42, 700, GetFontDefault().baseSize * 3, ColorAlpha(GOLD, moneyTimer/(float)(FPS/2))); // Money gain indicator
+
+        DrawText(TextFormat("+%i", moneyGain), 42, 700, GetFontDefault().baseSize * 3, ColorAlpha(GOLD, moneyTimer / (float)(FPS / 2))); // Money gain indicator
     }
-    
+
     // Health bar
     DrawRectangle(1040, 720, 225, 30, DARKBROWN);
 
@@ -680,17 +688,18 @@ void Game::UpdateAndDraw()
         parTimer = true;
     else
         parTimer = false;
-    map.Draw(round);
-
-    if (!gameOver)
+   
+     if (!gameOver)
     {
+         map.Draw(round);
+
         if (!pause)
         {
             backUI();
 
             if (turret.size() > 0 && !turret.back()->active)
             {
-                DrawCircleV(turret.back()->pos, turret.back()->range, ColorAlpha(turret.back()->colorZone, 0.3)); // Draw turret range
+                DrawCircleV(turret.back()->pos, turret.back()->range, ColorAlpha(turret.back()->colorZone, opacityZone)); // Draw turret range
             }
             for (Turret *t : turret)
 
@@ -755,7 +764,7 @@ void Game::UpdateAndDraw()
                     enemy[t]->UpdateAndDraw(map, round, enemy);
                     if (enemy[t]->hp <= 0)
                     {
-                        moneyTimer = FPS*2;
+                        moneyTimer = FPS * 2;
                         moneyGain = enemy[t]->reward;
                         money += moneyGain;
                         enemy[t]->timer = FPS * 2;
@@ -875,15 +884,77 @@ void Game::UpdateAndDraw()
                 enemy.push_back(new Berserker);
                 enemy.back()->sourceTexture = berserkerEnemy;
                 round++;
+                hp = 0;
             }
 
             FrameTimer(timer);
             FrameTimer(moneyTimer);
 
             frontUI();
-
-            if (hp <= 0)
+            if (hp == 0)
             {
+                FrameTimer(animationTimer);
+            }
+            if (hp <= 0 && animationTimer >= 60)
+            {
+                pointSelected = false;
+                opacityZone = 0;
+                map.Despawn.mTilePos = 1000;
+                if (animationTimer == 300)
+                {
+                    Despawn.environment = 1;
+                }
+
+                if (animationTimer > 240)
+                {
+
+                    Rectangle source = {map.texture[63].x, map.texture[63].y, SIZE, SIZE};
+                    Vector2 origin = {0, 0};
+                    if (animationTimer % 4 == 0)
+                    {
+                        map.Despawn.environment = -1 * map.Despawn.environment;
+                    }
+
+                    Rectangle dest{float((int)map.Despawn.mPos.x), map.Despawn.mPos.y + map.Despawn.environment, SIZE, SIZE};
+                    DrawTexturePro(map.tilesheet, source, dest, origin, 0, WHITE);
+                }
+                else if (animationTimer < 240)
+                {
+                    Rectangle dest{float((int)map.Despawn.mPos.x), float((int)map.Despawn.mPos.y), SIZE, SIZE};
+                    Vector2 origin = {0, 0};
+                    Rectangle source = {map.texture[86].x, map.texture[86].y, SIZE, SIZE};
+
+                    DrawTexturePro(map.tilesheet, source, dest, origin, 0, WHITE);
+                    DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32, 50.0f, ColorAlpha(RED, 0.25f / 30.f * ((animationTimer / 4) - 30.0f)));
+                    DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32, 20.0f, ColorAlpha(ORANGE, 0.3f / 30.f * ((animationTimer / 4) - 30.0f)));
+                    float radius = (60 - (animationTimer / 4)) * 2;
+
+                    DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32 + radius, 3, ColorAlpha(ORANGE, ((animationTimer / 4) - 30) / 30.0f));
+                    DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32 - radius, 3, ColorAlpha(ORANGE, ((animationTimer / 4) - 30) / 30.0f));
+                    DrawCircle(map.Despawn.mPos.x + 32 + radius, map.Despawn.mPos.y + 32, 3, ColorAlpha(ORANGE, ((animationTimer / 4) - 30) / 30.0f));
+                    DrawCircle(map.Despawn.mPos.x + 32 - radius, map.Despawn.mPos.y + 32, 3, ColorAlpha(ORANGE, ((animationTimer / 4) - 30) / 30.0f));
+                    DrawCircle(map.Despawn.mPos.x + 32 + cos(45 * DEG2RAD) * radius, map.Despawn.mPos.y + 32 + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((animationTimer / 4) - 30) / 30.0f));
+                    DrawCircle(map.Despawn.mPos.x + 32 - cos(45 * DEG2RAD) * radius, map.Despawn.mPos.y + 32 + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((animationTimer / 4) - 30) / 30.0f));
+                    DrawCircle(map.Despawn.mPos.x + 32 + cos(45 * DEG2RAD) * radius, map.Despawn.mPos.y + 32 - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((animationTimer / 4) - 30) / 30.0f));
+                    DrawCircle(map.Despawn.mPos.x + 32 - cos(45 * DEG2RAD) * radius, map.Despawn.mPos.y + 32 - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((animationTimer / 4) - 30) / 30.0f));
+                    DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32, 1300 - ((animationTimer - 120) * 1300 / 120), ColorAlpha(WHITE, 1 - (animationTimer - 120) / 120.0f));
+                }
+
+                for (Turret *t : turret)
+                {
+                    t->active = false;
+                }
+
+                for (Enemy *e : enemy)
+                {
+                    e->direction = {0, 0};
+                }
+
+                hp = 0;
+            }
+            else if (hp <= 0 && animationTimer < 60)
+            {
+                DrawRectangle(0, 0, 1280, 768, ColorAlpha(WHITE,  1));
                 StopMusicStream(gameSounds.secondTheme);
                 if (music)
                 {
@@ -894,6 +965,7 @@ void Game::UpdateAndDraw()
         }
         else
         {
+
             DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 0.3));
 
             SoundButton({480, 600, SIZE * 1.5f, SIZE * 1.5f}, music);
@@ -921,6 +993,7 @@ void Game::UpdateAndDraw()
             }
             else if (timerFadeScreen <= 0)
             {
+                DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
                 bool currentMucic = music;
                 bool currentSound = soundEffect;
                 this->~Game();
@@ -932,9 +1005,15 @@ void Game::UpdateAndDraw()
     }
     else
     {
-        DrawRectangleGradientV(0, 0, 1280, 1500, BLACK, MAROON);
+
+        if (animationTimer != 0)
+        {
+            FrameTimer(animationTimer);
+        }
+         DrawRectangleGradientV(0, 0, 1280, 1500, BLACK, MAROON);
         DrawText(TextFormat("WAVE %i", round), 540, 200, 40, LIGHTGRAY);
         UpdateMusicStream(gameSounds.gameOver);
+         
         if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY) && timerFadeScreen == FPS)
         {
             timerFadeScreen--;
@@ -948,15 +1027,21 @@ void Game::UpdateAndDraw()
             DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
             FrameTimer(timerFadeScreen);
         }
-        else if (timerFadeScreen <= 0)
+         DrawRectangle(0, 0, 1280, 768, ColorAlpha(WHITE,  (float)(animationTimer / 60.0f)));
+         if (timerFadeScreen <= 0)
         {
+            DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
             bool currentMucic = music;
             bool currentSound = soundEffect;
+            animationTimer = 300;
+            opacityZone = 0.4;
             this->~Game();
             new (this) Game();
             this->music = currentMucic;
             this->soundEffect = currentSound;
         }
+       
+       
     }
 }
 
