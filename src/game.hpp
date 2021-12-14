@@ -27,6 +27,7 @@ public:
     int timerFadeScreen;
     int round;
     bool showTurretRange;
+    bool highScoreBeated;
     Rectangle classicTurret;
     Rectangle slowingTurret;
     Rectangle explosiveTurret;
