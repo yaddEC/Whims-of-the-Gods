@@ -1,4 +1,6 @@
 #include "game.hpp"
+#include <iostream>
+#include <fstream>
 
 #define FPS 60
 
@@ -73,6 +75,7 @@ Game::Game()
     gameOver = false;
     music = true;
     soundEffect = true;
+    highScoreBeated = false;
     hp = 20;
     maxHp = 20;
     money = 1000;
@@ -301,6 +304,14 @@ void Game::Menu()
     {
         StopMusicStream(gameSounds.mainTheme);
         credit = true;
+    }
+
+    std::ifstream readScore("HighScore.txt");
+    if (readScore)
+    {
+        int oldSocre;
+        readScore >> oldSocre;
+        DrawText(TextFormat("High Score: wave %i", oldSocre), 1050, 300, 20, WHITE);
     }
 
     SoundButton({520, 700, 48, 48}, music);
@@ -651,7 +662,6 @@ void Game::frontUI()
 
     if (moneyTimer > 0)
     {
-
         DrawText(TextFormat("+%i", moneyGain), 42, 700, GetFontDefault().baseSize * 3, ColorAlpha(GOLD, moneyTimer / (float)(FPS / 2))); // Money gain indicator
     }
 
@@ -884,7 +894,6 @@ void Game::UpdateAndDraw()
                 enemy.push_back(new Berserker);
                 enemy.back()->sourceTexture = berserkerEnemy;
                 round++;
-                hp = 0;
             }
 
             FrameTimer(timer);
@@ -955,6 +964,25 @@ void Game::UpdateAndDraw()
             else if (hp <= 0 && animationTimer < 60)
             {
                 DrawRectangle(0, 0, 1280, 768, ColorAlpha(WHITE,  1));
+                std::ifstream readScore("HighScore.txt");
+                if (readScore)
+                {
+                    int oldScore;
+                    readScore >> oldScore;
+                    if (round > oldScore)
+                    {
+                        highScoreBeated = true;
+                        std::ofstream writeScore("HighScore.txt");
+                        writeScore << round << std::endl;
+                    }
+                }
+                else
+                {
+                    highScoreBeated = true;
+                    std::ofstream writeScore("HighScore.txt");
+                    writeScore << round << std::endl;
+                }
+
                 StopMusicStream(gameSounds.secondTheme);
                 if (music)
                 {
@@ -1012,6 +1040,10 @@ void Game::UpdateAndDraw()
         }
          DrawRectangleGradientV(0, 0, 1280, 1500, BLACK, MAROON);
         DrawText(TextFormat("WAVE %i", round), 540, 200, 40, LIGHTGRAY);
+        if(highScoreBeated)
+        {
+            DrawText("New High Score!", 540, 250, 20, GOLD);
+        }
         UpdateMusicStream(gameSounds.gameOver);
          
         if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY) && timerFadeScreen == FPS)
