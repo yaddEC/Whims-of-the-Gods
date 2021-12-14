@@ -92,4 +92,4 @@ $make clean
 
 - Last version: **v1.0**
 - Last Update date: **12/17/2021**
-- Authors: **DECHAUX Yann** & **HENO Matiac**
+- Authors: **DECHAUX Yann** & **HENO Matias**
