@@ -4,25 +4,30 @@
 #include <vector>
 #include <cmath>
 #include <mathematics.hpp>
+#include "../sounds.hpp"
+
 
 class Entity
 {
     public:
-    
-    TextureObject texture;
-    bool active = false;
+    Entity();
+    float rotation;
+    Rectangle sourceTexture;
+    int damage;
+    int timer;
+    bool active;
     int hp;
     Vector2 pos;
-    Vector2 posTile;
+    int posTile;
 
     virtual void UpdateAndDraw()
     {
-
     }
 };
 
 
 void FrameTimer(int &timer);
+void DefSpawn(Vector2 pos);
 
 
 

@@ -4,65 +4,72 @@
 #include <raylib.h>
 #include "entities/turret.hpp"
 #include "entities/enemy.hpp"
-#include "entities/tower.hpp"
-
-class Tile
-{
-private:
-    int mTilePos;
-    int mWidthTile;
-
-public:
-    Vector2 mPos;
-    char value;
-    bool active;
-    Tile();
-    ~Tile();
-
-    void Init(int i, int mapWidth, char val);
-
-    void Draw(Texture2D tilesheet, Tile frame);
-};
-
-class Tilemap
-{
-private:
-    const char *plan;
-    int mHeight;
-    int mWidth;
-    int total;
-
-public:
-    Tile *tile;
-    Texture2D tilesheet;
-    Tile texture[368];
-    Tilemap();
-    void Init();
-    void Draw();
-    ~Tilemap();
-};
 
 class Game
 {
 public:
-    bool quit = false;
-    bool start = false;
-    int money = 100;
+    bool quit;
+    bool start;
+    bool pause;
+    bool gameOver;
+    bool music;
+    bool soundEffect;
+
+    bool credit;
+    int creditHeight;
+    std::vector<const char*> creditTitle;
+    int titleID;
+
+    int hp;
+    int maxHp;
+    int money;
     int timer;
-    bool showTurretRange = false;
-    TextureObject classicTurret;
-    TextureObject slowingTurret;
-    TextureObject explosiveTurret;
+    int timerFadeScreen;
+    int round;
+    bool showTurretRange;
+    bool highScoreBeated;
+    Rectangle classicTurret;
+    Rectangle slowingTurret;
+    Rectangle explosiveTurret;
+    Rectangle pauseSource;
+    Rectangle warriorEnemy;
+    Rectangle healerEnemy;
+    Rectangle berserkerEnemy;
     TextureObject jackhammer;
+    TextureObject menuScreen;
+    TextureObject pauseScreen;
+    float scrollingFive;
+    float scrollingFourth;
+    float scrollingThird;
+    float scrollingSecond;
+    float scrollingFirst;
+    Texture2D five;
+    Texture2D fourth;
+    Texture2D third;
+    Texture2D second;
+    Texture2D first;
+    Texture2D title;
+    Tile Spawn;
+    Tile Despawn;
     Tilemap map;
+    GameSounds gameSounds;
+    TurretSounds turretSounds;
+    EnemySounds enemySounds;
     std::vector<Turret *> turret;
     std::vector<Enemy *> enemy;
     Game();
     void Menu();
+    void Credit();
     void UpdateAndDraw();
-    void UpdateAndDrawUI();
+    void backUI();
+    void frontUI();
     void UpdateAndDrawTurret();
     void UpdateAndDrawEnemy();
+    bool Button(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color);
+    bool DynamicButton(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color);
+    void SoundButton(Rectangle dest, bool &type);
+    void DrawTextWave();
+    void EnemyDestroyedAnimation(Enemy *&e);
     ~Game();
 };
 
@@ -70,5 +77,4 @@ bool InRec(int x, int y, float width, float height);
 
 bool InRec(Rectangle rec);
 
-bool Button(int x, int y, float width, float height, const char *name, Color color);
-
+bool Button(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color, Sound &sound);

@@ -9,24 +9,27 @@ bool InRec(Rectangle rec);
 class Turret : public Entity
 {
 public:
-    int id;
-    float range = 100.0f;
-    float rotation = 0.0f;
-    int target = -1;
-    int damage;
+    enum Type
+    {
+        CLASSIC=1,
+        SLOWING,
+        EXPLOSIVE
+    };
+    Type id;
+    float range;
+    int target;
     int price;
+    int updatePrice;
     float attackSpeed;
     Vector2 explosionPos;
-    float slowEffect = 1;
-    int timer = 0;
+    float slowEffect;
+    bool showTurretUpgrade;
     Color colorZone;
 
-    void UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos);
+    void UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, TurretSounds &turretSounds, bool soundEffect);
 
-    Turret()
-    {
-        colorZone = DARKBLUE;
-    }
+    Turret();
+
     virtual ~Turret()
     {
     }
@@ -36,35 +39,17 @@ class ClassicTurret : public Turret
 {
 
 public:
-    ClassicTurret()
-    {
-        damage = 10;
-        price = 100;
-        attackSpeed = 2;
-    }
+    ClassicTurret();
 };
 
 class SlowingTurret : public Turret
 {
 public:
-    SlowingTurret()
-    {
-
-        damage = 5;
-        price = 150;
-        attackSpeed = 6;
-        slowEffect = 0.5f;
-    }
+    SlowingTurret();
 };
 
 class ExplosiveTurret : public Turret
 {
 public:
-    ExplosiveTurret()
-    {
-
-        damage = 20;
-        price = 200;
-        attackSpeed = 1;
-    }
+    ExplosiveTurret();
 };

@@ -2,6 +2,7 @@
 #include <cmath>
 #include <vector>
 #include <raylib.h>
+#include <time.h>
 
 #define SIZE 64.0f
 
@@ -47,4 +48,16 @@ int GetTile(A vec)
 {
 
     return static_cast<int>(vec.x/64)+16*static_cast<int>(vec.y/64);
+}
+
+template<typename A>
+void DirGet(A a,A b, A &c )
+{
+    b.x+=32;
+    b.y+=32;
+A d=vector(a,b);
+c.x=d.x/norm(d);
+c.y=d.y/norm(d);
+
+
 }

@@ -4,36 +4,73 @@
 
 int main(void)
 {
-    const int screenWidth  = 1280;
+    const int screenWidth = 1280;
     const int screenHeight = 768;
 
     SetConfigFlags(FLAG_VSYNC_HINT);
-    InitWindow(screenWidth, screenHeight, "BLINDER");
+    InitWindow(screenWidth, screenHeight, "Whim Of The Gods");
     InitAudioDevice();
+
     Game game = {};
-    
+
     // Main game loop
     while (!WindowShouldClose() && !game.quit)
     {
         BeginDrawing();
-        ClearBackground(RAYWHITE);
+        ClearBackground(GetColor(0x8db3c6ff));
 
-        if(game.start)
+        if (game.music)  // activate/desactivate music
         {
-            DrawRectangle(1024,0,256,768,BROWN);
-            game.UpdateAndDraw();
+            SetMusicVolume(game.gameSounds.mainTheme, 0.5f);
+            SetMusicVolume(game.gameSounds.secondTheme, 0.5f);
+            SetMusicVolume(game.gameSounds.gameOver, 0.5f);
+            SetMusicVolume(game.gameSounds.creditsTheme, 0.5f);
         }
         else
         {
+            SetMusicVolume(game.gameSounds.mainTheme, 0);
+            SetMusicVolume(game.gameSounds.secondTheme, 0);
+            SetMusicVolume(game.gameSounds.gameOver, 0);
+            SetMusicVolume(game.gameSounds.creditsTheme, 0);
+        }
+
+        if (game.start) // if button start is pressed
+        {
+            if (!IsMusicStreamPlaying(game.gameSounds.secondTheme) && game.hp > 0)
+            {
+                PlayMusicStream(game.gameSounds.secondTheme);
+            }
+            DrawRectangle(1024, 0, 256, 768, BROWN);
+            DrawRectangle(1030, 530, 245, 170, ColorAlpha(DARKBROWN, 0.5));
+            game.UpdateAndDraw();
+        }
+        else if(game.credit)
+        {
+            if (!IsMusicStreamPlaying(game.gameSounds.creditsTheme))
+            {
+                PlayMusicStream(game.gameSounds.creditsTheme);
+            }
+            game.Credit();
+        }
+        else // print menu
+        {
+            if (!IsMusicStreamPlaying(game.gameSounds.mainTheme))
+            {
+                PlayMusicStream(game.gameSounds.mainTheme);
+            }
             game.Menu();
         }
-        
+
+        UpdateMusicStream(game.gameSounds.mainTheme);
+        UpdateMusicStream(game.gameSounds.secondTheme);
+        UpdateMusicStream(game.gameSounds.creditsTheme);
+
         DrawFPS(10, 10);
 
+        
         EndDrawing();
     }
 
-   
     CloseAudioDevice();
     CloseWindow();
 

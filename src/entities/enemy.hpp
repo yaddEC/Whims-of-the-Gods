@@ -1,80 +1,49 @@
 #pragma once
 #include "entity.hpp"
+#include "tile.hpp"
+
+
+void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, Tile *c, Tile *d, int PrevTile,float &rotation);
 
 class Enemy : public Entity
 {
 public:
     Enemy();
-    int radius = 5.0f;
-    int damage;
-    int hp = 60;
+
+    int radius;
+    int hp;
+    int maxHp;
+    int prevTile;
+    int healTimer;
     float speed;
-    int slowingTimer = 0;
-    float slowingCoef = 1;
+    int slowingTimer;
+    float slowingCoef;
     Vector2 direction;
-    int reward = 5;
+    int looking;
+    int reward;
+    Color color;
 
-    void UpdateAndDraw() override
-    {
-        FrameTimer(slowingTimer);
+    void UpdateAndDraw(Tilemap &map, int round,std::vector<Enemy *> &enemy);
+    
+    virtual ~Enemy();
 
-        if (pos.x - radius < 0 || pos.x + radius > 1024) // TEST ENEMY
-            direction.x *= -1;
-        if (pos.y - radius < 0 || pos.y + radius > 768)
-            direction.y *= -1;
-        if(slowingTimer==0 && slowingCoef != 1)
-        {
-            slowingCoef = 1;
-        }
-        pos.x += direction.x*slowingCoef;
-        pos.y += direction.y*slowingCoef;
-
-        DrawCircle(pos.x, pos.y, radius, RED);
-        DrawRectangle(pos.x-20, pos.y+20, 40,10, ColorAlpha(BLACK, 0.5));
-        DrawRectangle(pos.x-20, pos.y+20, hp*40/60,10, GREEN);
-        DrawRectangleLines(pos.x-21, pos.y+20, 42,10, BLACK);
-       
-    }
-    virtual ~Enemy()
-    {
-    }
 };
 
 class Warrior : public Enemy
 {
 public:
-    Warrior()
-    {
-        damage = 2;
-        speed = 4;
-        hp = 10;
-    }
-    void UpdateAndDraw() override
-    {
-    }
+    Warrior();
 };
 
 class Healer : public Enemy
 {
-private:
-    int heal;
-    int timer;
 
 public:
-    Healer()
-    {
-        damage = 1;
-    }
-
-    void UpdateAndDraw() override
-    {
-    }
+    Healer();
 };
 
 class Berserker : public Enemy
 {
 public:
-    void UpdateAndDraw() override
-    {
-    }
+    Berserker();
 };
