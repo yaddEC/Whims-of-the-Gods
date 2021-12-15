@@ -17,13 +17,12 @@ int main(void)
 
     Game game = {};
 
-    // Main game loop
-    while (!WindowShouldClose() && !game.quit)
+    while (!WindowShouldClose() && !game.quit) // Main game loop
     {
         BeginDrawing();
         ClearBackground(GetColor(0x8db3c6ff));
 
-        if (game.music)  // activate/desactivate music
+        if (game.music) // activate/desactivate music
         {
             SetMusicVolume(gRes->sounds.mainTheme, 0.5f);
             SetMusicVolume(gRes->sounds.secondTheme, 0.5f);
@@ -38,42 +37,42 @@ int main(void)
             SetMusicVolume(gRes->sounds.creditsTheme, 0);
         }
 
-        if (game.start) // if button start is pressed
+        if (game.start) // if start button is pressed
         {
             if (game.hp > 0)
             {
                 game.currentMusic = &(gRes->sounds.secondTheme);
-                PlayMusicStream(gRes->sounds.secondTheme);
+                PlayMusicStream(gRes->sounds.secondTheme); //  Play game music
             }
             DrawRectangle(1024, 0, 256, 768, BROWN);
             DrawRectangle(1030, 530, 245, 170, ColorAlpha(DARKBROWN, 0.5));
+
             game.UpdateAndDraw();
         }
-        else if(game.credit)
+
+        else if (game.credit) // if credit button is pressed
         {
-            if (!IsMusicStreamPlaying(gRes->sounds.creditsTheme))
-            {
-                game.currentMusic = &(gRes->sounds.creditsTheme);
-                PlayMusicStream(gRes->sounds.creditsTheme);
-            }
+
+            game.currentMusic = &(gRes->sounds.creditsTheme);
+            PlayMusicStream(gRes->sounds.creditsTheme); //  Play credits music
+
             game.Credit();
         }
+
         else // print menu
         {
-            /* if (!IsMusicStreamPlaying(gRes->sounds.mainTheme))
-            { */
-                game.currentMusic = &(gRes->sounds.mainTheme);
-                PlayMusicStream(gRes->sounds.mainTheme);
-            /* } */
+
+            game.currentMusic = &(gRes->sounds.mainTheme);
+            PlayMusicStream(gRes->sounds.mainTheme); //  Play menu music
+
             game.Menu();
         }
 
-        if (game.currentMusic)
+        if (game.currentMusic) // update current music
             UpdateMusicStream(*(game.currentMusic));
 
         DrawFPS(10, 10);
 
-        
         EndDrawing();
     }
 

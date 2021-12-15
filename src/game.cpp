@@ -5,8 +5,8 @@
 
 #define FPS 60
 
-static bool pointSelected = false;
-static bool jackActive = false;
+static bool turretSelected = false; // Is a turret selected (dragged)
+static bool jackActive = false;     // Is jackhammer slected (dragged)
 static float opacityZone = 0.4;
 static int spawnTimer = 600;
 static int frameCounter = 60;
@@ -15,7 +15,7 @@ static int secondTimer = 0;
 static bool parTimer = false;
 static int maxEnemies = 10;
 
-static int moneyTimer = 0;
+static int moneyTimer = 0; // Timer for the money gain animation (the "+$" stay for a cupple of frames)
 static int moneyGain = 0;
 
 Game::Game()
@@ -74,8 +74,8 @@ Game::Game()
     start = false;
     pause = false;
     gameOver = false;
-    music = true;
-    soundEffect = true;
+    music = true;       // Is music activated
+    soundEffect = true; // Are sound effects activated
     highScoreBeated = false;
     hp = 20;
     maxHp = 20;
@@ -85,7 +85,7 @@ Game::Game()
     timerFadeScreen = FPS;
     showTurretRange = false;
 
-    scrollingFive = 0.0f;
+    scrollingFive = 0.0f; // background slides positions in main menu
     scrollingFourth = 0.0f;
     scrollingThird = 0.0f;
     scrollingSecond = 0.0f;
@@ -105,7 +105,7 @@ Game::Game()
     berserkerEnemy = {map.texture[246].x, map.texture[246].y, SIZE, SIZE};
 }
 
-bool Game::Button(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color)
+bool Game::Button(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color) // Create a button, returns true when pressed
 {
     bool res = false;
 
@@ -118,9 +118,8 @@ bool Game::Button(int x, int y, float width, float height, const char *name, flo
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             if (soundEffect)
-            {
                 PlaySound(gRes->sounds.button);
-            }
+
             res = true;
             DrawRectangle(x, y, width, height, RED);
         }
@@ -132,31 +131,25 @@ bool Game::Button(int x, int y, float width, float height, const char *name, flo
     return res;
 }
 
-void DynamicTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint)
+void DynamicTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint) //  animated DrawTexturePro (used for title in main menu)
 {
     if (parTimer)
-    {
         DrawTexturePro(texture, source, {dest.x + (frameCounter - 30) / 4, dest.y + (frameCounter - 30) / 4, dest.width + 30 - frameCounter / 2, dest.height + 30 - frameCounter / 2}, origin, rotation, tint);
-    }
+
     else
-    {
         DrawTexturePro(texture, source, {dest.x - (frameCounter - 30) / 4, dest.y - (frameCounter - 30) / 4, dest.width + (frameCounter / 2), dest.height + frameCounter / 2}, origin, rotation, tint);
-    }
 }
 
-bool Game::DynamicButton(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color)
+bool Game::DynamicButton(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color) //  animated button (used for ready button)
 {
-
     if (parTimer)
-    {
         return Button(x + (frameCounter - 30) / 4, y + (frameCounter - 30) / 4, width + 30 - frameCounter / 2, height + 30 - frameCounter / 2, name, nameSpacing - 0.05 + (frameCounter / 2 * 0.001666), nameSize + 1.2 - (frameCounter / 2 * 0.04), color);
-    }
+
     else
-    {
         return Button(x - (frameCounter - 30) / 4, y - (frameCounter - 30) / 4, width + (frameCounter / 2), height + frameCounter / 2, name, nameSpacing - (frameCounter / 2 * 0.001666), nameSize + (frameCounter / 2 * 0.04), color);
-    }
 }
-void Game::SoundButton(Rectangle dest, bool &type)
+
+void Game::SoundButton(Rectangle dest, bool &type) // Create sound button, returns true when pressed
 {
 
     if (InRec(dest))
@@ -166,9 +159,8 @@ void Game::SoundButton(Rectangle dest, bool &type)
         {
             type = !type;
             if (soundEffect)
-            {
                 PlaySound(gRes->sounds.button);
-            }
+
         }
     }
     else
@@ -189,7 +181,7 @@ void Game::SoundButton(Rectangle dest, bool &type)
     DrawTexturePro(gRes->textures.tilesheet, source, dest, {0, 0}, 0, WHITE);
 }
 
-void Game::EnemyDestroyedAnimation(Enemy *&e)
+void Game::EnemyDestroyedAnimation(Enemy *&e) // Enemies death animation
 {
 
     Rectangle source;
@@ -228,7 +220,7 @@ void Game::DrawTextWave()
     }
     else
     {
-        DrawText(TextFormat("WAVE %i", round), 370, 350, 80, ColorAlpha(WHITE, (timer - FPS * 2) / (float)FPS));
+        DrawText(TextFormat("WAVE %i", round), 370, 350, 80, ColorAlpha(WHITE, (timer - FPS * 7) / (float)FPS));
     }
 }
 
@@ -416,7 +408,7 @@ void Game::backUI()
     Rectangle dest = {classicTurretIcon.x - 5, classicTurretIcon.y + 62, SIZE / 2, SIZE / 2};
     DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, priceColor);
 
-    if (InRec(classicTurretIcon))
+    if (InRec(classicTurretIcon) && hp > 0)
     {
         DrawText("Classic Turret", 1070, 550, 20, RED);
         DrawText("Damage: Medium", 1050, 600, 20, BLACK);
@@ -424,7 +416,7 @@ void Game::backUI()
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 50) // Buy and place new classic turret
         {
-            pointSelected = true;
+            turretSelected = true;
             turret.push_back(new ClassicTurret);
             turret.back()->sourceTexture = classicTurret;
         }
@@ -447,7 +439,7 @@ void Game::backUI()
     {
         DrawTexturePro(gRes->textures.tilesheet, {map.texture[284].x, map.texture[284].y, SIZE, SIZE}, slowingTurretIcon, origin, 0, WHITE);
     }
-    if (InRec(slowingTurretIcon))
+    if (InRec(slowingTurretIcon) && hp > 0)
     {
         if (round < 3)
         {
@@ -463,7 +455,7 @@ void Game::backUI()
 
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 150) // Buy and place new slowing turret
             {
-                pointSelected = true;
+                turretSelected = true;
                 turret.push_back(new SlowingTurret);
                 turret.back()->sourceTexture = slowingTurret;
             }
@@ -487,7 +479,7 @@ void Game::backUI()
     {
         DrawTexturePro(gRes->textures.tilesheet, {map.texture[284].x, map.texture[284].y, SIZE, SIZE}, explosiveTurretIcon, origin, 0, WHITE);
     }
-    if (InRec(explosiveTurretIcon))
+    if (InRec(explosiveTurretIcon) && hp > 0)
     {
         if (round < 5)
         {
@@ -503,7 +495,7 @@ void Game::backUI()
 
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 300) // Buy and place new explosive turret
             {
-                pointSelected = true;
+                turretSelected = true;
                 turret.push_back(new ExplosiveTurret);
                 turret.back()->sourceTexture = explosiveTurret;
             }
@@ -523,7 +515,7 @@ void Game::backUI()
         DrawRectangleLines(map.tile[GetTile(GetMousePosition())].mPos.x, map.tile[GetTile(GetMousePosition())].mPos.y, SIZE, SIZE, ColorAlpha(WHITE, opacityZone));
     }
 
-    if (InRec(jackHammerIcon))
+    if (InRec(jackHammerIcon) && hp > 0)
     {
         DrawText("Sell Turret", 1090, 550, 20, SKYBLUE);
         DrawText("Recover half the", 1070, 580, 19, BLACK);
@@ -577,7 +569,7 @@ void Game::backUI()
         jackActive = !jackActive;
     }
 
-    if (pointSelected)
+    if (turretSelected)
     {
         if (GetMousePosition().x < 1024 && GetMousePosition().x > 0 && GetMousePosition().y < 768 && GetMousePosition().y > 0)
         {
@@ -596,7 +588,7 @@ void Game::backUI()
             {
                 delete turret.back();
                 turret.pop_back();
-                pointSelected = false;
+                turretSelected = false;
             }
         }
         else
@@ -607,7 +599,7 @@ void Game::backUI()
                 money -= turret.back()->price;
                 map.tile[GetTile(GetMousePosition())].active = true;
                 turret.back()->active = true;
-                pointSelected = false;
+                turretSelected = false;
             }
         }
     }
@@ -669,7 +661,7 @@ void Game::frontUI()
     DrawRectangleLines(1040, 720, 225, 30, WHITE);
     DrawText(TextFormat("%i / %i", hp, maxHp), 1050, 727, GetFontDefault().baseSize * 2, WHITE);
 
-    if (timer == 0 && enemy.size() == 0 && DynamicButton(400, 685, 224, 50, "Ready", 0.3f, 3, GREEN))
+    if (timer == 0 && enemy.size() == 0 && DynamicButton(400, 685, 224, 50, "Ready", 0.3f, 3, GREEN) && hp > 0)
     {
         round++;
         timer = spawnTimer;
@@ -907,7 +899,12 @@ void Game::UpdateAndDraw()
                         PlayMusicStream(gRes->sounds.kaboom);
                     }
 
-                    pointSelected = false;
+                    if (turretSelected)
+                    {
+                        delete turret.back();
+                        turret.pop_back();
+                        turretSelected = false;
+                    }
                     opacityZone = 0;
                     map.Despawn.mTilePos = 1000;
                 }
@@ -1039,7 +1036,7 @@ void Game::UpdateAndDraw()
             PlayMusicStream(gRes->sounds.gameOver);
         }
         DrawRectangleGradientV(0, 0, 1280, 1500, BLACK, MAROON);
-        DrawText(TextFormat("WAVE %i", round), 540, 200, 40, LIGHTGRAY);
+        DrawTextWave();
         if (highScoreBeated)
         {
             DrawText("New High Score!", 540, 250, 20, GOLD);
