@@ -47,3 +47,4 @@ host: $(PROGRAM)$(EXT)
 clean:
 	rm -f $(OBJS) $(DEPS) $(PROGRAM) build.tar.gz
 	rm -f $(PROGRAM).html $(PROGRAM).js $(PROGRAM).data $(PROGRAM).wasm
+	rm -f HighScore.txt

@@ -632,7 +632,7 @@ void Game::backUI()
     }
 
     DrawTexturePro(map.tilesheet, pauseSource, pauseIcon, origin, 0, WHITE);
-    if (InRec(pauseIcon))
+    if (hp > 0 && InRec(pauseIcon))
     {
         DrawRectangleLinesEx(pauseIcon, 1, ColorAlpha(WHITE, opacityZone));
 
@@ -698,10 +698,10 @@ void Game::UpdateAndDraw()
         parTimer = true;
     else
         parTimer = false;
-   
-     if (!gameOver)
+
+    if (!gameOver)
     {
-         map.Draw(round);
+        map.Draw(round);
 
         if (!pause)
         {
@@ -894,24 +894,36 @@ void Game::UpdateAndDraw()
                 enemy.push_back(new Berserker);
                 enemy.back()->sourceTexture = berserkerEnemy;
                 round++;
+                hp = 0;
             }
 
             FrameTimer(timer);
             FrameTimer(moneyTimer);
 
             frontUI();
-            if (hp == 0)
+            if (hp <= 0)
             {
-                FrameTimer(animationTimer);
-            }
-            if (hp <= 0 && animationTimer >= 60)
-            {
-                pointSelected = false;
-                opacityZone = 0;
-                map.Despawn.mTilePos = 1000;
                 if (animationTimer == 300)
                 {
                     Despawn.environment = 1;
+                    StopMusicStream(gameSounds.secondTheme);
+                    SetMusicVolume(gameSounds.kaboom, 1);
+                    PlayMusicStream(gameSounds.kaboom);
+                    pointSelected = false;
+                    opacityZone = 0;
+                    map.Despawn.mTilePos = 1000;
+                }
+                FrameTimer(animationTimer);
+                UpdateMusicStream(gameSounds.kaboom);
+
+                for (Turret *t : turret)
+                {
+                    t->active = false;
+                }
+
+                for (Enemy *e : enemy)
+                {
+                    e->direction = {0, 0};
                 }
 
                 if (animationTimer > 240)
@@ -927,7 +939,8 @@ void Game::UpdateAndDraw()
                     Rectangle dest{float((int)map.Despawn.mPos.x), map.Despawn.mPos.y + map.Despawn.environment, SIZE, SIZE};
                     DrawTexturePro(map.tilesheet, source, dest, origin, 0, WHITE);
                 }
-                else if (animationTimer < 240)
+
+                else if (animationTimer <= 240 && animationTimer > 60)
                 {
                     Rectangle dest{float((int)map.Despawn.mPos.x), float((int)map.Despawn.mPos.y), SIZE, SIZE};
                     Vector2 origin = {0, 0};
@@ -949,48 +962,35 @@ void Game::UpdateAndDraw()
                     DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32, 1300 - ((animationTimer - 120) * 1300 / 120), ColorAlpha(WHITE, 1 - (animationTimer - 120) / 120.0f));
                 }
 
-                for (Turret *t : turret)
+                else
                 {
-                    t->active = false;
-                }
-
-                for (Enemy *e : enemy)
-                {
-                    e->direction = {0, 0};
-                }
-
-                hp = 0;
-            }
-            else if (hp <= 0 && animationTimer < 60)
-            {
-                DrawRectangle(0, 0, 1280, 768, ColorAlpha(WHITE,  1));
-                std::ifstream readScore("HighScore.txt");
-                if (readScore)
-                {
-                    int oldScore;
-                    readScore >> oldScore;
-                    if (round > oldScore)
+                    DrawRectangle(0, 0, 1280, 768, ColorAlpha(WHITE, 1));
+                    std::ifstream readScore("HighScore.txt");
+                    if (readScore)
+                    {
+                        int oldScore;
+                        readScore >> oldScore;
+                        if (round > oldScore)
+                        {
+                            highScoreBeated = true;
+                            std::ofstream writeScore("HighScore.txt");
+                            writeScore << round << std::endl;
+                        }
+                    }
+                    else
                     {
                         highScoreBeated = true;
                         std::ofstream writeScore("HighScore.txt");
                         writeScore << round << std::endl;
                     }
-                }
-                else
-                {
-                    highScoreBeated = true;
-                    std::ofstream writeScore("HighScore.txt");
-                    writeScore << round << std::endl;
-                }
 
-                StopMusicStream(gameSounds.secondTheme);
-                if (music)
-                {
-                    PlayMusicStream(gameSounds.gameOver);
+                    StopMusicStream(gameSounds.secondTheme);
+                    gameOver = true;
+                    StopMusicStream(gameSounds.kaboom);
                 }
-                gameOver = true;
             }
         }
+
         else
         {
 
@@ -1031,21 +1031,26 @@ void Game::UpdateAndDraw()
             }
         }
     }
+
     else
     {
 
-        if (animationTimer != 0)
+        if (animationTimer > 0)
         {
             FrameTimer(animationTimer);
         }
-         DrawRectangleGradientV(0, 0, 1280, 1500, BLACK, MAROON);
+        else if (music && !IsMusicStreamPlaying(gameSounds.gameOver))
+        {
+            PlayMusicStream(gameSounds.gameOver);
+        }
+        DrawRectangleGradientV(0, 0, 1280, 1500, BLACK, MAROON);
         DrawText(TextFormat("WAVE %i", round), 540, 200, 40, LIGHTGRAY);
-        if(highScoreBeated)
+        if (highScoreBeated)
         {
             DrawText("New High Score!", 540, 250, 20, GOLD);
         }
         UpdateMusicStream(gameSounds.gameOver);
-         
+
         if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY) && timerFadeScreen == FPS)
         {
             timerFadeScreen--;
@@ -1059,8 +1064,8 @@ void Game::UpdateAndDraw()
             DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
             FrameTimer(timerFadeScreen);
         }
-         DrawRectangle(0, 0, 1280, 768, ColorAlpha(WHITE,  (float)(animationTimer / 60.0f)));
-         if (timerFadeScreen <= 0)
+        DrawRectangle(0, 0, 1280, 768, ColorAlpha(WHITE, (float)(animationTimer / 60.0f)));
+        if (timerFadeScreen <= 0)
         {
             DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
             bool currentMucic = music;
@@ -1072,8 +1077,6 @@ void Game::UpdateAndDraw()
             this->music = currentMucic;
             this->soundEffect = currentSound;
         }
-       
-       
     }
 }
 

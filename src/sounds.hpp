@@ -5,10 +5,11 @@ class GameSounds
 public:
     Music mainTheme;
     Music secondTheme;
-    Sound button;
-    Sound sellTurret;
     Music gameOver;
     Music creditsTheme;
+    Music kaboom;
+    Sound button;
+    Sound sellTurret;
     GameSounds();
     ~GameSounds();
 };
