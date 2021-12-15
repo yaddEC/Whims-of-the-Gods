@@ -71,8 +71,6 @@ int main(void)
         if (game.currentMusic) // update current music
             UpdateMusicStream(*(game.currentMusic));
 
-        DrawFPS(10, 10);
-
         EndDrawing();
     }
 

@@ -402,7 +402,7 @@ void Game::backUI()
         priceColor = classicColor = textureColor = LIGHTGRAY;
     }
 
-    if (enemy.size() != 0 && Button(1227, 69, 32, 32, TextFormat("x%i", gameSpeed), 0.2f, 2, BLANK))
+    if (hp>0 && enemy.size() != 0 && Button(1227, 69, 32, 32, TextFormat("x%i", gameSpeed), 0.2f, 2, BLANK))
     {
         switch (gameSpeed)
         {
@@ -685,7 +685,7 @@ void Game::frontUI()
     DrawRectangleLines(1040, 720, 225, 30, WHITE);
     DrawText(TextFormat("%i / %i", hp, maxHp), 1050, 727, GetFontDefault().baseSize * 2, WHITE);
 
-    if (timer == 0 && enemy.size() == 0 && DynamicButton(400, 685, 224, 50, "Ready", 0.3f, 3, GREEN) && hp > 0)
+    if (timer == 0 && enemy.size() == 0 && hp > 0 && DynamicButton(400, 685, 224, 50, "Ready", 0.3f, 3, GREEN))
     {
         switch (gameSpeed)
         {
@@ -702,6 +702,7 @@ void Game::frontUI()
 
             break;
         }
+
 
         round++;
         timer = spawnTimer;
@@ -794,6 +795,10 @@ void Game::UpdateAndDraw()
                         SetTargetFPS(60);
                     }
                     hp -= enemy[t]->damage;
+                    if(hp<0)
+                    {
+                        hp = 0;
+                    }
                     Enemy *tmp = enemy[t];
                     enemy.erase(enemy.begin() + t);
                     delete tmp;
