@@ -14,6 +14,7 @@ static int animationTimer = 300;
 static int secondTimer = 0;
 static bool parTimer = false;
 static int maxEnemies = 10;
+static int gameSpeed = 1;
 
 static int moneyTimer = 0; // Timer for the money gain animation (the "+$" stay for a cupple of frames)
 static int moneyGain = 0;
@@ -160,7 +161,6 @@ void Game::SoundButton(Rectangle dest, bool &type) // Create sound button, retur
             type = !type;
             if (soundEffect)
                 PlaySound(gRes->sounds.button);
-
         }
     }
     else
@@ -398,6 +398,28 @@ void Game::backUI()
     if (money < 50)
     {
         priceColor = classicColor = textureColor = LIGHTGRAY;
+    }
+
+    if (enemy.size() != 0 && Button(1227, 69, 32, 32, TextFormat("x%i", gameSpeed), 0.2f, 2, BLANK))
+    {
+        switch (gameSpeed)
+        {
+        case 4:
+            gameSpeed = 8;
+            SetTargetFPS(480);
+
+            break;
+        case 8:
+            gameSpeed = 1;
+            SetTargetFPS(60);
+
+            break;
+        default:
+            gameSpeed = 4;
+            SetTargetFPS(240);
+
+            break;
+        }
     }
 
     DrawRectangleLinesEx(classicTurretIcon, 2, classicColor);
@@ -663,6 +685,22 @@ void Game::frontUI()
 
     if (timer == 0 && enemy.size() == 0 && DynamicButton(400, 685, 224, 50, "Ready", 0.3f, 3, GREEN) && hp > 0)
     {
+        switch (gameSpeed)
+        {
+        case 4:
+            SetTargetFPS(240);
+
+            break;
+        case 8:
+            SetTargetFPS(480);
+
+            break;
+        default:
+            SetTargetFPS(60);
+
+            break;
+        }
+
         round++;
         timer = spawnTimer;
         if (round > 5)
@@ -749,6 +787,10 @@ void Game::UpdateAndDraw()
             {
                 if (enemy[t]->posTile == map.Despawn.mTilePos)
                 {
+                    if (enemy.size() == 1)
+                    {
+                        SetTargetFPS(60);
+                    }
                     hp -= enemy[t]->damage;
                     Enemy *tmp = enemy[t];
                     enemy.erase(enemy.begin() + t);
@@ -769,11 +811,16 @@ void Game::UpdateAndDraw()
                 }
                 else if (enemy[t]->timer > 0)
                 {
+
                     EnemyDestroyedAnimation(enemy[t]);
                     FrameTimer(enemy[t]->timer);
                 }
                 else
                 {
+                    if (enemy.size() == 1)
+                    {
+                        SetTargetFPS(60);
+                    }
                     Enemy *tmp = enemy[t];
                     enemy.erase(enemy.begin() + t);
                     delete tmp;
@@ -879,7 +926,6 @@ void Game::UpdateAndDraw()
                 enemy.push_back(new Berserker);
                 enemy.back()->sourceTexture = berserkerEnemy;
                 round++;
-                hp = 0;
             }
 
             FrameTimer(timer);
@@ -890,6 +936,8 @@ void Game::UpdateAndDraw()
             {
                 if (animationTimer == 300)
                 {
+                    SetTargetFPS(60);
+                    gameSpeed = 1;
                     Despawn.environment = 1;
                     StopMusicStream(gRes->sounds.secondTheme);
                     if (soundEffect)
@@ -1000,7 +1048,10 @@ void Game::UpdateAndDraw()
             }
             if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY) && timerFadeScreen == FPS)
             {
+                SetTargetFPS(60);
+                gameSpeed=1;
                 timerFadeScreen--;
+                
             }
             else if (timerFadeScreen < FPS && timerFadeScreen > 0)
             {
