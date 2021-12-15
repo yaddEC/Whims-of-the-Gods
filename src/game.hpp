@@ -5,6 +5,7 @@
 #include "entities/turret.hpp"
 #include "entities/enemy.hpp"
 
+
 class Game
 {
 public:
@@ -35,28 +36,20 @@ public:
     Rectangle warriorEnemy;
     Rectangle healerEnemy;
     Rectangle berserkerEnemy;
-    TextureObject jackhammer;
-    TextureObject menuScreen;
-    TextureObject pauseScreen;
     float scrollingFive;
     float scrollingFourth;
     float scrollingThird;
     float scrollingSecond;
     float scrollingFirst;
-    Texture2D five;
-    Texture2D fourth;
-    Texture2D third;
-    Texture2D second;
-    Texture2D first;
-    Texture2D title;
+
+    Music* currentMusic = nullptr;
+    
     Tile Spawn;
     Tile Despawn;
-    Tilemap map;
-    GameSounds gameSounds;
-    TurretSounds turretSounds;
-    EnemySounds enemySounds;
-    std::vector<Turret *> turret;
-    std::vector<Enemy *> enemy;
+    Tilemap map; 
+    
+    std::vector<Turret *> turret; // TODO: Rename turrets
+    std::vector<Enemy *> enemy; // TODO: Rename enemies
     Game();
     void Menu();
     void Credit();

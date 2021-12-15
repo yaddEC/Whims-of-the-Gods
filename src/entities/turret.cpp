@@ -1,3 +1,5 @@
+#include "../resources.hpp"
+#include "enemy.hpp"
 #include "turret.hpp"
 
 Turret::Turret()
@@ -9,7 +11,7 @@ Turret::Turret()
     showTurretUpgrade = false;
 }
 
-void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, TurretSounds &turretSounds, bool soundEffect)
+void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, Sounds &turretSounds, bool soundEffect)
 {
     if (active) //if the turret is active
     {

@@ -6,16 +6,6 @@
 
 #define SIZE 64.0f
 
-
-
-struct TextureObject
-{
-    Texture2D model;
-    Rectangle sourceRec = (Rectangle){0.0f, 0.0f, SIZE, SIZE};
-    Vector2 origin = (Vector2){SIZE / 2.0f, SIZE / 2.0f};
-    Rectangle destRec;
-};
-
 template<typename A>
 inline float norm(A Vec)
 {

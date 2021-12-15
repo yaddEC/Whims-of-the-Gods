@@ -1,6 +1,7 @@
-#include <raylib.h>
-#include "game.hpp"
 #include <vector>
+#include <raylib.h>
+#include "resources.hpp"
+#include "game.hpp"
 
 int main(void)
 {
@@ -10,6 +11,9 @@ int main(void)
     SetConfigFlags(FLAG_VSYNC_HINT);
     InitWindow(screenWidth, screenHeight, "Whim Of The Gods");
     InitAudioDevice();
+
+    Resources resources;
+    gRes = &resources;
 
     Game game = {};
 
@@ -21,24 +25,25 @@ int main(void)
 
         if (game.music)  // activate/desactivate music
         {
-            SetMusicVolume(game.gameSounds.mainTheme, 0.5f);
-            SetMusicVolume(game.gameSounds.secondTheme, 0.5f);
-            SetMusicVolume(game.gameSounds.gameOver, 0.5f);
-            SetMusicVolume(game.gameSounds.creditsTheme, 0.5f);
+            SetMusicVolume(gRes->sounds.mainTheme, 0.5f);
+            SetMusicVolume(gRes->sounds.secondTheme, 0.5f);
+            SetMusicVolume(gRes->sounds.gameOver, 0.5f);
+            SetMusicVolume(gRes->sounds.creditsTheme, 0.5f);
         }
         else
         {
-            SetMusicVolume(game.gameSounds.mainTheme, 0);
-            SetMusicVolume(game.gameSounds.secondTheme, 0);
-            SetMusicVolume(game.gameSounds.gameOver, 0);
-            SetMusicVolume(game.gameSounds.creditsTheme, 0);
+            SetMusicVolume(gRes->sounds.mainTheme, 0);
+            SetMusicVolume(gRes->sounds.secondTheme, 0);
+            SetMusicVolume(gRes->sounds.gameOver, 0);
+            SetMusicVolume(gRes->sounds.creditsTheme, 0);
         }
 
         if (game.start) // if button start is pressed
         {
-            if (!IsMusicStreamPlaying(game.gameSounds.secondTheme) && game.hp > 0)
+            if (game.hp > 0)
             {
-                PlayMusicStream(game.gameSounds.secondTheme);
+                game.currentMusic = &(gRes->sounds.secondTheme);
+                PlayMusicStream(gRes->sounds.secondTheme);
             }
             DrawRectangle(1024, 0, 256, 768, BROWN);
             DrawRectangle(1030, 530, 245, 170, ColorAlpha(DARKBROWN, 0.5));
@@ -46,24 +51,25 @@ int main(void)
         }
         else if(game.credit)
         {
-            if (!IsMusicStreamPlaying(game.gameSounds.creditsTheme))
+            if (!IsMusicStreamPlaying(gRes->sounds.creditsTheme))
             {
-                PlayMusicStream(game.gameSounds.creditsTheme);
+                game.currentMusic = &(gRes->sounds.creditsTheme);
+                PlayMusicStream(gRes->sounds.creditsTheme);
             }
             game.Credit();
         }
         else // print menu
         {
-            if (!IsMusicStreamPlaying(game.gameSounds.mainTheme))
-            {
-                PlayMusicStream(game.gameSounds.mainTheme);
-            }
+            /* if (!IsMusicStreamPlaying(gRes->sounds.mainTheme))
+            { */
+                game.currentMusic = &(gRes->sounds.mainTheme);
+                PlayMusicStream(gRes->sounds.mainTheme);
+            /* } */
             game.Menu();
         }
 
-        UpdateMusicStream(game.gameSounds.mainTheme);
-        UpdateMusicStream(game.gameSounds.secondTheme);
-        UpdateMusicStream(game.gameSounds.creditsTheme);
+        if (game.currentMusic)
+            UpdateMusicStream(*(game.currentMusic));
 
         DrawFPS(10, 10);
 

@@ -1,6 +1,7 @@
-#include "game.hpp"
 #include <iostream>
 #include <fstream>
+#include "game.hpp"
+#include "resources.hpp"
 
 #define FPS 60
 
@@ -83,12 +84,7 @@ Game::Game()
     timer = 0;
     timerFadeScreen = FPS;
     showTurretRange = false;
-    title = LoadTexture("assets/title.png");
-    five = LoadTexture("assets/5_plan.png");
-    fourth = LoadTexture("assets/4_plan.png");
-    third = LoadTexture("assets/3_plan.png");
-    second = LoadTexture("assets/2_plan.png");
-    first = LoadTexture("assets/1_plan.png");
+
     scrollingFive = 0.0f;
     scrollingFourth = 0.0f;
     scrollingThird = 0.0f;
@@ -99,8 +95,6 @@ Game::Game()
     DefSpawn(map.Spawn.mPos);
 
     pauseSource = {map.texture[107].x, map.texture[107].y, SIZE, SIZE};
-
-    jackhammer.model = LoadTexture("assets/jackhammer.png");
 
     classicTurret = {map.texture[250].x, map.texture[250].y, SIZE, SIZE};
     slowingTurret = {map.texture[249].x, map.texture[249].y, SIZE, SIZE};
@@ -125,7 +119,7 @@ bool Game::Button(int x, int y, float width, float height, const char *name, flo
         {
             if (soundEffect)
             {
-                PlaySound(gameSounds.button);
+                PlaySound(gRes->sounds.button);
             }
             res = true;
             DrawRectangle(x, y, width, height, RED);
@@ -173,7 +167,7 @@ void Game::SoundButton(Rectangle dest, bool &type)
             type = !type;
             if (soundEffect)
             {
-                PlaySound(gameSounds.button);
+                PlaySound(gRes->sounds.button);
             }
         }
     }
@@ -192,7 +186,7 @@ void Game::SoundButton(Rectangle dest, bool &type)
         source = {map.texture[285].x, map.texture[285].y, SIZE, SIZE};
         DrawRectangleLinesEx(dest, 1.0f, RED);
     }
-    DrawTexturePro(map.tilesheet, source, dest, {0, 0}, 0, WHITE);
+    DrawTexturePro(gRes->textures.tilesheet, source, dest, {0, 0}, 0, WHITE);
 }
 
 void Game::EnemyDestroyedAnimation(Enemy *&e)
@@ -204,7 +198,7 @@ void Game::EnemyDestroyedAnimation(Enemy *&e)
         source = {map.texture[269].x, map.texture[269].y, SIZE, SIZE};
         if (e->timer > 60 || e->timer % 3 == 0)
         {
-            DrawTexturePro(map.tilesheet, source, {e->pos.x - 32, e->pos.y - 32, 64, 64}, {0, 0}, 0, WHITE);
+            DrawTexturePro(gRes->textures.tilesheet, source, {e->pos.x - 32, e->pos.y - 32, 64, 64}, {0, 0}, 0, WHITE);
         }
     }
     else if (e->damage == 2)
@@ -213,7 +207,7 @@ void Game::EnemyDestroyedAnimation(Enemy *&e)
         source = {map.texture[270].x, map.texture[270].y, SIZE, SIZE};
         if (e->timer > 60 || e->timer % 3 == 0)
         {
-            DrawTexturePro(map.tilesheet, source, {e->pos.x - 32, e->pos.y - 32, 64, 64}, {0, 0}, 0, WHITE);
+            DrawTexturePro(gRes->textures.tilesheet, source, {e->pos.x - 32, e->pos.y - 32, 64, 64}, {0, 0}, 0, WHITE);
         }
     }
     else
@@ -221,7 +215,7 @@ void Game::EnemyDestroyedAnimation(Enemy *&e)
         source = {map.texture[268].x, map.texture[268].y, SIZE, SIZE};
         if (e->timer > 60 || e->timer % 3 == 0)
         {
-            DrawTexturePro(map.tilesheet, source, {e->pos.x - 32, e->pos.y - 32, 64, 64}, {0, 0}, 0, WHITE);
+            DrawTexturePro(gRes->textures.tilesheet, source, {e->pos.x - 32, e->pos.y - 32, 64, 64}, {0, 0}, 0, WHITE);
         }
     }
 }
@@ -259,41 +253,41 @@ void Game::Menu()
     scrollingSecond -= 0.8f;
     scrollingFirst -= 1.2f;
 
-    if (scrollingFive <= -five.width * 2)
+    if (scrollingFive <= -gRes->textures.five.width * 2)
     {
         scrollingFive = 0;
     }
-    if (scrollingThird <= -third.width * 2)
+    if (scrollingThird <= -gRes->textures.third.width * 2)
     {
         scrollingThird = 0;
     }
-    if (scrollingSecond <= -second.width * 2)
+    if (scrollingSecond <= -gRes->textures.second.width * 2)
     {
         scrollingSecond = 0;
     }
-    if (scrollingFirst <= -first.width * 2)
+    if (scrollingFirst <= -gRes->textures.first.width * 2)
     {
         scrollingFirst = 0;
     }
 
-    DrawTextureEx(five, (Vector2){scrollingFive, 20}, 0.0f, 2.0f, WHITE);
-    DrawTextureEx(five, (Vector2){five.width * 2 + scrollingFive, 20}, 0.0f, 2.0f, WHITE);
+    DrawTextureEx(gRes->textures.five, (Vector2){scrollingFive, 20}, 0.0f, 2.0f, WHITE);
+    DrawTextureEx(gRes->textures.five, (Vector2){gRes->textures.five.width * 2 + scrollingFive, 20}, 0.0f, 2.0f, WHITE);
 
-    DrawTextureEx(fourth, (Vector2){1066, 369}, 0.0f, 2.0f, WHITE);
+    DrawTextureEx(gRes->textures.fourth, (Vector2){1066, 369}, 0.0f, 2.0f, WHITE);
 
-    DrawTextureEx(third, (Vector2){scrollingThird, 429}, 0.0f, 2.0f, WHITE);
-    DrawTextureEx(third, (Vector2){third.width * 2 + scrollingThird, 429}, 0.0f, 2.0f, WHITE);
+    DrawTextureEx(gRes->textures.third, (Vector2){scrollingThird, 429}, 0.0f, 2.0f, WHITE);
+    DrawTextureEx(gRes->textures.third, (Vector2){gRes->textures.third.width * 2 + scrollingThird, 429}, 0.0f, 2.0f, WHITE);
 
-    DrawTextureEx(second, (Vector2){scrollingSecond, 429}, 0.0f, 2.0f, WHITE);
-    DrawTextureEx(second, (Vector2){second.width * 2 + scrollingSecond, 429}, 0.0f, 2.0f, WHITE);
+    DrawTextureEx(gRes->textures.second, (Vector2){scrollingSecond, 429}, 0.0f, 2.0f, WHITE);
+    DrawTextureEx(gRes->textures.second, (Vector2){gRes->textures.second.width * 2 + scrollingSecond, 429}, 0.0f, 2.0f, WHITE);
 
-    DrawTextureEx(first, (Vector2){scrollingFirst, 339}, 0.0f, 2.0f, WHITE);
-    DrawTextureEx(first, (Vector2){first.width * 2 + scrollingFirst, 339}, 0.0f, 2.0f, WHITE);
-    DynamicTexturePro(title, {0, 0, (float)title.width, (float)title.height}, {320, 124, (float)title.width, (float)title.height}, {0, 0}, 0, WHITE);
+    DrawTextureEx(gRes->textures.first, (Vector2){scrollingFirst, 339}, 0.0f, 2.0f, WHITE);
+    DrawTextureEx(gRes->textures.first, (Vector2){gRes->textures.first.width * 2 + scrollingFirst, 339}, 0.0f, 2.0f, WHITE);
+    DynamicTexturePro(gRes->textures.title, {0, 0, (float)gRes->textures.title.width, (float)gRes->textures.title.height}, {320, 124, (float)gRes->textures.title.width, (float)gRes->textures.title.height}, {0, 0}, 0, WHITE);
 
     if (Button(545, 535, 200, 50, "START", 0.22f, 3, GRAY))
     {
-        StopMusicStream(gameSounds.mainTheme);
+        StopMusicStream(gRes->sounds.mainTheme);
         start = true;
     }
     if (Button(545, 590, 200, 50, "QUIT", 0.32f, 3, GRAY))
@@ -302,7 +296,7 @@ void Game::Menu()
     }
     if (Button(1050, 700, 150, 35, "CREDITS", 0.2f, 2, GRAY))
     {
-        StopMusicStream(gameSounds.mainTheme);
+        StopMusicStream(gRes->sounds.mainTheme);
         credit = true;
     }
 
@@ -375,7 +369,7 @@ void Game::Credit()
     {
         if (music)
         {
-            SetMusicVolume(gameSounds.creditsTheme, 0.5 - (0.5 - (timerFadeScreen * 0.5 / (float)(FPS))));
+            SetMusicVolume(gRes->sounds.creditsTheme, 0.5 - (0.5 - (timerFadeScreen * 0.5 / (float)(FPS))));
         }
         DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
         FrameTimer(timerFadeScreen);
@@ -386,7 +380,7 @@ void Game::Credit()
         titleID = 0;
         creditHeight = 768;
         timerFadeScreen = FPS;
-        StopMusicStream(gameSounds.creditsTheme);
+        StopMusicStream(gRes->sounds.creditsTheme);
         credit = false;
     }
 }
@@ -415,12 +409,12 @@ void Game::backUI()
     }
 
     DrawRectangleLinesEx(classicTurretIcon, 2, classicColor);
-    DrawTexturePro(map.tilesheet, classicTurret, classicTurretIcon, origin, 0, textureColor);
+    DrawTexturePro(gRes->textures.tilesheet, classicTurret, classicTurretIcon, origin, 0, textureColor);
 
     DrawText("50", classicTurretIcon.x + 25, classicTurretIcon.y + 70, GetFontDefault().baseSize * 2, priceColor);
     Rectangle source = {map.texture[287].x, map.texture[287].y, SIZE, SIZE};
     Rectangle dest = {classicTurretIcon.x - 5, classicTurretIcon.y + 62, SIZE / 2, SIZE / 2};
-    DrawTexturePro(map.tilesheet, source, dest, origin, 0, priceColor);
+    DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, priceColor);
 
     if (InRec(classicTurretIcon))
     {
@@ -443,15 +437,15 @@ void Game::backUI()
     }
 
     DrawRectangleLinesEx(slowingTurretIcon, 2, slowingColor);
-    DrawTexturePro(map.tilesheet, slowingTurret, slowingTurretIcon, origin, 0, textureColor);
+    DrawTexturePro(gRes->textures.tilesheet, slowingTurret, slowingTurretIcon, origin, 0, textureColor);
 
     DrawText("150", slowingTurretIcon.x + 25, slowingTurretIcon.y + 70, GetFontDefault().baseSize * 2, priceColor);
     dest = {slowingTurretIcon.x - 5, slowingTurretIcon.y + 62, SIZE / 2, SIZE / 2};
-    DrawTexturePro(map.tilesheet, source, dest, origin, 0, priceColor);
+    DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, priceColor);
 
     if (round < 3)
     {
-        DrawTexturePro(map.tilesheet, {map.texture[284].x, map.texture[284].y, SIZE, SIZE}, slowingTurretIcon, origin, 0, WHITE);
+        DrawTexturePro(gRes->textures.tilesheet, {map.texture[284].x, map.texture[284].y, SIZE, SIZE}, slowingTurretIcon, origin, 0, WHITE);
     }
     if (InRec(slowingTurretIcon))
     {
@@ -483,15 +477,15 @@ void Game::backUI()
     }
 
     DrawRectangleLinesEx(explosiveTurretIcon, 2, explosiveColor);
-    DrawTexturePro(map.tilesheet, explosiveTurret, explosiveTurretIcon, origin, 0, textureColor);
+    DrawTexturePro(gRes->textures.tilesheet, explosiveTurret, explosiveTurretIcon, origin, 0, textureColor);
 
     DrawText("300", explosiveTurretIcon.x + 25, explosiveTurretIcon.y + 70, GetFontDefault().baseSize * 2, priceColor);
     dest = {explosiveTurretIcon.x - 5, explosiveTurretIcon.y + 62, SIZE / 2, SIZE / 2};
-    DrawTexturePro(map.tilesheet, source, dest, origin, 0, priceColor);
+    DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, priceColor);
 
     if (round < 5)
     {
-        DrawTexturePro(map.tilesheet, {map.texture[284].x, map.texture[284].y, SIZE, SIZE}, explosiveTurretIcon, origin, 0, WHITE);
+        DrawTexturePro(gRes->textures.tilesheet, {map.texture[284].x, map.texture[284].y, SIZE, SIZE}, explosiveTurretIcon, origin, 0, WHITE);
     }
     if (InRec(explosiveTurretIcon))
     {
@@ -521,7 +515,7 @@ void Game::backUI()
 
     if (!jackActive)
     {
-        DrawTexture(jackhammer.model, jackHammerIcon.x + 6, jackHammerIcon.y + 10, WHITE);
+        DrawTexture(gRes->textures.jackhammer, jackHammerIcon.x + 6, jackHammerIcon.y + 10, WHITE);
     }
 
     if (GetMousePosition().x < 1024 && GetMousePosition().x > 0 && GetMousePosition().y < 768 && GetMousePosition().y > 0)
@@ -551,7 +545,7 @@ void Game::backUI()
         {
             if (soundEffect)
             {
-                PlaySound(gameSounds.sellTurret);
+                PlaySound(gRes->sounds.sellTurret);
             }
             map.tile[GetTile(GetMousePosition())].environment = 9;
             moneyTimer = FPS * 2;
@@ -568,7 +562,7 @@ void Game::backUI()
                 {
                     if (soundEffect)
                     {
-                        PlaySound(gameSounds.sellTurret);
+                        PlaySound(gRes->sounds.sellTurret);
                     }
                     moneyTimer = FPS * 2;
                     moneyGain = t->price / 2;
@@ -631,7 +625,7 @@ void Game::backUI()
         showTurretRange = !showTurretRange;
     }
 
-    DrawTexturePro(map.tilesheet, pauseSource, pauseIcon, origin, 0, WHITE);
+    DrawTexturePro(gRes->textures.tilesheet, pauseSource, pauseIcon, origin, 0, WHITE);
     if (hp > 0 && InRec(pauseIcon))
     {
         DrawRectangleLinesEx(pauseIcon, 1, ColorAlpha(WHITE, opacityZone));
@@ -640,7 +634,7 @@ void Game::backUI()
         {
             if (soundEffect)
             {
-                PlaySound(gameSounds.button);
+                PlaySound(gRes->sounds.button);
             }
             pause = true;
         }
@@ -651,14 +645,14 @@ void Game::frontUI()
 {
     if (jackActive)
     {
-        DrawTexture(jackhammer.model, GetMousePosition().x - 48 / 2, GetMousePosition().y, WHITE);
+        DrawTexture(gRes->textures.jackhammer, GetMousePosition().x - 48 / 2, GetMousePosition().y, WHITE);
     }
 
     DrawText(TextFormat("%i", money), 60, 730, GetFontDefault().baseSize * 3, GOLD); // Money UI
     Rectangle source = {map.texture[287].x, map.texture[287].y, SIZE, SIZE};
     Rectangle dest = {10, 710, SIZE, SIZE};
     Vector2 origin = {0, 0};
-    DrawTexturePro(map.tilesheet, source, dest, origin, 0, GOLD);
+    DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, GOLD);
 
     if (moneyTimer > 0)
     {
@@ -714,7 +708,7 @@ void Game::UpdateAndDraw()
             for (Turret *t : turret)
 
             {
-                t->UpdateAndDraw(enemy, map.tilesheet, map.texture[t->id + 295], turretSounds, soundEffect);
+                t->UpdateAndDraw(enemy, gRes->textures.tilesheet, map.texture[t->id + 295], gRes->sounds, soundEffect);
 
                 if (t->showTurretUpgrade) // Draw upgrade button
                 {
@@ -741,7 +735,7 @@ void Game::UpdateAndDraw()
                         Rectangle source = {map.texture[287].x, map.texture[287].y, SIZE, SIZE};
                         Rectangle dest = {t->pos.x, t->pos.y - 22, SIZE / 2, SIZE / 2};
                         Vector2 origin = {0, 0};
-                        DrawTexturePro(map.tilesheet, source, dest, origin, 0, GOLD);
+                        DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, GOLD);
                     }
                 }
 
@@ -799,7 +793,6 @@ void Game::UpdateAndDraw()
             {
                 DrawTextWave();
             }
-
             if (timer != 0 && round != 0) // WAVES
             {
                 if (round == 1 && timer % (2 * FPS) == 0) // TEST WAVE 1
@@ -906,15 +899,19 @@ void Game::UpdateAndDraw()
                 if (animationTimer == 300)
                 {
                     Despawn.environment = 1;
-                    StopMusicStream(gameSounds.secondTheme);
-                    SetMusicVolume(gameSounds.kaboom, 1);
-                    PlayMusicStream(gameSounds.kaboom);
+                    StopMusicStream(gRes->sounds.secondTheme);
+                    if (soundEffect)
+                    {
+                        currentMusic = &(gRes->sounds.kaboom);
+                        SetMusicVolume(gRes->sounds.kaboom, 1);
+                        PlayMusicStream(gRes->sounds.kaboom);
+                    }
+
                     pointSelected = false;
                     opacityZone = 0;
                     map.Despawn.mTilePos = 1000;
                 }
                 FrameTimer(animationTimer);
-                UpdateMusicStream(gameSounds.kaboom);
 
                 for (Turret *t : turret)
                 {
@@ -937,7 +934,7 @@ void Game::UpdateAndDraw()
                     }
 
                     Rectangle dest{float((int)map.Despawn.mPos.x), map.Despawn.mPos.y + map.Despawn.environment, SIZE, SIZE};
-                    DrawTexturePro(map.tilesheet, source, dest, origin, 0, WHITE);
+                    DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, WHITE);
                 }
 
                 else if (animationTimer <= 240 && animationTimer > 60)
@@ -946,7 +943,7 @@ void Game::UpdateAndDraw()
                     Vector2 origin = {0, 0};
                     Rectangle source = {map.texture[86].x, map.texture[86].y, SIZE, SIZE};
 
-                    DrawTexturePro(map.tilesheet, source, dest, origin, 0, WHITE);
+                    DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, WHITE);
                     DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32, 50.0f, ColorAlpha(RED, 0.25f / 30.f * ((animationTimer / 4) - 30.0f)));
                     DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32, 20.0f, ColorAlpha(ORANGE, 0.3f / 30.f * ((animationTimer / 4) - 30.0f)));
                     float radius = (60 - (animationTimer / 4)) * 2;
@@ -984,16 +981,14 @@ void Game::UpdateAndDraw()
                         writeScore << round << std::endl;
                     }
 
-                    StopMusicStream(gameSounds.secondTheme);
+                    StopMusicStream(gRes->sounds.secondTheme);
                     gameOver = true;
-                    StopMusicStream(gameSounds.kaboom);
+                    StopMusicStream(gRes->sounds.kaboom);
                 }
             }
         }
-
         else
         {
-
             DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 0.3));
 
             SoundButton({480, 600, SIZE * 1.5f, SIZE * 1.5f}, music);
@@ -1014,7 +1009,7 @@ void Game::UpdateAndDraw()
             {
                 if (music)
                 {
-                    SetMusicVolume(gameSounds.secondTheme, 0.5 - (0.5 - (timerFadeScreen * 0.5 / (float)(FPS))));
+                    SetMusicVolume(gRes->sounds.secondTheme, 0.5 - (0.5 - (timerFadeScreen * 0.5 / (float)(FPS))));
                 }
                 DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
                 FrameTimer(timerFadeScreen);
@@ -1022,16 +1017,16 @@ void Game::UpdateAndDraw()
             else if (timerFadeScreen <= 0)
             {
                 DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
-                bool currentMucic = music;
-                bool currentSound = soundEffect;
+                StopMusicStream(gRes->sounds.secondTheme);
+                bool isCurrentMusicActive = music;
+                bool isCurrentSoundActive = soundEffect;
                 this->~Game();
                 new (this) Game();
-                this->music = currentMucic;
-                this->soundEffect = currentSound;
+                this->music = isCurrentMusicActive;
+                this->soundEffect = isCurrentSoundActive;
             }
         }
     }
-
     else
     {
 
@@ -1039,9 +1034,9 @@ void Game::UpdateAndDraw()
         {
             FrameTimer(animationTimer);
         }
-        else if (music && !IsMusicStreamPlaying(gameSounds.gameOver))
+        else if (music && !IsMusicStreamPlaying(gRes->sounds.gameOver))
         {
-            PlayMusicStream(gameSounds.gameOver);
+            PlayMusicStream(gRes->sounds.gameOver);
         }
         DrawRectangleGradientV(0, 0, 1280, 1500, BLACK, MAROON);
         DrawText(TextFormat("WAVE %i", round), 540, 200, 40, LIGHTGRAY);
@@ -1049,7 +1044,7 @@ void Game::UpdateAndDraw()
         {
             DrawText("New High Score!", 540, 250, 20, GOLD);
         }
-        UpdateMusicStream(gameSounds.gameOver);
+        UpdateMusicStream(gRes->sounds.gameOver);
 
         if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY) && timerFadeScreen == FPS)
         {
@@ -1059,7 +1054,7 @@ void Game::UpdateAndDraw()
         {
             if (music)
             {
-                SetMusicVolume(gameSounds.gameOver, 0.5 - (0.5 - (timerFadeScreen * 0.5 / (float)(FPS))));
+                SetMusicVolume(gRes->sounds.gameOver, 0.5 - (0.5 - (timerFadeScreen * 0.5 / (float)(FPS))));
             }
             DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
             FrameTimer(timerFadeScreen);
@@ -1068,14 +1063,15 @@ void Game::UpdateAndDraw()
         if (timerFadeScreen <= 0)
         {
             DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
-            bool currentMucic = music;
-            bool currentSound = soundEffect;
+            StopMusicStream(gRes->sounds.secondTheme);
             animationTimer = 300;
             opacityZone = 0.4;
+            bool isCurrentMusicActive = music;
+            bool isCurrentSoundActive = soundEffect;
             this->~Game();
             new (this) Game();
-            this->music = currentMucic;
-            this->soundEffect = currentSound;
+            this->music = isCurrentMusicActive;
+            this->soundEffect = isCurrentSoundActive;
         }
     }
 }

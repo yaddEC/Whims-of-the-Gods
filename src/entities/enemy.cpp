@@ -1,4 +1,6 @@
 #include "enemy.hpp"
+#include "../resources.hpp"
+
 
 static Vector2 Spawn;
 
@@ -126,16 +128,16 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
 
     if (slowingTimer > 0)
     {
-        DrawTexturePro(map.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, SKYBLUE);
+        DrawTexturePro(gRes->textures.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, SKYBLUE);
     }
     else
     {
-        DrawTexturePro(map.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, WHITE);
+        DrawTexturePro(gRes->textures.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, WHITE);
     }
 
     if (timer > 0)
     {
-        DrawTexturePro(map.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, ColorAlpha(RED, 0.5));
+        DrawTexturePro(gRes->textures.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, ColorAlpha(RED, 0.5));
     }
   
     if (direction.x != 0 || direction.y!=0)

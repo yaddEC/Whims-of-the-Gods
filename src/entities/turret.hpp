@@ -1,10 +1,12 @@
 #pragma once
 #include "entity.hpp"
-#include "enemy.hpp"
 
 bool InRec(int x, int y, float width, float height);
 
 bool InRec(Rectangle rec);
+
+class Enemy; // Forward declaration
+struct Sounds; // Forward declaration
 
 class Turret : public Entity
 {
@@ -26,7 +28,7 @@ public:
     bool showTurretUpgrade;
     Color colorZone;
 
-    void UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, TurretSounds &turretSounds, bool soundEffect);
+    void UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, Sounds &turretSounds, bool soundEffect);
 
     Turret();
 
