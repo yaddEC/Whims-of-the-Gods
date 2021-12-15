@@ -34,7 +34,7 @@ fi
 echo ${deployed_files[*]}
 
 # deploy zip to deploy folder
-deploy_folder=~/public_html/testdir/${CI_COMMIT_TIMESTAMP:-no_date}_${CI_COMMIT_SHORT_SHA:-no_hash}
+deploy_folder=~/public_html/testdir/Caprice_Des_Dieux_${CI_COMMIT_TIMESTAMP:-no_date}_${CI_COMMIT_SHORT_SHA:-no_hash}
 
 mkdir -p $deploy_folder
 
