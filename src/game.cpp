@@ -80,7 +80,7 @@ Game::Game()
     highScoreBeated = false;
     hp = 20;
     maxHp = 20;
-    money = 1000;
+    money = 100;
     round = 0;
     timer = 0;
     timerFadeScreen = FPS;
@@ -238,8 +238,10 @@ void Game::Menu()
         parTimer = true;
     }
     else
+    {
         parTimer = false;
-
+    }
+        
     scrollingFive -= 0.1f;
     scrollingThird -= 0.5f;
     scrollingSecond -= 0.8f;
@@ -249,7 +251,7 @@ void Game::Menu()
     {
         scrollingFive = 0;
     }
-    if (scrollingThird <= -gRes->textures.third.width * 2)
+    if (scrollingThird <= -gRes->textures.third.width * 2)  
     {
         scrollingThird = 0;
     }
@@ -758,7 +760,7 @@ void Game::UpdateAndDraw()
                         else if (Button(t->pos.x - 70, t->pos.y - 20, 140, 30, "Upgrade", 0.05, 1.7, buttonColor)) // enough money Button
                         {
                             money -= t->updatePrice;
-                            t->range += 20;
+                            t->range += 64;
                             t->updatePrice *= 2;
                         }
                         DrawText(TextFormat("%i", t->updatePrice), t->pos.x + 30, t->pos.y - 14, GetFontDefault().baseSize * 2, GOLD);
@@ -1087,10 +1089,10 @@ void Game::UpdateAndDraw()
             PlayMusicStream(gRes->sounds.gameOver);
         }
         DrawRectangleGradientV(0, 0, 1280, 1500, BLACK, MAROON);
-        DrawTextWave();
+        DrawText(TextFormat("WAVE %i", round), 535, 200, 50, LIGHTGRAY);
         if (highScoreBeated)
         {
-            DrawText("New High Score!", 540, 250, 20, GOLD);
+            DrawText("New High Score!", 550, 250, 20, GOLD);
         }
         UpdateMusicStream(gRes->sounds.gameOver);
 

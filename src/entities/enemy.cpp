@@ -155,26 +155,26 @@ Enemy::~Enemy()
 Warrior::Warrior()
 {
     damage = 2;
-    speed = 0.8;
-    hp = 60;
-    maxHp = 60;
+    speed = 1.2;
+    hp = 90;
+    maxHp = 90;
     reward = 5;
 }
 
 Healer::Healer()
 {
     damage = 1;
-    speed = 1;
-    hp = 30;
-    maxHp = 30;
+    speed = 1.4;
+    hp = 45;
+    maxHp = 45;
     reward = 10;
 }
 
 Berserker::Berserker()
 {
     damage = 5;
-    speed = 0.6;
-    hp = 120;
-    maxHp = 120;
+    speed = 1;
+    hp = 180;
+    maxHp = 180;
     reward = 20;
 }
