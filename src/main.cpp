@@ -8,7 +8,7 @@ int main(void)
     const int screenWidth = 1280;
     const int screenHeight = 768;
 
-    SetConfigFlags(FLAG_VSYNC_HINT);
+    SetConfigFlags(60);
     InitWindow(screenWidth, screenHeight, "Whim Of The Gods");
     InitAudioDevice();
 
