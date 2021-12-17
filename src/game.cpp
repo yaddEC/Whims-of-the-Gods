@@ -5,7 +5,6 @@
 
 #define FPS 60
 
-
 void Game::Menu()
 {
 
@@ -119,21 +118,15 @@ void Game::UpdateAndDraw()
     }
 }
 
-Game::Game()  //--------------------------------------- INIT GAME ---------------------------------------------
+Game::Game() //--------------------------------------- INIT GAME ---------------------------------------------
 {
-    credit = false; 
-    opacityZone = 0.4;
-    timer.spawnTimer = FPS * 10;
-    timer.frameCounter = FPS;
-    timer.animationTimer = FPS * 5;
-    timer.secondTimer = 0;
-    timer.parTimer = false;
-    maxEnemies = 10;
-    newEnemiesMaxHp = 45.0f;
-    gameSpeed = 1;
-    timer.moneyTimer = 0;
-    moneyGain = 0;
-    creditHeight = 780;
+
+    quit = false;
+    start = false;
+    pause = false;
+    gameOver = false;
+    credit = false;
+    titleID = 0;
     creditTitle = {"Special Thanks",
                    "Caprice des dieux inc",
                    "Writers",
@@ -180,12 +173,7 @@ Game::Game()  //--------------------------------------- INIT GAME --------------
                    "Quality Assurance",
                    "Technical Requirement Group",
                    "Technology"};
-    titleID = 0;
 
-    quit = false;
-    start = false;
-    pause = false;
-    gameOver = false;
     music = true;       // Is music activated
     soundEffect = true; // Are sound effects activated
     highScoreBeated = false;
@@ -196,6 +184,19 @@ Game::Game()  //--------------------------------------- INIT GAME --------------
     timer.waveTimer = 0;
     timer.timerFadeScreen = FPS;
     showTurretRange = false;
+
+    opacityZone = 0.4;
+    timer.spawnTimer = FPS * 10;
+    timer.frameCounter = FPS;
+    timer.animationTimer = FPS * 5;
+    timer.secondTimer = 0;
+    timer.parTimer = false;
+    maxEnemies = 10;
+    newEnemiesMaxHp = 45.0f;
+    gameSpeed = 1;
+    timer.moneyTimer = 0;
+    moneyGain = 0;
+    creditHeight = 780;
 
     scrollingFive = 0.0f; // background slides positions in main menu
     scrollingFourth = 0.0f;
@@ -241,19 +242,7 @@ void Game::DrawGame() //--------------------------------------- DRAW GAME ------
     }
     for (Turret *t : turrets)
     {
-        t->UpdateAndDraw(enemies, gRes->textures.tilesheet, map.texture[t->id + 295], gRes->sounds, *this);
-
-        if (turrets.back()->active && InRec(t->pos.x - SIZE/2, t->pos.y - SIZE/2, SIZE, SIZE))
-        {
-            if ((IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && t->showTurretUpgrade == false) || t->showTurretUpgrade) //Turn true showTurretRange
-            {
-                t->showTurretUpgrade = true;
-            }
-        }
-        else
-        {
-            t->showTurretUpgrade = false;
-        }
+        t->UpdateAndDraw(gRes->textures.tilesheet, map.texture[t->id + 295], *this);
     }
 
     for (long unsigned int t = 0; t < enemies.size(); t++) // DESTROY ENEMY CONDITIONS
@@ -420,7 +409,7 @@ void Game::DrawGameOver() //--------------------------------------- DRAW GAME OV
     }
 }
 
-void Game::Credit()  //--------------------------------------- DRAW CREDITS ---------------------------------------------
+void Game::Credit() //--------------------------------------- DRAW CREDITS ---------------------------------------------
 {
     if (titleID > 45)
     {
@@ -494,7 +483,6 @@ void Game::Credit()  //--------------------------------------- DRAW CREDITS ----
 //                                      DRAW UI
 //---------------------------------------------------------------------------------------------------------
 
-
 void Game::backUI()
 {
     //show range of all turret
@@ -512,7 +500,7 @@ void Game::backUI()
 
     for (Turret *t : turrets)
     {
-        if(InRec(t->pos.x - SIZE/2, t->pos.y - SIZE/2, SIZE, SIZE))
+        if (InRec(t->pos.x - SIZE / 2, t->pos.y - SIZE / 2, SIZE, SIZE))
             DrawCircleLines(t->pos.x, t->pos.y, t->range, t->colorZone); // Draw turret range
     }
 
@@ -536,7 +524,7 @@ void Game::backUI()
     Vector2 origin = {0, 0};
 
     //Button that change the game speed
-    if (hp > 0 && round>0 && Button(1227, 69, 32, 32, TextFormat("x%i", gameSpeed), 0.2f, 2, BLANK))
+    if (hp > 0 && round > 0 && Button(1227, 69, 32, 32, TextFormat("x%i", gameSpeed), 0.2f, 2, BLANK))
     {
         switch (gameSpeed)
         {
@@ -601,7 +589,7 @@ void Game::backUI()
         if (map.tile[Tile::GetTile(GetMousePosition())].environment != 9)
         {
             PlaySound(gRes->sounds.sellTurret);
-            map.tile[GetTile(GetMousePosition())].environment = 9;
+            map.tile[Tile::GetTile(GetMousePosition())].environment = 9;
             timer.moneyTimer = FPS * 2;
             moneyGain = rand() % 15;
             money += moneyGain;
@@ -776,6 +764,17 @@ void Game::frontUI()
                 DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, GOLD);
             }
         }
+        if (turrets.back()->active && InRec(t->pos.x - SIZE / 2, t->pos.y - SIZE / 2, SIZE, SIZE))
+        {
+            if ((IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && t->showTurretUpgrade == false) || t->showTurretUpgrade) //Turn true showTurretRange
+            {
+                t->showTurretUpgrade = true;
+            }
+        }
+        else
+        {
+            t->showTurretUpgrade = false;
+        }
     }
 
     if (jackActive)
@@ -843,7 +842,6 @@ Game::~Game() // ---------------------------- GAME DESTRUCTOR ------------------
     for (Enemy *e : enemies)
         delete e;
 }
-
 
 //---------------------------------------------------------------------------------------------------------
 //                                      DRAW WAVES
@@ -1015,7 +1013,7 @@ void Game::DefeatAnimation()
     {
         SetTargetFPS(FPS);
         gameSpeed = 1;
-        Despawn.environment = 1;
+        map.Despawn.environment = 1;
         StopMusicStream(gRes->sounds.secondTheme);
         if (soundEffect)
         {
@@ -1112,7 +1110,6 @@ void Game::DefeatAnimation()
 //---------------------------------------------------------------------------------------------------------
 //                              BUTTONS FUNCTIONS
 //---------------------------------------------------------------------------------------------------------
-
 
 bool Game::Button(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color) // Create a button, returns true when pressed
 {

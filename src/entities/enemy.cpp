@@ -117,11 +117,6 @@ void Enemy::GetEnemyDirection(Tilemap &map, int round)
     }
 }
 
-void Healer::UpdateSpecific(std::vector<Enemy *> &enemies)
-{
-    ActivateHealingZone(enemies);
-}
-
 void Enemy::ActivateHealingZone(std::vector<Enemy *> &enemies)
 {
     if (healTimer > FPS / 2)
@@ -165,7 +160,6 @@ Enemy::~Enemy()
 
 Warrior::Warrior()
 {
-    id = WARRIOR;
     damage = 2;
     speed = 1.2;
     hp = 90;
@@ -175,7 +169,6 @@ Warrior::Warrior()
 
 Healer::Healer()
 {
-    id = HEALER;
     damage = 1;
     speed = 1.4;
     hp = 45;
@@ -183,9 +176,13 @@ Healer::Healer()
     reward = 10;
 }
 
+void Healer::UpdateSpecific(std::vector<Enemy *> &enemies)
+{
+    ActivateHealingZone(enemies);
+}
+
 Berserker::Berserker()
 {
-    id = BERSERKER;
     damage = 5;
     speed = 1.0;
     hp = 180;

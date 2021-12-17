@@ -30,7 +30,7 @@ public:
     bool showTurretUpgrade;
     Color colorZone;
 
-    void UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, Sounds &turretSounds, Game& game);
+    void UpdateAndDraw(Texture2D tilesheet, Vector2 sourcePos, Game& game);
 
     Turret();
 
@@ -39,6 +39,7 @@ public:
     }
 
     void DrawExplosionAnimation();
+    virtual void DoSpecificEffect(Game& game){};
 };
 
 class ClassicTurret : public Turret
@@ -46,16 +47,19 @@ class ClassicTurret : public Turret
 
 public:
     ClassicTurret();
+    void DoSpecificEffect(Game& game) override;
 };
 
 class SlowingTurret : public Turret
 {
 public:
     SlowingTurret();
+    void DoSpecificEffect(Game& game) override;
 };
 
 class ExplosiveTurret : public Turret
 {
 public:
     ExplosiveTurret();
+    void DoSpecificEffect(Game& game) override;
 };

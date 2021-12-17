@@ -12,7 +12,7 @@ Turret::Turret()
     showTurretUpgrade = false;
 }
 
-void Turret::UpdateAndDraw(std::vector<Enemy *> &enemies, Texture2D tilesheet, Vector2 sourcePos, Sounds &turretSounds, Game& game)
+void Turret::UpdateAndDraw(Texture2D tilesheet, Vector2 sourcePos, Game &game)
 {
     if (active) //if the turret is active
     {
@@ -24,13 +24,13 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemies, Texture2D tilesheet, V
 
         int nearestEnemyId = -1;
         int nearestEnemyDistance = -1;
-        for (auto j = 0u; target == -1 && j < enemies.size(); j++) // Check every enemy if turret has no current target
+        for (auto j = 0u; target == -1 && j < game.enemies.size(); j++) // Check every enemy if turret has no current target
         {
-            if (enemies[j]->active)
+            if (game.enemies[j]->active)
             {
 
               
-                float normTurretEnemy = distance(enemies[j]->pos, Vector2{pos.x, pos.y});
+                float normTurretEnemy = distance(game.enemies[j]->pos, Vector2{pos.x, pos.y});
                 if (normTurretEnemy <= range) // if enemy in turret range
                 {
                     if (nearestEnemyDistance == -1 || normTurretEnemy < nearestEnemyDistance) // if enemy closer than current nearest enemy
@@ -45,10 +45,10 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemies, Texture2D tilesheet, V
         {
             target = nearestEnemyId;
         }
-        if (target != -1 && enemies[target]->hp > 0 && distance(enemies[target]->pos, Vector2{pos.x, pos.y}) <= range) // The turret rotate to aim the target
+        if (target != -1 && game.enemies[target]->hp > 0 && distance(game.enemies[target]->pos, Vector2{pos.x, pos.y}) <= range) // The turret rotate to aim the target
         {
-            rotation = -acos((enemies[target]->pos.x - pos.x) / distance(enemies[target]->pos, Vector2{pos.x, pos.y})) * RAD2DEG;
-            if (enemies[target]->pos.y - pos.y > 0)
+            rotation = -acos((game.enemies[target]->pos.x - pos.x) / distance(game.enemies[target]->pos, Vector2{pos.x, pos.y})) * RAD2DEG;
+            if (game.enemies[target]->pos.y - pos.y > 0)
             {
                 rotation = -rotation;
             }
@@ -57,37 +57,12 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemies, Texture2D tilesheet, V
             if (timer <= 0) // shoot if it can (timer = number of frames between each shots)
             {
                 timer = FPS / attackSpeed;
-                enemies[target]->hp -= damage;
-                enemies[target]->timer = 5;
+                game.enemies[target]->hp -= damage;
+                game.enemies[target]->timer = 5;
 
-                //DoSpecific();
+                DoSpecificEffect(game); // Specific effect for each turret type
 
-                if (id == CLASSIC) // Classic turret
-                {
-                    game.PlaySound(turretSounds.classic);
-                    
-                }
-
-                if (id == SLOWING) // Slowing turret
-                {
-                    game.PlaySound(turretSounds.slowing);
-                    enemies[target]->slowingTimer = FPS / 2; // Slowing effect
-                    enemies[target]->slowingCoef = slowEffect;
-                }
-                else if (id == EXPLOSIVE) // Explosive turret
-                {
-                    game.PlaySound(turretSounds.explosion);
-                    for (Enemy *e : enemies) // Area Damage
-                    {
-                        if (e != enemies[target] && e->active && collCirclex2(enemies[target]->pos, 50.0f, e->pos, e->radius))
-                        {
-                            e->hp -= damage;
-                            e->timer = 5;
-                        }
-                        explosionPos = enemies[target]->pos;
-                    }
-                }
-                if (enemies[target]->hp <= 0) // target dead
+                if (game.enemies[target]->hp <= 0) // target dead
                 {
                     target = -1;
                 }
@@ -138,6 +113,11 @@ ClassicTurret::ClassicTurret()
     attackSpeed = 2;
 }
 
+void ClassicTurret::DoSpecificEffect(Game& game)
+{
+    game.PlaySound(gRes->sounds.classic);
+}
+
 SlowingTurret::SlowingTurret()
 {
     id = SLOWING;
@@ -148,6 +128,13 @@ SlowingTurret::SlowingTurret()
     slowEffect = 0.5f;
 }
 
+void SlowingTurret::DoSpecificEffect(Game& game)
+{
+    game.PlaySound(gRes->sounds.slowing);
+    game.enemies[target]->slowingTimer = FPS / 2; // Slowing effect
+    game.enemies[target]->slowingCoef = slowEffect;
+}
+
 ExplosiveTurret::ExplosiveTurret()
 {
     id = EXPLOSIVE;
@@ -155,4 +142,18 @@ ExplosiveTurret::ExplosiveTurret()
     price = 300;
     updatePrice = price / 2;
     attackSpeed = 1;
+}
+
+void ExplosiveTurret::DoSpecificEffect(Game& game)
+{
+    game.PlaySound(gRes->sounds.explosion);
+    for (Enemy *e : game.enemies) // Area Damage
+    {
+        if (e != game.enemies[target] && e->active && collCirclex2(game.enemies[target]->pos, 50.0f, e->pos, e->radius))
+        {
+            e->hp -= damage;
+            e->timer = 5;
+        }
+        explosionPos = game.enemies[target]->pos;
+    }
 }
