@@ -67,8 +67,8 @@ public:
     Tile Despawn;
     Tilemap map;
 
-    std::vector<Turret *> turret; // TODO: Rename turrets
-    std::vector<Enemy *> enemy;   // TODO: Rename enemies
+    std::vector<Turret *> turrets; // TODO: Rename turrets
+    std::vector<Enemy *> enemies;   // TODO: Rename enemies
     Game();
     void Menu();
     void Credit();

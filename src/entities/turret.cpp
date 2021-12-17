@@ -11,7 +11,7 @@ Turret::Turret()
     showTurretUpgrade = false;
 }
 
-void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, Sounds &turretSounds, bool soundEffect)
+void Turret::UpdateAndDraw(std::vector<Enemy *> &enemies, Texture2D tilesheet, Vector2 sourcePos, Sounds &turretSounds, bool soundEffect)
 {
     if (active) //if the turret is active
     {
@@ -23,12 +23,12 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
 
         int nearestEnemyId = -1;
         int nearestEnemyDistance = -1;
-        for (auto j = 0u; target == -1 && j < enemy.size(); j++) // Check every enemy if turret has no current target
+        for (auto j = 0u; target == -1 && j < enemies.size(); j++) // Check every enemy if turret has no current target
         {
-            if (enemy[j]->active)
+            if (enemies[j]->active)
             {
 
-                float normTurretEnemy = norm(vector(enemy[j]->pos, Vector2{pos.x, pos.y}));
+                float normTurretEnemy = norm(vector(enemies[j]->pos, Vector2{pos.x, pos.y}));
                 if (normTurretEnemy <= range) // if enemy in turret range
                 {
                     if (nearestEnemyDistance == -1 || normTurretEnemy < nearestEnemyDistance) // if enemy closer than current nearest enemy
@@ -43,10 +43,10 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
         {
             target = nearestEnemyId;
         }
-        if (target != -1 && enemy[target]->hp > 0 && norm(vector(enemy[target]->pos, Vector2{pos.x, pos.y})) <= range) // The turret rotate to aim the target
+        if (target != -1 && enemies[target]->hp > 0 && norm(vector(enemies[target]->pos, Vector2{pos.x, pos.y})) <= range) // The turret rotate to aim the target
         {
-            rotation = -acos((enemy[target]->pos.x - pos.x) / norm(vector(enemy[target]->pos, Vector2{pos.x, pos.y}))) * RAD2DEG;
-            if (enemy[target]->pos.y - pos.y > 0)
+            rotation = -acos((enemies[target]->pos.x - pos.x) / norm(vector(enemies[target]->pos, Vector2{pos.x, pos.y}))) * RAD2DEG;
+            if (enemies[target]->pos.y - pos.y > 0)
             {
                 rotation = -rotation;
             }
@@ -55,8 +55,8 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
             if (timer <= 0) // if can shoot
             {
                 timer = 60 / attackSpeed;
-                enemy[target]->hp -= damage;
-                enemy[target]->timer = 5;
+                enemies[target]->hp -= damage;
+                enemies[target]->timer = 5;
 
                 if (id == CLASSIC && soundEffect) // Classic turret
                 {
@@ -69,8 +69,8 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
                     {
                         PlaySound(turretSounds.slowing);
                     }
-                    enemy[target]->slowingTimer = FPS/2;  // Slowing effect
-                    enemy[target]->slowingCoef = slowEffect;
+                    enemies[target]->slowingTimer = FPS/2;  // Slowing effect
+                    enemies[target]->slowingCoef = slowEffect;
                 }
                 else if (id == EXPLOSIVE) // Explosive turret
                 {
@@ -78,17 +78,17 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
                     {
                         PlaySound(turretSounds.explosion);
                     }
-                    for (Enemy *e : enemy) // Area Damage
+                    for (Enemy *e : enemies) // Area Damage
                     {
-                        if (e != enemy[target] && e->active && collCirclex2(enemy[target]->pos, 50.0f, e->pos, e->radius))
+                        if (e != enemies[target] && e->active && collCirclex2(enemies[target]->pos, 50.0f, e->pos, e->radius))
                         {
                             e->hp -= damage;
                             e->timer = 5;
                         }
-                        explosionPos = enemy[target]->pos;
+                        explosionPos = enemies[target]->pos;
                     }
                 }
-                if (enemy[target]->hp <= 0) // target dead
+                if (enemies[target]->hp <= 0) // target dead
                 {
                     target = -1;
                 }

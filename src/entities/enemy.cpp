@@ -1,13 +1,11 @@
 #include "enemy.hpp"
 #include "../resources.hpp"
 
-
 static Vector2 Spawn;
 
 void DefSpawn(Vector2 pos)
 {
     Spawn = pos;
-    
 }
 
 Enemy::Enemy()
@@ -23,7 +21,53 @@ Enemy::Enemy()
     pos.y = Spawn.y + 32;
 }
 
-void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
+void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemies)
+{
+
+    GetEnemyDirection(map, round);
+
+    FrameTimer(slowingTimer); // Update Timers
+    FrameTimer(timer);
+    FrameTimer(healTimer);
+
+    if (slowingTimer == 0 && slowingCoef != 1) // Update slowing effect
+    {
+        slowingCoef = 1;
+    }
+
+    pos.x += direction.x * slowingCoef * speed; // Update enemy position
+    pos.y += direction.y * slowingCoef * speed;
+
+    if (id == HEALER)
+    {
+        ActivateHealingZone(enemies);
+    }
+
+    Rectangle destRec{float((int)pos.x), float((int)pos.y), SIZE, SIZE};
+
+    if (slowingTimer > 0) // slowed enemy animation
+    {
+        DrawTexturePro(gRes->textures.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, SKYBLUE);
+    }
+    else // draw enemy
+    {
+        DrawTexturePro(gRes->textures.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, WHITE);
+    }
+
+    if (timer > 0) // Enemy hit animation
+    {
+        DrawTexturePro(gRes->textures.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, ColorAlpha(RED, 0.5));
+    }
+
+    if (active) // Draw enemy health bar
+    {
+        DrawRectangle(pos.x - 20, pos.y + 20, 40, 10, ColorAlpha(BLACK, 0.5));
+        DrawRectangle(pos.x - 20, pos.y + 20, hp * 40 / maxHp, 10, GREEN);
+        DrawRectangleLines(pos.x - 21, pos.y + 20, 42, 10, BLACK);
+    }
+}
+
+void Enemy::GetEnemyDirection(Tilemap &map, int round)
 {
     float rot;
     Vector2 dirmem;
@@ -75,76 +119,42 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
         direction = dirmem;
         rotation = rot;
     }
+}
 
-    FrameTimer(slowingTimer);
-    FrameTimer(timer);
-    FrameTimer(healTimer);
-
-    if (slowingTimer == 0 && slowingCoef != 1)
+void Enemy::ActivateHealingZone(std::vector<Enemy *> &enemies)
+{
+    if (healTimer > FPS / 2)
     {
-        slowingCoef = 1;
+        DrawCircleLines(pos.x, pos.y, 50.0f, ColorAlpha(YELLOW, 0.5f / (FPS / 2.0f) * (healTimer - (FPS / 2.0f))));
     }
-    pos.x += direction.x * slowingCoef * speed;
-    pos.y += direction.y * slowingCoef * speed;
-
-    if (id == HEALER)
+    if (healTimer == 0)
     {
-        if (healTimer > FPS/2)
-        {
-            DrawCircleLines(pos.x, pos.y, 50.0f, ColorAlpha(YELLOW, 0.5f / (FPS/2.0f) * (healTimer - (FPS/2.0f))));
-        }
-        if (healTimer == 0)
-        {
-            speed = 1.4;
+        speed = 1.4;
 
-            bool selfHeal = true;
-            for (Enemy *t : enemy)
+        bool selfHeal = true;
+        for (Enemy *t : enemies)
+        {
+            if (t != this && t->active && t->hp < t->maxHp && collCirclex2(t->pos, 50.0f, pos, radius))
             {
-                if (t != this && t->active && t->hp < t->maxHp && collCirclex2(t->pos, 50.0f, pos, radius))
-                {
-                    speed = 1.1;
-                    t->hp += 10;
-                    healTimer = FPS;
-                    if (t->hp > t->maxHp)
-                    {
-                        t->hp = t->maxHp;
-                    }
-                    selfHeal = false;
-                }
-            }
-            if (hp < maxHp && selfHeal)
-            {
-                hp += 10;
+                speed = 1.1;
+                t->hp += 10;
                 healTimer = FPS;
-                if (hp > maxHp)
+                if (t->hp > t->maxHp)
                 {
-                    hp = maxHp;
+                    t->hp = t->maxHp;
                 }
+                selfHeal = false;
             }
         }
-    }
-
-    Rectangle destRec{float((int)pos.x), float((int)pos.y), SIZE, SIZE};
-
-    if (slowingTimer > 0)
-    {
-        DrawTexturePro(gRes->textures.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, SKYBLUE);
-    }
-    else
-    {
-        DrawTexturePro(gRes->textures.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, WHITE);
-    }
-
-    if (timer > 0)
-    {
-        DrawTexturePro(gRes->textures.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, ColorAlpha(RED, 0.5));
-    }
-  
-    if (direction.x != 0 || direction.y!=0)
-    {
-        DrawRectangle(pos.x - 20, pos.y + 20, 40, 10, ColorAlpha(BLACK, 0.5));
-        DrawRectangle(pos.x - 20, pos.y + 20, hp * 40 / maxHp, 10, GREEN);
-        DrawRectangleLines(pos.x - 21, pos.y + 20, 42, 10, BLACK);
+        if (hp < maxHp && selfHeal)
+        {
+            hp += 10;
+            healTimer = FPS;
+            if (hp > maxHp)
+            {
+                hp = maxHp;
+            }
+        }
     }
 }
 
