@@ -31,7 +31,7 @@ void Game::UpdateAndDraw()
 
 void Game::TimerUpdater()
 {
-        FrameTimer(timer.frameCounter);
+    FrameTimer(timer.frameCounter);
     if (timer.frameCounter == 0)
     {
         timer.frameCounter = 60;
@@ -114,9 +114,9 @@ Game::Game()
     highScoreBeated = false;
     hp = 20;
     maxHp = 20;
-    money = 100;
+    money = 150;
     round = 0;
-    timer.waveTimer= 0;
+    timer.waveTimer = 0;
     timer.timerFadeScreen = FPS;
     showTurretRange = false;
 
@@ -248,13 +248,13 @@ void Game::EnemyDestroyedAnimation(Enemy *&e) // Enemies death animation
 
 void Game::DrawTextWave()
 {
-    if (timer.waveTimer> 480)
+    if (timer.waveTimer > 480)
     {
         DrawText(TextFormat("WAVE %i", round), 370, 350, 80, WHITE);
     }
     else
     {
-        DrawText(TextFormat("WAVE %i", round), 370, 350, 80, ColorAlpha(WHITE, (timer.waveTimer- FPS * 7) / (float)FPS));
+        DrawText(TextFormat("WAVE %i", round), 370, 350, 80, ColorAlpha(WHITE, (timer.waveTimer - FPS * 7) / (float)FPS));
     }
 }
 
@@ -413,8 +413,75 @@ void Game::Credit()
     }
 }
 
+void Game::DrawUiTurret(int moneyNeeded, int roundUnlock, int type, const char *turretName, const char *damage, const char *speed, const char *special, Rectangle turret, Rectangle turretIcon, Color turretColor, Color textureColor, Color priceColor, Vector2 origin)
+{
+    Color textColorName= turretColor;
+    if (money < moneyNeeded || round < roundUnlock)
+    {
+        priceColor = turretColor = textureColor = LIGHTGRAY;
+    }
+
+    DrawRectangleLinesEx(turretIcon, 2, turretColor);
+    DrawTexturePro(gRes->textures.tilesheet, turret, turretIcon, origin, 0, textureColor);
+
+    DrawText(TextFormat("%i", moneyNeeded), turretIcon.x + 25, turretIcon.y + 70, GetFontDefault().baseSize * 2, priceColor);
+    Rectangle source = {map.texture[287].x, map.texture[287].y, SIZE, SIZE};
+    Rectangle dest = {turretIcon.x - 5, turretIcon.y + 62, SIZE / 2, SIZE / 2};
+    DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, priceColor);
+
+    if (round < roundUnlock)
+    {
+        DrawTexturePro(gRes->textures.tilesheet, {map.texture[284].x, map.texture[284].y, SIZE, SIZE}, turretIcon, origin, 0, WHITE);
+    }
+    if (InRec(turretIcon) && hp > 0)
+    {
+        if (round < roundUnlock)
+        {
+            DrawText("Unlockable at", 1045, 600, 20, BLACK);
+            DrawText(TextFormat("wave %i", roundUnlock), 1190, 600, 20, GOLD);
+        }
+        else
+        {
+            DrawText(TextFormat("%s", turretName), 1070, 550, 20, textColorName);
+            DrawText(TextFormat("Damage :%s", damage), 1050, 600, 20, BLACK);
+            DrawText(TextFormat("Attack Speed :%s", speed), 1050, 630, 20, BLACK);
+            DrawText(TextFormat("Special :%s", special), 1050, 655, 19, BLACK);
+
+            switch (type)
+            {
+            case 1:
+                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= moneyNeeded) // Buy and place new slowing turret
+                {
+                    turretSelected = true;
+                    turrets.push_back(new SlowingTurret);
+                    turrets.back()->sourceTexture = turret;
+                }
+                break;
+                case 2:
+                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= moneyNeeded) // Buy and place new slowing turret
+                {
+                    turretSelected = true;
+                    turrets.push_back(new ExplosiveTurret);
+                    turrets.back()->sourceTexture = turret;
+                }
+                break;
+
+            default:
+                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= moneyNeeded) // Buy and place new slowing turret
+                {
+                    turretSelected = true;
+                    turrets.push_back(new ClassicTurret);
+                    turrets.back()->sourceTexture = turret;
+                }
+                break;
+            }
+        }
+    }
+}
+
 void Game::backUI()
 {
+    //Variable for drawTexturePro of turrets/jack hammer
     const Rectangle classicTurretIcon = (Rectangle){1110, 152, SIZE, SIZE};
     const Rectangle slowingTurretIcon = (Rectangle){1110, 280, SIZE, SIZE};
     const Rectangle explosiveTurretIcon = (Rectangle){1110, 408, SIZE, SIZE};
@@ -430,12 +497,7 @@ void Game::backUI()
     Color textureColor = WHITE;
     Vector2 origin = {0, 0};
 
-    //UpdateAndDrawUI Normal turret
-    if (money < 50)
-    {
-        priceColor = classicColor = textureColor = LIGHTGRAY;
-    }
-
+    //Button that change the game speed
     if (hp > 0 && enemies.size() != 0 && Button(1227, 69, 32, 32, TextFormat("x%i", gameSpeed), 0.2f, 2, BLANK))
     {
         switch (gameSpeed)
@@ -458,112 +520,15 @@ void Game::backUI()
         }
     }
 
-    DrawRectangleLinesEx(classicTurretIcon, 2, classicColor);
-    DrawTexturePro(gRes->textures.tilesheet, classicTurret, classicTurretIcon, origin, 0, textureColor);
+    //Draw turrets ui
+    DrawUiTurret(50, 0,0, "Classic Turret", "Medium", "Medium", "None", classicTurret, classicTurretIcon, classicColor, textureColor, priceColor, origin);
+    DrawUiTurret(150, 3,1, "Slowing Turret", "Low", "High", "Slows", slowingTurret, slowingTurretIcon, slowingColor, textureColor, priceColor, origin);
+    DrawUiTurret(300, 5,2, "Explosive Turret", "High", "Low", "Area Damage", explosiveTurret, explosiveTurretIcon, explosiveColor, textureColor, priceColor, origin);
 
-    DrawText("50", classicTurretIcon.x + 25, classicTurretIcon.y + 70, GetFontDefault().baseSize * 2, priceColor);
-    Rectangle source = {map.texture[287].x, map.texture[287].y, SIZE, SIZE};
-    Rectangle dest = {classicTurretIcon.x - 5, classicTurretIcon.y + 62, SIZE / 2, SIZE / 2};
-    DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, priceColor);
-
-    if (InRec(classicTurretIcon) && hp > 0)
-    {
-        DrawText("Classic Turret", 1070, 550, 20, RED);
-        DrawText("Damage: Medium", 1050, 600, 20, BLACK);
-        DrawText("Attack Speed: Medium", 1050, 630, 20, BLACK);
-
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 50) // Buy and place new classic turret
-        {
-            turretSelected = true;
-            turrets.push_back(new ClassicTurret);
-            turrets.back()->sourceTexture = classicTurret;
-        }
-    }
-
-    //UpdateAndDrawUI Slow turret
-    if (money < 150 || round < 3)
-    {
-        priceColor = slowingColor = textureColor = LIGHTGRAY;
-    }
-
-    DrawRectangleLinesEx(slowingTurretIcon, 2, slowingColor);
-    DrawTexturePro(gRes->textures.tilesheet, slowingTurret, slowingTurretIcon, origin, 0, textureColor);
-
-    DrawText("150", slowingTurretIcon.x + 25, slowingTurretIcon.y + 70, GetFontDefault().baseSize * 2, priceColor);
-    dest = {slowingTurretIcon.x - 5, slowingTurretIcon.y + 62, SIZE / 2, SIZE / 2};
-    DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, priceColor);
-
-    if (round < 3)
-    {
-        DrawTexturePro(gRes->textures.tilesheet, {map.texture[284].x, map.texture[284].y, SIZE, SIZE}, slowingTurretIcon, origin, 0, WHITE);
-    }
-    if (InRec(slowingTurretIcon) && hp > 0)
-    {
-        if (round < 3)
-        {
-            DrawText("Unlockable at", 1045, 600, 20, BLACK);
-            DrawText("wave 3", 1190, 600, 20, GOLD);
-        }
-        else
-        {
-            DrawText("Slowing Turret", 1070, 550, 20, GREEN);
-            DrawText("Damage: Low", 1050, 600, 20, BLACK);
-            DrawText("Attack Speed: High", 1050, 630, 20, BLACK);
-            DrawText("Special:  Slows", 1050, 655, 19, BLACK);
-
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 150) // Buy and place new slowing turret
-            {
-                turretSelected = true;
-                turrets.push_back(new SlowingTurret);
-                turrets.back()->sourceTexture = slowingTurret;
-            }
-        }
-    }
-
-    //UpdateAndDrawUI Explosive turret
-    if (money < 300 || round < 5)
-    {
-        priceColor = explosiveColor = textureColor = LIGHTGRAY;
-    }
-
-    DrawRectangleLinesEx(explosiveTurretIcon, 2, explosiveColor);
-    DrawTexturePro(gRes->textures.tilesheet, explosiveTurret, explosiveTurretIcon, origin, 0, textureColor);
-
-    DrawText("300", explosiveTurretIcon.x + 25, explosiveTurretIcon.y + 70, GetFontDefault().baseSize * 2, priceColor);
-    dest = {explosiveTurretIcon.x - 5, explosiveTurretIcon.y + 62, SIZE / 2, SIZE / 2};
-    DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, priceColor);
-
-    if (round < 5)
-    {
-        DrawTexturePro(gRes->textures.tilesheet, {map.texture[284].x, map.texture[284].y, SIZE, SIZE}, explosiveTurretIcon, origin, 0, WHITE);
-    }
-    if (InRec(explosiveTurretIcon) && hp > 0)
-    {
-        if (round < 5)
-        {
-            DrawText("Unlockable at", 1045, 600, 20, BLACK);
-            DrawText("wave 5", 1190, 600, 20, GOLD);
-        }
-        else
-        {
-            DrawText("Explosive Turret", 1060, 550, 20, ORANGE);
-            DrawText("Damage: High", 1050, 600, 20, BLACK);
-            DrawText("Attack Speed: Low", 1050, 630, 20, BLACK);
-            DrawText("Special:  Area Damage", 1050, 655, 19, BLACK);
-
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 300) // Buy and place new explosive turret
-            {
-                turretSelected = true;
-                turrets.push_back(new ExplosiveTurret);
-                turrets.back()->sourceTexture = explosiveTurret;
-            }
-        }
-    }
-
-    //UpdateAndDrawUI jack hammer
+    //Draw JackHammer Ui
     DrawRectangleLinesEx(jackHammerIcon, 2, SKYBLUE);
 
-    if (!jackActive)
+    if (!jackActive)//if the jackhammer isnt currently dragged
     {
         DrawTexture(gRes->textures.jackhammer, jackHammerIcon.x + 6, jackHammerIcon.y + 10, WHITE);
     }
@@ -582,13 +547,14 @@ void Game::backUI()
         DrawText("Destroy Things", 1070, 630, 20, SKYBLUE);
         DrawText("Gain some money", 1077, 660, 19, BLACK);
 
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) // Buy and place new slowing turret
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) 
         {
             jackActive = !jackActive;
         }
     }
 
-    else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && jackActive)
+    //Jack Hammer turret/trees & bushes deletion
+    else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && jackActive) 
     {
         map.tile[GetTile(GetMousePosition())].active = false;
         if (map.tile[GetTile(GetMousePosition())].environment != 9)
@@ -627,19 +593,21 @@ void Game::backUI()
         jackActive = !jackActive;
     }
 
+
+    //if you are dragging a turret
     if (turretSelected)
     {
-        if (GetMousePosition().x < 1024 && GetMousePosition().x > 0 && GetMousePosition().y < 768 && GetMousePosition().y > 0)
+        if (GetMousePosition().x < 1024 && GetMousePosition().x > 0 && GetMousePosition().y < 768 && GetMousePosition().y > 0) // set turret in the center of the tile if mouse on the map
         {
             turrets.back()->pos.x = map.tile[GetTile(GetMousePosition())].pos.x + SIZE / 2;
             turrets.back()->pos.y = map.tile[GetTile(GetMousePosition())].pos.y + SIZE / 2;
         }
-        else
+        else //make turret follow your mouse if mouse on ui
         {
             turrets.back()->pos = GetMousePosition();
         }
 
-        if ((GetMousePosition().x >= 1024 || GetMousePosition().x <= 0 || GetMousePosition().y >= 768 || GetMousePosition().y <= 0) || map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].road != false)
+        if ((GetMousePosition().x >= 1024 || GetMousePosition().x <= 0 || GetMousePosition().y >= 768 || GetMousePosition().y <= 0) || map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].road != false) //change range color in red(cant place turret in ui/road/rocks or trees)
         {
             turrets.back()->colorZone = RED;
             if (IsMouseButtonUp(MOUSE_LEFT_BUTTON))
@@ -649,7 +617,7 @@ void Game::backUI()
                 turretSelected = false;
             }
         }
-        else
+        else // place the turret
         {
             turrets.back()->colorZone = DARKBLUE;
             if (IsMouseButtonUp(MOUSE_LEFT_BUTTON))
@@ -661,7 +629,7 @@ void Game::backUI()
             }
         }
     }
-
+    //show range of all turret
     if (showTurretRange)
     {
         for (long unsigned int i = 0; i < turrets.size(); i++)
@@ -675,6 +643,7 @@ void Game::backUI()
         showTurretRange = !showTurretRange;
     }
 
+    //Pause button
     DrawTexturePro(gRes->textures.tilesheet, pauseSource, pauseIcon, origin, 0, WHITE);
     if (hp > 0 && InRec(pauseIcon))
     {
@@ -719,7 +688,7 @@ void Game::frontUI()
     DrawRectangleLines(1040, 720, 225, 30, WHITE);
     DrawText(TextFormat("%i / %i", hp, maxHp), 1050, 727, GetFontDefault().baseSize * 2, WHITE);
 
-    if (timer.waveTimer== 0 && enemies.size() == 0 && hp > 0 && DynamicButton(400, 685, 224, 50, "Ready", 0.3f, 3, GREEN))
+    if (timer.waveTimer == 0 && enemies.size() == 0 && hp > 0 && DynamicButton(400, 685, 224, 50, "Ready", 0.3f, 3, GREEN))
     {
         switch (gameSpeed)
         {
@@ -738,7 +707,7 @@ void Game::frontUI()
         }
 
         round++;
-        timer.waveTimer= timer.spawnTimer;
+        timer.waveTimer = timer.spawnTimer;
         if (round > 5)
         {
             maxEnemies += 2;
@@ -848,46 +817,46 @@ void Game::DeathAnimation()
 
 void Game::NextWave()
 {
-    if (timer.waveTimer> timer.spawnTimer - (FPS * 3))
+    if (timer.waveTimer > timer.spawnTimer - (FPS * 3))
     {
         DrawTextWave();
     }
-    if (timer.waveTimer!= 0 && round != 0) // WAVES
+    if (timer.waveTimer != 0 && round != 0) // WAVES
     {
-        if (round == 1 && timer.waveTimer% (2 * FPS) == 0) // TEST WAVE 1
+        if (round == 1 && timer.waveTimer % (2 * FPS) == 0) // TEST WAVE 1
         {
             enemies.push_back(new Warrior);
             enemies.back()->sourceTexture = warriorEnemy;
         }
 
-        else if (round == 2 && timer.waveTimer% FPS == 0) // TEST WAVE 2
+        else if (round == 2 && timer.waveTimer % FPS == 0) // TEST WAVE 2
         {
             enemies.push_back(new Warrior);
             enemies.back()->sourceTexture = warriorEnemy;
         }
 
-        else if (round == 3 && timer.waveTimer% FPS == 0) // TEST WAVE 3
+        else if (round == 3 && timer.waveTimer % FPS == 0) // TEST WAVE 3
         {
-            if (timer.waveTimer>= timer.spawnTimer - (2 * FPS))
+            if (timer.waveTimer >= timer.spawnTimer - (2 * FPS))
             {
                 enemies.push_back(new Berserker);
                 enemies.back()->sourceTexture = berserkerEnemy;
             }
-            else if (timer.waveTimer% (2 * FPS) == 0)
+            else if (timer.waveTimer % (2 * FPS) == 0)
             {
                 enemies.push_back(new Warrior);
                 enemies.back()->sourceTexture = warriorEnemy;
             }
         }
 
-        else if (round == 4 && timer.waveTimer% 60 == 0) // TEST WAVE 4
+        else if (round == 4 && timer.waveTimer % 60 == 0) // TEST WAVE 4
         {
-            if (timer.waveTimer> timer.spawnTimer - (5 * FPS))
+            if (timer.waveTimer > timer.spawnTimer - (5 * FPS))
             {
                 enemies.push_back(new Berserker);
                 enemies.back()->sourceTexture = berserkerEnemy;
             }
-            else if (timer.waveTimer% (2 * FPS) == 0)
+            else if (timer.waveTimer % (2 * FPS) == 0)
             {
                 enemies.push_back(new Warrior);
                 enemies.back()->sourceTexture = warriorEnemy;
@@ -896,12 +865,12 @@ void Game::NextWave()
 
         else if (round == 5 && timer.waveTimer % FPS == 0) // TEST WAVE 5
         {
-            if (timer.waveTimer>= timer.spawnTimer - (2 * FPS))
+            if (timer.waveTimer >= timer.spawnTimer - (2 * FPS))
             {
                 enemies.push_back(new Berserker);
                 enemies.back()->sourceTexture = berserkerEnemy;
             }
-            else if (timer.waveTimer> FPS)
+            else if (timer.waveTimer > FPS)
             {
                 enemies.push_back(new Warrior);
                 enemies.back()->sourceTexture = warriorEnemy;
@@ -912,7 +881,7 @@ void Game::NextWave()
                 enemies.back()->sourceTexture = healerEnemy;
             }
         }
-        else if (round > 5 && timer.waveTimer% (timer.spawnTimer / maxEnemies) == 0)
+        else if (round > 5 && timer.waveTimer % (timer.spawnTimer / maxEnemies) == 0)
         {
 
             int random = rand() % 10;
@@ -1154,8 +1123,6 @@ void Game::DrawGameOver()
         this->soundEffect = isCurrentSoundActive;
     }
 }
-
-
 
 Game::~Game()
 {

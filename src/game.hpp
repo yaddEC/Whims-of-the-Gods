@@ -87,6 +87,7 @@ public:
     void UpdateAndDrawTurret();
     void UpdateAndDrawEnemy();
     bool Button(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color);
+    void DrawUiTurret(int moneyNeeded, int roundUnlock, int type, const char *turretName, const char *damage, const char *speed, const char *special, Rectangle turret, Rectangle turretIcon, Color turretColor, Color textureColor, Color priceColor, Vector2 origin);
     bool DynamicButton(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color);
     void SoundButton(Rectangle dest, bool &type);
     void DrawTextWave();
@@ -96,6 +97,7 @@ public:
     void DrawPause();
     void TimerUpdater();
     void DrawGameOver();
+    void DrawUiTurret();
     void EnemyDestroyedAnimation(Enemy *&e);
     ~Game();
 };
