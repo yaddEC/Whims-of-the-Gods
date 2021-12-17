@@ -53,6 +53,7 @@ public:
     int moneyGain;
     int round;
     int maxEnemies;
+    float newEnemiesMaxHp;
     int gameSpeed;
     bool highScoreBeated;
 

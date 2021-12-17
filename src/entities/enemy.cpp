@@ -59,7 +59,7 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemies
         DrawTexturePro(gRes->textures.tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, ColorAlpha(RED, 0.5));
     }
 
-    if (active) // Draw enemy health bar
+    if (active && (direction.x!=0 || direction.y!=0)) // Draw enemy health bar
     {
         DrawRectangle(pos.x - 20, pos.y + 20, 40, 10, ColorAlpha(BLACK, 0.5));
         DrawRectangle(pos.x - 20, pos.y + 20, hp * 40 / maxHp, 10, GREEN);
