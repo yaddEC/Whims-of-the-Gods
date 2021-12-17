@@ -14,40 +14,49 @@ struct Timer
     int moneyTimer; // Timer for the money gain animation (the "+$" stay for a cupple of frames)
     int waveTimer;
     int timerFadeScreen;
-
 };
 
 class Game
 {
 public:
+
+    //Game status
     bool quit;
     bool start;
     bool pause;
     bool gameOver;
-    bool music;
-    bool soundEffect;
-    bool turretSelected = false; // Is a turret selected (dragged)
-    bool jackActive = false;     // Is jackhammer slected (dragged)
-    float opacityZone;
-    Timer timer;
 
-    int maxEnemies;
-    int gameSpeed;
-
-    int moneyGain;
-
+    //Credits variables
     bool credit;
     int creditHeight;
     std::vector<const char *> creditTitle;
     int titleID;
 
+    //Sound and music variables
+    bool music;
+    bool soundEffect;
+    Music *currentMusic = nullptr;
+
+    bool turretSelected = false; // Is a turret selected (dragged)
+    bool jackActive = false;     // Is jackhammer slected (dragged)
+    
+    Timer timer; // Every timers
+
+    // Turrets range variables
+    bool showTurretRange;
+    float opacityZone;
+    
+    //General variables
     int hp;
     int maxHp;
     int money;
-
+    int moneyGain;
     int round;
-    bool showTurretRange;
+    int maxEnemies;
+    int gameSpeed;
     bool highScoreBeated;
+
+    //UI variables
     Rectangle classicTurret;
     Rectangle slowingTurret;
     Rectangle explosiveTurret;
@@ -61,14 +70,14 @@ public:
     float scrollingSecond;
     float scrollingFirst;
 
-    Music *currentMusic = nullptr;
-
     Tile Spawn;
     Tile Despawn;
     Tilemap map;
 
-    std::vector<Turret *> turrets; // TODO: Rename turrets
-    std::vector<Enemy *> enemies;   // TODO: Rename enemies
+    std::vector<Turret *> turrets;
+    std::vector<Enemy *> enemies;   
+
+    //Functions
     Game();
     void Menu();
     void Credit();
@@ -95,4 +104,3 @@ bool InRec(int x, int y, float width, float height);
 
 bool InRec(Rectangle rec);
 
-bool Button(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color, Sound &sound);
