@@ -5,11 +5,18 @@
 
 void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, Tile *c, Tile *d, int PrevTile,float &rotation);
 
+enum EnemyType
+{
+    WARRIOR = 1,
+    HEALER,
+    BERSERKER
+};
+
 class Enemy : public Entity
 {
 public:
     Enemy();
-
+    EnemyType id;
     int radius;
     int hp;
     int maxHp;

@@ -4,6 +4,7 @@
 #include <raylib.h>
 #include <time.h>
 
+#define FPS 60
 #define SIZE 64.0f
 
 template<typename A>

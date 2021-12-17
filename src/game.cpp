@@ -3,8 +3,6 @@
 #include "game.hpp"
 #include "resources.hpp"
 
-#define FPS 60
-
 static bool turretSelected = false; // Is a turret selected (dragged)
 static bool jackActive = false;     // Is jackhammer slected (dragged)
 static float opacityZone = 0.4;
@@ -80,8 +78,8 @@ Game::Game()
     highScoreBeated = false;
     hp = 20;
     maxHp = 20;
-    money = 100;
-    round = 0;
+    money = 1000;
+    round = 5;
     timer = 0;
     timerFadeScreen = FPS;
     showTurretRange = false;

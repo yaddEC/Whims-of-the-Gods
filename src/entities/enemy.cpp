@@ -59,18 +59,18 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
     else
     {
 
-        Tile nullTile(999, 64, 'g');
+        Tile nullTile(999, SIZE, 'g');
         Tile *leftTile = (map.tile[posTile - 1].road == true && posTile % map.width != 0) ? &map.tile[posTile - 1] : &nullTile;
         Tile *rightTile = (map.tile[posTile + 1].road == true && (posTile % map.width) != 15) ? &map.tile[posTile + 1] : &nullTile;
         Tile *forwardTile = (map.tile[posTile + map.width].road == true && posTile < 176) ? &map.tile[posTile + map.width] : &nullTile;
         Tile *backwardTile = (map.tile[posTile - map.width].road == true && posTile > map.width) ? &map.tile[posTile - map.width] : &nullTile;
 
-        if (static_cast<int>(pos.x) % 64 >= 30 && static_cast<int>(pos.x) % 64 <= 33 && static_cast<int>(pos.y) % 64 >= 30 && static_cast<int>(pos.y) % 64 <= 33)
+        if (static_cast<int>(pos.x) % (int)SIZE >= 30 && static_cast<int>(pos.x) % (int)SIZE <= 33 && static_cast<int>(pos.y) % (int)SIZE >= 30 && static_cast<int>(pos.y) % (int)SIZE <= 33)
         {
             RandDirChooser(dirmem, pos, leftTile, rightTile, forwardTile, backwardTile, prevTile, rot);
         }
     }
-    if (static_cast<int>(pos.x) % 64 >= 30 && static_cast<int>(pos.x) % 64 <= 33 && static_cast<int>(pos.y) % 64 >= 30 && static_cast<int>(pos.y) % 64 <= 33)
+    if (static_cast<int>(pos.x) % (int)SIZE >= 30 && static_cast<int>(pos.x) % (int)SIZE <= 33 && static_cast<int>(pos.y) % (int)SIZE >= 30 && static_cast<int>(pos.y) % (int)SIZE <= 33)
     {
         direction = dirmem;
         rotation = rot;
@@ -87,24 +87,24 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
     pos.x += direction.x * slowingCoef * speed;
     pos.y += direction.y * slowingCoef * speed;
 
-    if (maxHp == 30)
+    if (id == HEALER)
     {
-        if (healTimer > 30)
+        if (healTimer > FPS/2)
         {
-            DrawCircleLines(pos.x, pos.y, 50.0f, ColorAlpha(YELLOW, 0.5f / 30.f * (healTimer - 30.0f)));
+            DrawCircleLines(pos.x, pos.y, 50.0f, ColorAlpha(YELLOW, 0.5f / (FPS/2.0f) * (healTimer - (FPS/2.0f))));
         }
         if (healTimer == 0)
         {
-            speed = 1;
+            speed = 1.4;
 
             bool selfHeal = true;
             for (Enemy *t : enemy)
             {
                 if (t != this && t->active && t->hp < t->maxHp && collCirclex2(t->pos, 50.0f, pos, radius))
                 {
-                    speed = 0.7f;
+                    speed = 1.1;
                     t->hp += 10;
-                    healTimer = 60;
+                    healTimer = FPS;
                     if (t->hp > t->maxHp)
                     {
                         t->hp = t->maxHp;
@@ -115,7 +115,7 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemy)
             if (hp < maxHp && selfHeal)
             {
                 hp += 10;
-                healTimer = 60;
+                healTimer = FPS;
                 if (hp > maxHp)
                 {
                     hp = maxHp;
@@ -154,6 +154,7 @@ Enemy::~Enemy()
 
 Warrior::Warrior()
 {
+    id = WARRIOR;
     damage = 2;
     speed = 1.2;
     hp = 90;
@@ -163,6 +164,7 @@ Warrior::Warrior()
 
 Healer::Healer()
 {
+    id = HEALER;
     damage = 1;
     speed = 1.4;
     hp = 45;
@@ -172,8 +174,9 @@ Healer::Healer()
 
 Berserker::Berserker()
 {
+    id = BERSERKER;
     damage = 5;
-    speed = 1;
+    speed = 1.0;
     hp = 180;
     maxHp = 180;
     reward = 20;
