@@ -52,9 +52,9 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemies, Texture2D tilesheet, V
             }
             rotation += 90;
 
-            if (timer <= 0) // if can shoot
+            if (timer <= 0) // shoot if it can (timer = number of frames between each shots)
             {
-                timer = 60 / attackSpeed;
+                timer = FPS / attackSpeed;
                 enemies[target]->hp -= damage;
                 enemies[target]->timer = 5;
 
@@ -69,7 +69,7 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemies, Texture2D tilesheet, V
                     {
                         PlaySound(turretSounds.slowing);
                     }
-                    enemies[target]->slowingTimer = FPS/2;  // Slowing effect
+                    enemies[target]->slowingTimer = FPS / 2; // Slowing effect
                     enemies[target]->slowingCoef = slowEffect;
                 }
                 else if (id == EXPLOSIVE) // Explosive turret
@@ -100,7 +100,7 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemies, Texture2D tilesheet, V
         }
     }
 
-    if (active && timer > 60 / attackSpeed - 3)  // Draw shoot animation
+    if (active && timer > FPS / attackSpeed - 3) // Draw shoot animation
     {
         Rectangle source = {sourcePos.x, sourcePos.y, SIZE, SIZE};
         Rectangle dest = {pos.x, pos.y, SIZE, SIZE};
@@ -116,18 +116,18 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemies, Texture2D tilesheet, V
 
 void Turret::DrawExplosionAnimation()
 {
-    DrawCircleV(explosionPos, 50.0f, ColorAlpha(RED, 0.25f / 30.f * (timer - 30.0f)));
-    DrawCircleV(explosionPos, 20.0f, ColorAlpha(ORANGE, 0.3f / 30.f * (timer - 30.0f)));
-    float radius = (60 - timer) * 2;
+    DrawCircleV(explosionPos, 50.0f, ColorAlpha(RED, 0.25f / (FPS / 2.0f) * (timer - (FPS / 2.0f))));
+    DrawCircleV(explosionPos, 20.0f, ColorAlpha(ORANGE, 0.3f / (FPS / 2.0f) * (timer - (FPS / 2.0f))));
+    float radius = (FPS - timer) * 2;
 
-    DrawCircle(explosionPos.x, explosionPos.y + radius, 3, ColorAlpha(ORANGE, (timer - 30) / 30.0f));
-    DrawCircle(explosionPos.x, explosionPos.y - radius, 3, ColorAlpha(ORANGE, (timer - 30) / 30.0f));
-    DrawCircle(explosionPos.x + radius, explosionPos.y, 3, ColorAlpha(ORANGE, (timer - 30) / 30.0f));
-    DrawCircle(explosionPos.x - radius, explosionPos.y, 3, ColorAlpha(ORANGE, (timer - 30) / 30.0f));
-    DrawCircle(explosionPos.x + cos(45 * DEG2RAD) * radius, explosionPos.y + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer - 30) / 30.0f));
-    DrawCircle(explosionPos.x - cos(45 * DEG2RAD) * radius, explosionPos.y + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer - 30) / 30.0f));
-    DrawCircle(explosionPos.x + cos(45 * DEG2RAD) * radius, explosionPos.y - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer - 30) / 30.0f));
-    DrawCircle(explosionPos.x - cos(45 * DEG2RAD) * radius, explosionPos.y - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer - 30) / 30.0f));
+    DrawCircle(explosionPos.x, explosionPos.y + radius, 3, ColorAlpha(ORANGE, (timer - (FPS / 2.0f)) / (FPS / 2.0f)));
+    DrawCircle(explosionPos.x, explosionPos.y - radius, 3, ColorAlpha(ORANGE, (timer - (FPS / 2.0f)) / (FPS / 2.0f)));
+    DrawCircle(explosionPos.x + radius, explosionPos.y, 3, ColorAlpha(ORANGE, (timer - (FPS / 2.0f)) / (FPS / 2.0f)));
+    DrawCircle(explosionPos.x - radius, explosionPos.y, 3, ColorAlpha(ORANGE, (timer - (FPS / 2.0f)) / (FPS / 2.0f)));
+    DrawCircle(explosionPos.x + cos(45 * DEG2RAD) * radius, explosionPos.y + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer - (FPS / 2.0f)) / (FPS / 2.0f)));
+    DrawCircle(explosionPos.x - cos(45 * DEG2RAD) * radius, explosionPos.y + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer - (FPS / 2.0f)) / (FPS / 2.0f)));
+    DrawCircle(explosionPos.x + cos(45 * DEG2RAD) * radius, explosionPos.y - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer - (FPS / 2.0f)) / (FPS / 2.0f)));
+    DrawCircle(explosionPos.x - cos(45 * DEG2RAD) * radius, explosionPos.y - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer - (FPS / 2.0f)) / (FPS / 2.0f)));
 }
 
 ClassicTurret::ClassicTurret()

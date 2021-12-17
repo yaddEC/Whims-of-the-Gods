@@ -38,7 +38,7 @@ public:
 
 };
 
-class Warrior : public Enemy
+class Warrior : public Enemy                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 {
 public:
     Warrior();

@@ -47,9 +47,9 @@ Game::Game()
 {
     credit = false;
     opacityZone = 0.4;
-    timer.spawnTimer = 600;
-    timer.frameCounter = 60;
-    timer.animationTimer = 300;
+    timer.spawnTimer = FPS * 10;
+    timer.frameCounter = FPS;
+    timer.animationTimer = FPS * 5;
     timer.secondTimer = 0;
     timer.parTimer = false;
     maxEnemies = 10;
@@ -169,19 +169,19 @@ bool Game::Button(int x, int y, float width, float height, const char *name, flo
 void DynamicTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint, bool parTimer, int frameCounter) //  animated DrawTexturePro (used for title in main menu)
 {
     if (parTimer)
-        DrawTexturePro(texture, source, {dest.x + (frameCounter - 30) / 4, dest.y + (frameCounter - 30) / 4, dest.width + 30 - frameCounter / 2, dest.height + 30 - frameCounter / 2}, origin, rotation, tint);
+        DrawTexturePro(texture, source, {dest.x + (frameCounter - (FPS / 2)) / 4, dest.y + (frameCounter - (FPS / 2)) / 4, dest.width + (FPS / 2) - frameCounter / 2, dest.height + (FPS / 2) - frameCounter / 2}, origin, rotation, tint);
 
     else
-        DrawTexturePro(texture, source, {dest.x - (frameCounter - 30) / 4, dest.y - (frameCounter - 30) / 4, dest.width + (frameCounter / 2), dest.height + frameCounter / 2}, origin, rotation, tint);
+        DrawTexturePro(texture, source, {dest.x - (frameCounter - (FPS / 2)) / 4, dest.y - (frameCounter - (FPS / 2)) / 4, dest.width + (frameCounter / 2), dest.height + frameCounter / 2}, origin, rotation, tint);
 }
 
 bool Game::DynamicButton(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color) //  animated button (used for ready button)
 {
     if (timer.parTimer)
-        return Button(x + (timer.frameCounter - 30) / 4, y + (timer.frameCounter - 30) / 4, width + 30 - timer.frameCounter / 2, height + 30 - timer.frameCounter / 2, name, nameSpacing - 0.05 + (timer.frameCounter / 2 * 0.001666), nameSize + 1.2 - (timer.frameCounter / 2 * 0.04), color);
+        return Button(x + (timer.frameCounter - (FPS / 2)) / 4, y + (timer.frameCounter - (FPS / 2)) / 4, width + (FPS / 2) - timer.frameCounter / 2, height + (FPS / 2) - timer.frameCounter / 2, name, nameSpacing - 0.05 + (timer.frameCounter / 2 * 0.001666), nameSize + 1.2 - (timer.frameCounter / 2 * 0.04), color);
 
     else
-        return Button(x - (timer.frameCounter - 30) / 4, y - (timer.frameCounter - 30) / 4, width + (timer.frameCounter / 2), height + timer.frameCounter / 2, name, nameSpacing - (timer.frameCounter / 2 * 0.001666), nameSize + (timer.frameCounter / 2 * 0.04), color);
+        return Button(x - (timer.frameCounter - (FPS / 2)) / 4, y - (timer.frameCounter - (FPS / 2)) / 4, width + (timer.frameCounter / 2), height + timer.frameCounter / 2, name, nameSpacing - (timer.frameCounter / 2 * 0.001666), nameSize + (timer.frameCounter / 2 * 0.04), color);
 }
 
 void Game::SoundButton(Rectangle dest, bool &type) // Create sound button, returns true when pressed
@@ -222,33 +222,33 @@ void Game::EnemyDestroyedAnimation(Enemy *&e) // Enemies death animation
     if (e->damage == 5)
     {
         source = {map.texture[269].x, map.texture[269].y, SIZE, SIZE};
-        if (e->timer > 60 || e->timer % 3 == 0)
+        if (e->timer > FPS || e->timer % 3 == 0)
         {
-            DrawTexturePro(gRes->textures.tilesheet, source, {e->pos.x - 32, e->pos.y - 32, 64, 64}, {0, 0}, 0, WHITE);
+            DrawTexturePro(gRes->textures.tilesheet, source, {e->pos.x - 32, e->pos.y - 32, SIZE, SIZE}, {0, 0}, 0, WHITE);
         }
     }
     else if (e->damage == 2)
     {
 
         source = {map.texture[270].x, map.texture[270].y, SIZE, SIZE};
-        if (e->timer > 60 || e->timer % 3 == 0)
+        if (e->timer > FPS || e->timer % 3 == 0)
         {
-            DrawTexturePro(gRes->textures.tilesheet, source, {e->pos.x - 32, e->pos.y - 32, 64, 64}, {0, 0}, 0, WHITE);
+            DrawTexturePro(gRes->textures.tilesheet, source, {e->pos.x - 32, e->pos.y - 32, SIZE, SIZE}, {0, 0}, 0, WHITE);
         }
     }
     else
     {
         source = {map.texture[268].x, map.texture[268].y, SIZE, SIZE};
-        if (e->timer > 60 || e->timer % 3 == 0)
+        if (e->timer > FPS || e->timer % 3 == 0)
         {
-            DrawTexturePro(gRes->textures.tilesheet, source, {e->pos.x - 32, e->pos.y - 32, 64, 64}, {0, 0}, 0, WHITE);
+            DrawTexturePro(gRes->textures.tilesheet, source, {e->pos.x - 32, e->pos.y - 32, SIZE, SIZE}, {0, 0}, 0, WHITE);
         }
     }
 }
 
 void Game::DrawTextWave()
 {
-    if (timer.waveTimer > 480)
+    if (timer.waveTimer > FPS * 8)
     {
         DrawText(TextFormat("WAVE %i", round), 370, 350, 80, WHITE);
     }
@@ -264,7 +264,7 @@ void Game::Menu()
     FrameTimer(timer.frameCounter);
     if (timer.frameCounter == 0)
     {
-        timer.frameCounter = 60;
+        timer.frameCounter = FPS;
         timer.secondTimer++;
     }
     if (timer.secondTimer % 2)
@@ -336,8 +336,8 @@ void Game::Menu()
         DrawText(TextFormat("High Score: wave %i", oldSocre), 1050, 300, 20, WHITE);
     }
 
-    SoundButton({520, 700, 48, 48}, music);
-    SoundButton({720, 700, 48, 48}, soundEffect);
+    SoundButton({520, 700, SIZE * 0.75, SIZE * 0.75}, music);
+    SoundButton({720, 700, SIZE * 0.75, SIZE * 0.75}, soundEffect);
 
     DrawText("Music", 517, 670, 20, WHITE);
     DrawText("Sound", 715, 670, 20, WHITE);
@@ -504,17 +504,17 @@ void Game::backUI()
         {
         case 4:
             gameSpeed = 8;
-            SetTargetFPS(480);
+            SetTargetFPS(FPS * 8);
 
             break;
         case 8:
             gameSpeed = 1;
-            SetTargetFPS(60);
+            SetTargetFPS(FPS);
 
             break;
         default:
             gameSpeed = 4;
-            SetTargetFPS(240);
+            SetTargetFPS(FPS * 4);
 
             break;
         }
@@ -717,9 +717,9 @@ void Game::frontUI()
 
 void Game::DeathAnimation()
 {
-    if (timer.animationTimer == 300)
+    if (timer.animationTimer == FPS * 5)
     {
-        SetTargetFPS(60);
+        SetTargetFPS(FPS);
         gameSpeed = 1;
         Despawn.environment = 1;
         StopMusicStream(gRes->sounds.secondTheme);
@@ -751,7 +751,7 @@ void Game::DeathAnimation()
         e->direction = {0, 0};
     }
 
-    if (timer.animationTimer > 240)
+    if (timer.animationTimer > FPS * 4)
     {
 
         Rectangle source = {map.texture[63].x, map.texture[63].y, SIZE, SIZE};
@@ -765,26 +765,26 @@ void Game::DeathAnimation()
         DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, WHITE);
     }
 
-    else if (timer.animationTimer <= 240 && timer.animationTimer > 60)
+    else if (timer.animationTimer <= FPS * 4 && timer.animationTimer > FPS)
     {
         Rectangle dest{float((int)map.Despawn.pos.x), float((int)map.Despawn.pos.y), SIZE, SIZE};
         Vector2 origin = {0, 0};
         Rectangle source = {map.texture[86].x, map.texture[86].y, SIZE, SIZE};
 
         DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, WHITE);
-        DrawCircle(map.Despawn.pos.x + 32, map.Despawn.pos.y + 32, 50.0f, ColorAlpha(RED, 0.25f / 30.f * ((timer.animationTimer / 4) - 30.0f)));
-        DrawCircle(map.Despawn.pos.x + 32, map.Despawn.pos.y + 32, 20.0f, ColorAlpha(ORANGE, 0.3f / 30.f * ((timer.animationTimer / 4) - 30.0f)));
+        DrawCircle(map.Despawn.pos.x + 32, map.Despawn.pos.y + 32, 50.0f, ColorAlpha(RED, 0.25f / (FPS / 2.0f) * ((timer.animationTimer / 4) - (FPS / 2.0f))));
+        DrawCircle(map.Despawn.pos.x + 32, map.Despawn.pos.y + 32, 20.0f, ColorAlpha(ORANGE, 0.3f / (FPS / 2.0f) * ((timer.animationTimer / 4) - (FPS / 2.0f))));
         float radius = (60 - (timer.animationTimer / 4)) * 2;
 
-        DrawCircle(map.Despawn.pos.x + 32, map.Despawn.pos.y + 32 + radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
-        DrawCircle(map.Despawn.pos.x + 32, map.Despawn.pos.y + 32 - radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
-        DrawCircle(map.Despawn.pos.x + 32 + radius, map.Despawn.pos.y + 32, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
-        DrawCircle(map.Despawn.pos.x + 32 - radius, map.Despawn.pos.y + 32, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
-        DrawCircle(map.Despawn.pos.x + 32 + cos(45 * DEG2RAD) * radius, map.Despawn.pos.y + 32 + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
-        DrawCircle(map.Despawn.pos.x + 32 - cos(45 * DEG2RAD) * radius, map.Despawn.pos.y + 32 + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
-        DrawCircle(map.Despawn.pos.x + 32 + cos(45 * DEG2RAD) * radius, map.Despawn.pos.y + 32 - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
-        DrawCircle(map.Despawn.pos.x + 32 - cos(45 * DEG2RAD) * radius, map.Despawn.pos.y + 32 - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
-        DrawCircle(map.Despawn.pos.x + 32, map.Despawn.pos.y + 32, 1300 - ((timer.animationTimer - 120) * 1300 / 120), ColorAlpha(WHITE, 1 - (timer.animationTimer - 120) / 120.0f));
+        DrawCircle(map.Despawn.pos.x + 32, map.Despawn.pos.y + 32 + radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - (FPS / 2.0f)) / (FPS / 2.0f)));
+        DrawCircle(map.Despawn.pos.x + 32, map.Despawn.pos.y + 32 - radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - (FPS / 2.0f)) / (FPS / 2.0f)));
+        DrawCircle(map.Despawn.pos.x + 32 + radius, map.Despawn.pos.y + 32, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - (FPS / 2.0f)) / (FPS / 2.0f)));
+        DrawCircle(map.Despawn.pos.x + 32 - radius, map.Despawn.pos.y + 32, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - (FPS / 2.0f)) / (FPS / 2.0f)));
+        DrawCircle(map.Despawn.pos.x + 32 + cos(45 * DEG2RAD) * radius, map.Despawn.pos.y + 32 + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - (FPS / 2.0f)) / (FPS / 2.0f)));
+        DrawCircle(map.Despawn.pos.x + 32 - cos(45 * DEG2RAD) * radius, map.Despawn.pos.y + 32 + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - (FPS / 2.0f)) / (FPS / 2.0f)));
+        DrawCircle(map.Despawn.pos.x + 32 + cos(45 * DEG2RAD) * radius, map.Despawn.pos.y + 32 - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - (FPS / 2.0f)) / (FPS / 2.0f)));
+        DrawCircle(map.Despawn.pos.x + 32 - cos(45 * DEG2RAD) * radius, map.Despawn.pos.y + 32 - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - (FPS / 2.0f)) / (FPS / 2.0f)));
+        DrawCircle(map.Despawn.pos.x + 32, map.Despawn.pos.y + 32, 1300 - ((timer.animationTimer - (FPS * 2)) * 1300 / (FPS * 2)), ColorAlpha(WHITE, 1 - (timer.animationTimer - (FPS * 2)) / (FPS * 2.0f)));
     }
 
     else
@@ -849,7 +849,7 @@ void Game::NextWave()
             }
         }
 
-        else if (round == 4 && timer.waveTimer % 60 == 0) // TEST WAVE 4
+        else if (round == 4 && timer.waveTimer % FPS == 0) // TEST WAVE 4
         {
             if (timer.waveTimer > timer.spawnTimer - (5 * FPS))
             {
@@ -938,7 +938,7 @@ void Game::DrawGame()
                 else if (Button(t->pos.x - 70, t->pos.y - 20, 140, 30, "Upgrade", 0.05, 1.7, buttonColor)) // enough money Button
                 {
                     money -= t->updatePrice;
-                    t->range += 64;
+                    t->range += SIZE;
                     t->updatePrice *= 2;
                 }
                 DrawText(TextFormat("%i", t->updatePrice), t->pos.x + 30, t->pos.y - 14, GetFontDefault().baseSize * 2, GOLD);
@@ -1113,11 +1113,11 @@ void Game::DrawGameOver()
     {
         DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timer.timerFadeScreen / (float)(FPS))));
         StopMusicStream(gRes->sounds.secondTheme);
-        timer.animationTimer = 300;
+        timer.animationTimer = FPS * 5;
         opacityZone = 0.4;
         bool isCurrentMusicActive = music;
         bool isCurrentSoundActive = soundEffect;
-        this->~Game();
+        this->~Game();                                                                                       
         new (this) Game();
         this->music = isCurrentMusicActive;
         this->soundEffect = isCurrentSoundActive;
