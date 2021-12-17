@@ -117,7 +117,7 @@ bool InRec(Rectangle rec)
     return false;
 }
 
-void FrameTimer(int &timer)
+void FrameTimer(int &timer) // decrease timer by one if is greater than 0
 {
     if (timer > 0)
     {

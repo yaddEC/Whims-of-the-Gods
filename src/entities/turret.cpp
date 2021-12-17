@@ -18,19 +18,9 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
         FrameTimer(timer);
         if (id == EXPLOSIVE && timer > 0)
         {
-            DrawCircleV(explosionPos, 50.0f, ColorAlpha(RED, 0.25f / 30.f * (timer - 30.0f)));
-            DrawCircleV(explosionPos, 20.0f, ColorAlpha(ORANGE, 0.3f / 30.f * (timer - 30.0f)));
-            float radius = (60 - timer)*2;
-
-            DrawCircle(explosionPos.x, explosionPos.y + radius, 3, ColorAlpha(ORANGE, (timer-30)/30.0f));
-            DrawCircle(explosionPos.x, explosionPos.y - radius, 3, ColorAlpha(ORANGE, (timer-30)/30.0f));
-            DrawCircle(explosionPos.x + radius, explosionPos.y, 3, ColorAlpha(ORANGE, (timer-30)/30.0f));
-            DrawCircle(explosionPos.x - radius, explosionPos.y, 3, ColorAlpha(ORANGE, (timer-30)/30.0f));
-            DrawCircle(explosionPos.x + cos(45 * DEG2RAD) * radius, explosionPos.y + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer-30)/30.0f));
-            DrawCircle(explosionPos.x - cos(45 * DEG2RAD) * radius, explosionPos.y + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer-30)/30.0f));
-            DrawCircle(explosionPos.x + cos(45 * DEG2RAD) * radius, explosionPos.y - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer-30)/30.0f));
-            DrawCircle(explosionPos.x - cos(45 * DEG2RAD) * radius, explosionPos.y - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer-30)/30.0f));
+            DrawExplosionAnimation();
         }
+
         int nearestEnemyId = -1;
         int nearestEnemyDistance = -1;
         for (auto j = 0u; target == -1 && j < enemy.size(); j++) // Check every enemy if turret has no current target
@@ -62,31 +52,33 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
             }
             rotation += 90;
 
-            if (timer <= 0)
+            if (timer <= 0) // if can shoot
             {
                 timer = 60 / attackSpeed;
                 enemy[target]->hp -= damage;
                 enemy[target]->timer = 5;
-                if (id == CLASSIC && soundEffect)
+
+                if (id == CLASSIC && soundEffect) // Classic turret
                 {
                     PlaySound(turretSounds.classic);
                 }
-                if (id == SLOWING)
+
+                if (id == SLOWING) // Slowing turret
                 {
-                    if(soundEffect)
+                    if (soundEffect)
                     {
                         PlaySound(turretSounds.slowing);
                     }
-                    enemy[target]->slowingTimer = 30;
+                    enemy[target]->slowingTimer = FPS/2;  // Slowing effect
                     enemy[target]->slowingCoef = slowEffect;
                 }
-                else if (id == EXPLOSIVE)
+                else if (id == EXPLOSIVE) // Explosive turret
                 {
-                    if(soundEffect)
+                    if (soundEffect)
                     {
                         PlaySound(turretSounds.explosion);
                     }
-                    for (Enemy *e : enemy)
+                    for (Enemy *e : enemy) // Area Damage
                     {
                         if (e != enemy[target] && e->active && collCirclex2(enemy[target]->pos, 50.0f, e->pos, e->radius))
                         {
@@ -108,7 +100,7 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
         }
     }
 
-    if (active && timer > 60 / attackSpeed - 3)
+    if (active && timer > 60 / attackSpeed - 3)  // Draw shoot animqtion
     {
         Rectangle source = {sourcePos.x, sourcePos.y, SIZE, SIZE};
         Rectangle dest = {pos.x, pos.y, SIZE, SIZE};
@@ -117,9 +109,25 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
     }
     Rectangle destRec = {pos.x, pos.y, SIZE, SIZE};
     if (active)
-        DrawTexturePro(tilesheet, {1280, 448, 64, 64}, destRec, {SIZE / 2, SIZE / 2}, 0, LIGHTGRAY);
+        DrawTexturePro(tilesheet, {1280, 448, SIZE, SIZE}, destRec, {SIZE / 2, SIZE / 2}, 0, LIGHTGRAY); // Draw turret base
 
     DrawTexturePro(tilesheet, sourceTexture, destRec, {SIZE / 2, SIZE / 2}, rotation, WHITE); // Draw turret
+}
+
+void Turret::DrawExplosionAnimation()
+{
+    DrawCircleV(explosionPos, 50.0f, ColorAlpha(RED, 0.25f / 30.f * (timer - 30.0f)));
+    DrawCircleV(explosionPos, 20.0f, ColorAlpha(ORANGE, 0.3f / 30.f * (timer - 30.0f)));
+    float radius = (60 - timer) * 2;
+
+    DrawCircle(explosionPos.x, explosionPos.y + radius, 3, ColorAlpha(ORANGE, (timer - 30) / 30.0f));
+    DrawCircle(explosionPos.x, explosionPos.y - radius, 3, ColorAlpha(ORANGE, (timer - 30) / 30.0f));
+    DrawCircle(explosionPos.x + radius, explosionPos.y, 3, ColorAlpha(ORANGE, (timer - 30) / 30.0f));
+    DrawCircle(explosionPos.x - radius, explosionPos.y, 3, ColorAlpha(ORANGE, (timer - 30) / 30.0f));
+    DrawCircle(explosionPos.x + cos(45 * DEG2RAD) * radius, explosionPos.y + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer - 30) / 30.0f));
+    DrawCircle(explosionPos.x - cos(45 * DEG2RAD) * radius, explosionPos.y + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer - 30) / 30.0f));
+    DrawCircle(explosionPos.x + cos(45 * DEG2RAD) * radius, explosionPos.y - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer - 30) / 30.0f));
+    DrawCircle(explosionPos.x - cos(45 * DEG2RAD) * radius, explosionPos.y - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, (timer - 30) / 30.0f));
 }
 
 ClassicTurret::ClassicTurret()

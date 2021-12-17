@@ -2,22 +2,22 @@
 #include "entity.hpp"
 
 bool InRec(int x, int y, float width, float height);
-
 bool InRec(Rectangle rec);
 
-class Enemy; // Forward declaration
+class Enemy;   // Forward declaration
 struct Sounds; // Forward declaration
+
+enum TurretType
+{
+    CLASSIC = 1,
+    SLOWING,
+    EXPLOSIVE
+};
 
 class Turret : public Entity
 {
 public:
-    enum Type
-    {
-        CLASSIC=1,
-        SLOWING,
-        EXPLOSIVE
-    };
-    Type id;
+    TurretType id;
     float range;
     int target;
     int price;
@@ -35,6 +35,8 @@ public:
     virtual ~Turret()
     {
     }
+
+    void DrawExplosionAnimation();
 };
 
 class ClassicTurret : public Turret
