@@ -14,6 +14,7 @@ LDLIBS=-lraylib
 
 ifeq ($(TARGET),x86_64-linux-gnu)
 LDLIBS+=-ldl -lpthread -lm
+LDFLAGS+=-static
 else ifeq ($(TARGET),x86_64-pc-cygwin)
 LDLIBS+=-lgdi32
 else ifeq ($(TARGET),x86_64-w64-mingw32)
