@@ -8,8 +8,8 @@ private:
     int mWidthTile;
 
 public:
-    int mTilePos; // draw tile id
-    Vector2 mPos; // pos on the map
+    int tilePos; // draw tile id
+    Vector2 pos; // pos on the map
     char value;
     bool active;
     bool road;
@@ -32,7 +32,7 @@ private:
 
 public:
     int width;
-    std::vector<Tile> tile; // use std::vector<Tile>   (texture.resize(...))
+    std::vector<Tile> tile; 
     Vector2 texture[368];
     Tile Spawn;
     Tile Despawn;

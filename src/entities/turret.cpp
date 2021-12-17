@@ -100,7 +100,7 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vec
         }
     }
 
-    if (active && timer > 60 / attackSpeed - 3)  // Draw shoot animqtion
+    if (active && timer > 60 / attackSpeed - 3)  // Draw shoot animation
     {
         Rectangle source = {sourcePos.x, sourcePos.y, SIZE, SIZE};
         Rectangle dest = {pos.x, pos.y, SIZE, SIZE};
