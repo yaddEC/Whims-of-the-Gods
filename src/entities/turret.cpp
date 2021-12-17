@@ -1,4 +1,5 @@
 #include "../resources.hpp"
+#include "../game.hpp"
 #include "enemy.hpp"
 #include "turret.hpp"
 
@@ -11,7 +12,7 @@ Turret::Turret()
     showTurretUpgrade = false;
 }
 
-void Turret::UpdateAndDraw(std::vector<Enemy *> &enemies, Texture2D tilesheet, Vector2 sourcePos, Sounds &turretSounds, bool soundEffect)
+void Turret::UpdateAndDraw(std::vector<Enemy *> &enemies, Texture2D tilesheet, Vector2 sourcePos, Sounds &turretSounds, Game& game)
 {
     if (active) //if the turret is active
     {
@@ -59,26 +60,23 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemies, Texture2D tilesheet, V
                 enemies[target]->hp -= damage;
                 enemies[target]->timer = 5;
 
-                if (id == CLASSIC && soundEffect) // Classic turret
+                //DoSpecific();
+
+                if (id == CLASSIC) // Classic turret
                 {
-                    PlaySound(turretSounds.classic);
+                    game.PlaySound(turretSounds.classic);
+                    
                 }
 
                 if (id == SLOWING) // Slowing turret
                 {
-                    if (soundEffect)
-                    {
-                        PlaySound(turretSounds.slowing);
-                    }
+                    game.PlaySound(turretSounds.slowing);
                     enemies[target]->slowingTimer = FPS / 2; // Slowing effect
                     enemies[target]->slowingCoef = slowEffect;
                 }
                 else if (id == EXPLOSIVE) // Explosive turret
                 {
-                    if (soundEffect)
-                    {
-                        PlaySound(turretSounds.explosion);
-                    }
+                    game.PlaySound(turretSounds.explosion);
                     for (Enemy *e : enemies) // Area Damage
                     {
                         if (e != enemies[target] && e->active && collCirclex2(enemies[target]->pos, 50.0f, e->pos, e->radius))

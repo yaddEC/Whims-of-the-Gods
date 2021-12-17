@@ -4,8 +4,10 @@
 bool InRec(int x, int y, float width, float height);
 bool InRec(Rectangle rec);
 
-class Enemy;   // Forward declaration
-struct Sounds; // Forward declaration
+// Forward declaration
+class Enemy;
+struct Sounds;
+class Game;
 
 enum TurretType
 {
@@ -28,7 +30,7 @@ public:
     bool showTurretUpgrade;
     Color colorZone;
 
-    void UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, Sounds &turretSounds, bool soundEffect);
+    void UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, Sounds &turretSounds, Game& game);
 
     Turret();
 

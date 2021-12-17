@@ -44,8 +44,6 @@ int main(void)
                 game.currentMusic = &(gRes->sounds.secondTheme);
                 PlayMusicStream(gRes->sounds.secondTheme); //  Play game music
             }
-            DrawRectangle(1024, 0, 256, 768, BROWN);
-            DrawRectangle(1030, 530, 245, 170, ColorAlpha(DARKBROWN, 0.5));
 
             game.UpdateAndDraw();
         }

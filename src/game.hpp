@@ -92,17 +92,20 @@ public:
     void SoundButton(Rectangle dest, bool &type);
     void DrawTextWave();
     void NextWave();
-    void DeathAnimation();
+    void DefeatAnimation();
     void DrawGame();
     void DrawPause();
     void TimerUpdater();
     void DrawGameOver();
     void DrawUiTurret();
     void EnemyDestroyedAnimation(Enemy *&e);
+    void PlaySound(Sound sound);
     ~Game();
 };
 
 bool InRec(int x, int y, float width, float height);
 
 bool InRec(Rectangle rec);
+
+void DynamicTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint, bool parTimer, int frameCounter);
 

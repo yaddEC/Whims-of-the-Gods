@@ -23,7 +23,6 @@ Enemy::Enemy()
 
 void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemies)
 {
-
     GetEnemyDirection(map, round);
 
     FrameTimer(slowingTimer); // Update Timers
@@ -38,10 +37,7 @@ void Enemy::UpdateAndDraw(Tilemap &map, int round, std::vector<Enemy *> &enemies
     pos.x += direction.x * slowingCoef * speed; // Update enemy position
     pos.y += direction.y * slowingCoef * speed;
 
-    if (id == HEALER)
-    {
-        ActivateHealingZone(enemies);
-    }
+    UpdateSpecific(enemies);
 
     Rectangle destRec{float((int)pos.x), float((int)pos.y), SIZE, SIZE};
 
@@ -119,6 +115,11 @@ void Enemy::GetEnemyDirection(Tilemap &map, int round)
         direction = dirmem;
         rotation = rot;
     }
+}
+
+void Healer::UpdateSpecific(std::vector<Enemy *> &enemies)
+{
+    ActivateHealingZone(enemies);
 }
 
 void Enemy::ActivateHealingZone(std::vector<Enemy *> &enemies)

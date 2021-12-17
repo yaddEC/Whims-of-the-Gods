@@ -30,9 +30,11 @@ public:
     int reward;
     Color color;
 
-    void UpdateAndDraw(Tilemap &map, int round,std::vector<Enemy *> &enemies);
+    virtual void UpdateAndDraw(Tilemap &map, int round,std::vector<Enemy *> &enemies);
     void GetEnemyDirection(Tilemap &map, int round);
     void ActivateHealingZone(std::vector<Enemy *> &enemies);
+
+    virtual void UpdateSpecific(std::vector<Enemy *> &enemies) {}
     
     virtual ~Enemy();
 
@@ -49,6 +51,7 @@ class Healer : public Enemy
 
 public:
     Healer();
+    virtual void UpdateSpecific(std::vector<Enemy *> &enemies);
 };
 
 class Berserker : public Enemy
