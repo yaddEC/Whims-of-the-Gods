@@ -53,6 +53,7 @@ Game::Game()
     timer.secondTimer = 0;
     timer.parTimer = false;
     maxEnemies = 10;
+    newEnemiesMaxHp = 45.0f;
     gameSpeed = 1;
     timer.moneyTimer = 0;
     moneyGain = 0;
@@ -114,7 +115,7 @@ Game::Game()
     highScoreBeated = false;
     hp = 20;
     maxHp = 20;
-    money = 150;
+    money = 100;
     round = 0;
     timer.waveTimer = 0;
     timer.timerFadeScreen = FPS;
@@ -415,7 +416,7 @@ void Game::Credit()
 
 void Game::DrawUiTurret(int moneyNeeded, int roundUnlock, int type, const char *turretName, const char *damage, const char *speed, const char *special, Rectangle turret, Rectangle turretIcon, Color turretColor, Color textureColor, Color priceColor, Vector2 origin)
 {
-    Color textColorName= turretColor;
+    Color textColorName = turretColor;
     if (money < moneyNeeded || round < roundUnlock)
     {
         priceColor = turretColor = textureColor = LIGHTGRAY;
@@ -457,7 +458,7 @@ void Game::DrawUiTurret(int moneyNeeded, int roundUnlock, int type, const char *
                     turrets.back()->sourceTexture = turret;
                 }
                 break;
-                case 2:
+            case 2:
                 if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= moneyNeeded) // Buy and place new slowing turret
                 {
                     turretSelected = true;
@@ -498,37 +499,40 @@ void Game::backUI()
     Vector2 origin = {0, 0};
 
     //Button that change the game speed
-    if (hp > 0 && enemies.size() != 0 && Button(1227, 69, 32, 32, TextFormat("x%i", gameSpeed), 0.2f, 2, BLANK))
+    if (hp > 0 && Button(1227, 69, 32, 32, TextFormat("x%i", gameSpeed), 0.2f, 2, BLANK))
     {
         switch (gameSpeed)
         {
         case 4:
             gameSpeed = 8;
-            SetTargetFPS(FPS * 8);
+            if (enemies.size() != 0)
+                SetTargetFPS(FPS * 8);
 
             break;
         case 8:
             gameSpeed = 1;
-            SetTargetFPS(FPS);
+            if (enemies.size() != 0)
+                SetTargetFPS(FPS);
 
             break;
         default:
             gameSpeed = 4;
-            SetTargetFPS(FPS * 4);
+            if (enemies.size() != 0)
+                SetTargetFPS(FPS * 4);
 
             break;
         }
     }
 
     //Draw turrets ui
-    DrawUiTurret(50, 0,0, "Classic Turret", "Medium", "Medium", "None", classicTurret, classicTurretIcon, classicColor, textureColor, priceColor, origin);
-    DrawUiTurret(150, 3,1, "Slowing Turret", "Low", "High", "Slows", slowingTurret, slowingTurretIcon, slowingColor, textureColor, priceColor, origin);
-    DrawUiTurret(300, 5,2, "Explosive Turret", "High", "Low", "Area Damage", explosiveTurret, explosiveTurretIcon, explosiveColor, textureColor, priceColor, origin);
+    DrawUiTurret(50, 0, 0, "Classic Turret", "Medium", "Medium", "None", classicTurret, classicTurretIcon, classicColor, textureColor, priceColor, origin);
+    DrawUiTurret(150, 3, 1, "Slowing Turret", "Low", "High", "Slows", slowingTurret, slowingTurretIcon, slowingColor, textureColor, priceColor, origin);
+    DrawUiTurret(300, 5, 2, "Explosive Turret", "High", "Low", "Area Damage", explosiveTurret, explosiveTurretIcon, explosiveColor, textureColor, priceColor, origin);
 
     //Draw JackHammer Ui
     DrawRectangleLinesEx(jackHammerIcon, 2, SKYBLUE);
 
-    if (!jackActive)//if the jackhammer isnt currently dragged
+    if (!jackActive) //if the jackhammer isnt currently dragged
     {
         DrawTexture(gRes->textures.jackhammer, jackHammerIcon.x + 6, jackHammerIcon.y + 10, WHITE);
     }
@@ -547,14 +551,14 @@ void Game::backUI()
         DrawText("Destroy Things", 1070, 630, 20, SKYBLUE);
         DrawText("Gain some money", 1077, 660, 19, BLACK);
 
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) 
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         {
             jackActive = !jackActive;
         }
     }
 
     //Jack Hammer turret/trees & bushes deletion
-    else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && jackActive) 
+    else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && jackActive)
     {
         map.tile[Tile::GetTile(GetMousePosition())].active = false;
         if (map.tile[Tile::GetTile(GetMousePosition())].environment != 9)
@@ -592,7 +596,6 @@ void Game::backUI()
         }
         jackActive = !jackActive;
     }
-
 
     //if you are dragging a turret
     if (turretSelected)
@@ -662,6 +665,38 @@ void Game::backUI()
 
 void Game::frontUI()
 {
+    for (Turret *t : turrets)
+    {
+        if (t->showTurretUpgrade) // Draw upgrade button
+        {
+            Color buttonColor = GREEN;
+            if (t->updatePrice > t->price * 2) // Max Level Button
+            {
+                DrawRectangle(t->pos.x - 70, t->pos.y - 20, 140, 30, GRAY);
+                DrawText("MAX LEVEL", t->pos.x - 60, t->pos.y - 13, GetFontDefault().baseSize * 2, WHITE);
+            }
+            else
+            {
+                if (t->updatePrice > money) // Not enough money Button
+                {
+                    DrawRectangle(t->pos.x - 70, t->pos.y - 20, 140, 30, GRAY);
+                    DrawText("Upgrade", t->pos.x - 63, t->pos.y - 13, GetFontDefault().baseSize * 1.7, WHITE);
+                }
+                else if (Button(t->pos.x - 70, t->pos.y - 20, 140, 30, "Upgrade", 0.05, 1.7, buttonColor)) // enough money Button
+                {
+                    money -= t->updatePrice;
+                    t->range += SIZE;
+                    t->updatePrice *= 2;
+                }
+                DrawText(TextFormat("%i", t->updatePrice), t->pos.x + 30, t->pos.y - 14, GetFontDefault().baseSize * 2, GOLD);
+                Rectangle source = {map.texture[287].x, map.texture[287].y, SIZE, SIZE};
+                Rectangle dest = {t->pos.x, t->pos.y - 22, SIZE / 2, SIZE / 2};
+                Vector2 origin = {0, 0};
+                DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, GOLD);
+            }
+        }
+    }
+
     if (jackActive)
     {
         DrawTexture(gRes->textures.jackhammer, GetMousePosition().x - 48 / 2, GetMousePosition().y, WHITE);
@@ -706,6 +741,10 @@ void Game::frontUI()
             break;
         }
 
+        if (round > 19)
+        {
+            newEnemiesMaxHp *= 1.2;
+        }
         round++;
         timer.waveTimer = timer.spawnTimer;
         if (round > 5)
@@ -890,18 +929,33 @@ void Game::NextWave()
             {
                 enemies.push_back(new Berserker);
                 enemies.back()->sourceTexture = berserkerEnemy;
+                if (round > 19)
+                {
+                    enemies.back()->hp = newEnemiesMaxHp * 4;
+                    enemies.back()->maxHp = newEnemiesMaxHp * 4;
+                }
             }
 
             else if (random < 5)
             {
                 enemies.push_back(new Healer);
                 enemies.back()->sourceTexture = healerEnemy;
+                if (round > 19)
+                {
+                    enemies.back()->hp = newEnemiesMaxHp;
+                    enemies.back()->maxHp = newEnemiesMaxHp;
+                }
             }
 
             else
             {
                 enemies.push_back(new Warrior);
                 enemies.back()->sourceTexture = warriorEnemy;
+                if (round > 19)
+                {
+                    enemies.back()->hp = newEnemiesMaxHp * 2;
+                    enemies.back()->maxHp = newEnemiesMaxHp * 2;
+                }
             }
         }
     }
@@ -916,38 +970,8 @@ void Game::DrawGame()
         DrawCircleV(turrets.back()->pos, turrets.back()->range, ColorAlpha(turrets.back()->colorZone, opacityZone)); // Draw turret range
     }
     for (Turret *t : turrets)
-
     {
         t->UpdateAndDraw(enemies, gRes->textures.tilesheet, map.texture[t->id + 295], gRes->sounds, soundEffect);
-
-        if (t->showTurretUpgrade) // Draw upgrade button
-        {
-            Color buttonColor = GREEN;
-            if (t->updatePrice > t->price * 2) // Max Level Button
-            {
-                DrawRectangle(t->pos.x - 70, t->pos.y - 20, 140, 30, GRAY);
-                DrawText("MAX LEVEL", t->pos.x - 60, t->pos.y - 13, GetFontDefault().baseSize * 2, WHITE);
-            }
-            else
-            {
-                if (t->updatePrice > money) // Not enough money Button
-                {
-                    DrawRectangle(t->pos.x - 70, t->pos.y - 20, 140, 30, GRAY);
-                    DrawText("Upgrade", t->pos.x - 63, t->pos.y - 13, GetFontDefault().baseSize * 1.7, WHITE);
-                }
-                else if (Button(t->pos.x - 70, t->pos.y - 20, 140, 30, "Upgrade", 0.05, 1.7, buttonColor)) // enough money Button
-                {
-                    money -= t->updatePrice;
-                    t->range += SIZE;
-                    t->updatePrice *= 2;
-                }
-                DrawText(TextFormat("%i", t->updatePrice), t->pos.x + 30, t->pos.y - 14, GetFontDefault().baseSize * 2, GOLD);
-                Rectangle source = {map.texture[287].x, map.texture[287].y, SIZE, SIZE};
-                Rectangle dest = {t->pos.x, t->pos.y - 22, SIZE / 2, SIZE / 2};
-                Vector2 origin = {0, 0};
-                DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, GOLD);
-            }
-        }
 
         if (turrets.back()->active && InRec(t->pos.x - 32, t->pos.y - 32, SIZE, SIZE))
         {
@@ -1112,12 +1136,12 @@ void Game::DrawGameOver()
     if (timer.timerFadeScreen <= 0)
     {
         DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timer.timerFadeScreen / (float)(FPS))));
-        StopMusicStream(gRes->sounds.secondTheme);
+        StopMusicStream(gRes->sounds.gameOver);
         timer.animationTimer = FPS * 5;
         opacityZone = 0.4;
         bool isCurrentMusicActive = music;
         bool isCurrentSoundActive = soundEffect;
-        this->~Game();                                                                                       
+        this->~Game();
         new (this) Game();
         this->music = isCurrentMusicActive;
         this->soundEffect = isCurrentSoundActive;
