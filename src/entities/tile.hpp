@@ -8,8 +8,8 @@ private:
     int mWidthTile;
 
 public:
-    int mTilePos; // draw tile id
-    Vector2 mPos; // pos on the map
+    int tilePos; // draw tile id
+    Vector2 pos; // pos on the map
     char value;
     bool active;
     bool road;
@@ -19,7 +19,12 @@ public:
 
     Tile(int i, int mapWidth, char val);
 
-    void Draw(Texture2D tilesheet, Vector2 frame);
+    void Draw(Vector2 frame);
+
+    static int GetTile(Vector2 vec)
+    {
+        return static_cast<int>(vec.x / 64) + 16 * static_cast<int>(vec.y / 64);
+    }
 };
 
 class Tilemap
@@ -27,13 +32,11 @@ class Tilemap
 private:
     const char *plan;
     int height;
-    
     int total;
 
 public:
     int width;
-    std::vector<Tile> tile; // use std::vector<Tile>   (texture.resize(...))
-    Texture2D tilesheet;
+    std::vector<Tile> tile; 
     Vector2 texture[368];
     Tile Spawn;
     Tile Despawn;
@@ -41,4 +44,5 @@ public:
     void Init();
     void Draw(int round);
     ~Tilemap();
+
 };

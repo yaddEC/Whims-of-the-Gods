@@ -9,7 +9,7 @@ This is our very first project in C++ so the objective was to get used to C++ ar
 
 ### **GamePlay**
 
-The gameplay is very simple, it's a classic tower defense.(1979). </br>
+The gameplay is very simple, it's a classic tower defense. </br>
 In **Whim Of The Gods** the player must protect the castle from the enemies by placing turrets along the path. Every turret costs money and you only start with 100$ but don't worry killing enemies and destroying objects will reward you with some money. The money will allow you to buy new turrets, upgade the ones you already have. You can't move or trade turrets once they are placed you hqve the option to sell them at half of their original price. </br>
 There are **3 types of enemies**. The first ones are **warriors** (medium speed, medium damage), the second ones are **berserkers** (low speed, high damage) and the last are **healers** (high speed, low damage and obviously heal). Make the best strategie and defeat as many enemy waves as possible!
 

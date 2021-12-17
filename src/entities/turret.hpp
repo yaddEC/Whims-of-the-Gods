@@ -1,21 +1,23 @@
 #pragma once
 #include "entity.hpp"
-#include "enemy.hpp"
 
 bool InRec(int x, int y, float width, float height);
-
 bool InRec(Rectangle rec);
+
+class Enemy;   // Forward declaration
+struct Sounds; // Forward declaration
+
+enum TurretType
+{
+    CLASSIC = 1,
+    SLOWING,
+    EXPLOSIVE
+};
 
 class Turret : public Entity
 {
 public:
-    enum Type
-    {
-        CLASSIC=1,
-        SLOWING,
-        EXPLOSIVE
-    };
-    Type id;
+    TurretType id;
     float range;
     int target;
     int price;
@@ -26,13 +28,15 @@ public:
     bool showTurretUpgrade;
     Color colorZone;
 
-    void UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, TurretSounds &turretSounds, bool soundEffect);
+    void UpdateAndDraw(std::vector<Enemy *> &enemy, Texture2D tilesheet, Vector2 sourcePos, Sounds &turretSounds, bool soundEffect);
 
     Turret();
 
     virtual ~Turret()
     {
     }
+
+    void DrawExplosionAnimation();
 };
 
 class ClassicTurret : public Turret

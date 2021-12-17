@@ -1,4 +1,5 @@
 #include "tile.hpp"
+#include "../resources.hpp"
 
 Tile::Tile()
 {
@@ -7,7 +8,7 @@ Tile::Tile()
 Tile::Tile(int i, int mapWidth, char val)
 {
     mWidthTile = SIZE;
-    mTilePos = i;
+    tilePos = i;
     if (val == 'I' || val == 'L' || val == 'V' || val == '>' || val == '<' || val == 'A')
     {
         active = true;
@@ -20,16 +21,16 @@ Tile::Tile(int i, int mapWidth, char val)
     }
 
     value = val;
-    mPos.x = (i % mapWidth) * mWidthTile;
-    mPos.y = (i / mapWidth) * mWidthTile;
+    pos.x = (i % mapWidth) * mWidthTile;
+    pos.y = (i / mapWidth) * mWidthTile;
 }
 
-void Tile::Draw(Texture2D tilesheet, Vector2 frame)
+void Tile::Draw(Vector2 frame)
 {
     Rectangle source = {frame.x, frame.y, SIZE, SIZE};
-    Rectangle dest{float((int)mPos.x), float((int)mPos.y), SIZE, SIZE};
+    Rectangle dest{float((int)pos.x), float((int)pos.y), SIZE, SIZE};
     Vector2 origin = {0, 0};
-    DrawTexturePro(tilesheet, source, dest, origin, 0, WHITE);
+    DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, WHITE);
 
     
 }
@@ -44,7 +45,6 @@ Tilemap::Tilemap()
     width = 16;
 
     total = height * width;
-    tilesheet = LoadTexture("assets/towerDefense_tilesheet.png");
 
     plan =
         {
@@ -114,16 +114,16 @@ void Tilemap::Draw(int round)
     int id = 0;
     for (int i = 0; i < total; i++)
     {
-        if (Spawn.mTilePos == tile[i].mTilePos)
+        if (Spawn.tilePos == tile[i].tilePos)
         {
 
             id = 64;
             tile[i].road = true;
         }
-        else if (Despawn.mTilePos == tile[i].mTilePos)
+        else if (Despawn.tilePos == tile[i].tilePos)
         {
             id = 63;
-            tile[i].Draw(tilesheet, texture[50]);
+            tile[i].Draw(texture[50]);
             tile[i].road = true;
         }
         else
@@ -197,10 +197,10 @@ void Tilemap::Draw(int round)
             }
         }
 
-        tile[i].Draw(tilesheet, texture[id]);
+        tile[i].Draw(texture[id]);
         if (tile[i].environment != 9)
         {
-            tile[i].Draw(tilesheet, texture[130 + tile[i].environment]);
+            tile[i].Draw(texture[130 + tile[i].environment]);
         }
     }
 }

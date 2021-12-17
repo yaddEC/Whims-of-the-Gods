@@ -1,73 +1,76 @@
-#include <raylib.h>
-#include "game.hpp"
 #include <vector>
+#include <raylib.h>
+#include "resources.hpp"
+#include "game.hpp"
 
 int main(void)
 {
     const int screenWidth = 1280;
     const int screenHeight = 768;
-
-    SetConfigFlags(FLAG_VSYNC_HINT);
+    SetTargetFPS(60);
+    
     InitWindow(screenWidth, screenHeight, "Whim Of The Gods");
     InitAudioDevice();
 
+    Resources resources;
+    gRes = &resources;
+
     Game game = {};
 
-    // Main game loop
-    while (!WindowShouldClose() && !game.quit)
+    while (!WindowShouldClose() && !game.quit) // Main game loop
     {
         BeginDrawing();
         ClearBackground(GetColor(0x8db3c6ff));
 
-        if (game.music)  // activate/desactivate music
+        if (game.music) // activate/desactivate music
         {
-            SetMusicVolume(game.gameSounds.mainTheme, 0.5f);
-            SetMusicVolume(game.gameSounds.secondTheme, 0.5f);
-            SetMusicVolume(game.gameSounds.gameOver, 0.5f);
-            SetMusicVolume(game.gameSounds.creditsTheme, 0.5f);
+            SetMusicVolume(gRes->sounds.mainTheme, 0.5f);
+            SetMusicVolume(gRes->sounds.secondTheme, 0.5f);
+            SetMusicVolume(gRes->sounds.gameOver, 0.5f);
+            SetMusicVolume(gRes->sounds.creditsTheme, 0.5f);
         }
         else
         {
-            SetMusicVolume(game.gameSounds.mainTheme, 0);
-            SetMusicVolume(game.gameSounds.secondTheme, 0);
-            SetMusicVolume(game.gameSounds.gameOver, 0);
-            SetMusicVolume(game.gameSounds.creditsTheme, 0);
+            SetMusicVolume(gRes->sounds.mainTheme, 0);
+            SetMusicVolume(gRes->sounds.secondTheme, 0);
+            SetMusicVolume(gRes->sounds.gameOver, 0);
+            SetMusicVolume(gRes->sounds.creditsTheme, 0);
         }
 
-        if (game.start) // if button start is pressed
+        if (game.start) // if start button is pressed
         {
-            if (!IsMusicStreamPlaying(game.gameSounds.secondTheme) && game.hp > 0)
+            if (game.hp > 0)
             {
-                PlayMusicStream(game.gameSounds.secondTheme);
+                game.currentMusic = &(gRes->sounds.secondTheme);
+                PlayMusicStream(gRes->sounds.secondTheme); //  Play game music
             }
             DrawRectangle(1024, 0, 256, 768, BROWN);
             DrawRectangle(1030, 530, 245, 170, ColorAlpha(DARKBROWN, 0.5));
+
             game.UpdateAndDraw();
         }
-        else if(game.credit)
+
+        else if (game.credit) // if credit button is pressed
         {
-            if (!IsMusicStreamPlaying(game.gameSounds.creditsTheme))
-            {
-                PlayMusicStream(game.gameSounds.creditsTheme);
-            }
+
+            game.currentMusic = &(gRes->sounds.creditsTheme);
+            PlayMusicStream(gRes->sounds.creditsTheme); //  Play credits music
+
             game.Credit();
         }
+
         else // print menu
         {
-            if (!IsMusicStreamPlaying(game.gameSounds.mainTheme))
-            {
-                PlayMusicStream(game.gameSounds.mainTheme);
-            }
+
+            game.currentMusic = &(gRes->sounds.mainTheme);
+            PlayMusicStream(gRes->sounds.mainTheme); //  Play menu music
+
             game.Menu();
         }
 
-        UpdateMusicStream(game.gameSounds.mainTheme);
-        UpdateMusicStream(game.gameSounds.secondTheme);
-        UpdateMusicStream(game.gameSounds.creditsTheme);
+        if (game.currentMusic) // update current music
+            UpdateMusicStream(*(game.currentMusic));
 
-        DrawFPS(10, 10);
-
-        
         EndDrawing();
     }
 

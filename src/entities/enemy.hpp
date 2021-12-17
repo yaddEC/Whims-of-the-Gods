@@ -5,11 +5,18 @@
 
 void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, Tile *c, Tile *d, int PrevTile,float &rotation);
 
+enum EnemyType
+{
+    WARRIOR = 1,
+    HEALER,
+    BERSERKER
+};
+
 class Enemy : public Entity
 {
 public:
     Enemy();
-
+    EnemyType id;
     int radius;
     int hp;
     int maxHp;
@@ -23,13 +30,15 @@ public:
     int reward;
     Color color;
 
-    void UpdateAndDraw(Tilemap &map, int round,std::vector<Enemy *> &enemy);
+    void UpdateAndDraw(Tilemap &map, int round,std::vector<Enemy *> &enemies);
+    void GetEnemyDirection(Tilemap &map, int round);
+    void ActivateHealingZone(std::vector<Enemy *> &enemies);
     
     virtual ~Enemy();
 
 };
 
-class Warrior : public Enemy
+class Warrior : public Enemy                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 {
 public:
     Warrior();
