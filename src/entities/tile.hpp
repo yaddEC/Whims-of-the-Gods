@@ -27,7 +27,6 @@ class Tilemap
 private:
     const char *plan;
     int height;
-    
     int total;
 
 public:

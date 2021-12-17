@@ -127,7 +127,7 @@ Game::Game()
     scrollingFirst = 0.0f;
 
     map.Init();
-    DefSpawn(map.Spawn.mPos);
+    DefSpawn(map.Spawn.pos);
 
     pauseSource = {map.texture[107].x, map.texture[107].y, SIZE, SIZE};
 
@@ -380,7 +380,7 @@ void Game::Credit()
         DrawText("Musics", 600, height + 300, 30, BLACK);
         DrawText("Menu:  Tower defense style music loop by DST", 400, height + 350, 20, BLACK);
         DrawText("Game:  Return of Tower Defense Theme by DST", 400, height + 390, 20, BLACK);
-        DrawText("Credits:  \"Blueberries\" composed, performed, mixed and mastered by Viktor Kraus", 260, height + 430, 20, BLACK);
+        DrawText("Credits:  \"Blueberries\" coposed, performed, mixed and mastered by Viktor Kraus", 260, height + 430, 20, BLACK);
         creditHeight -= 2;
         if (creditHeight < -500)
         {
@@ -570,7 +570,7 @@ void Game::backUI()
 
     if (GetMousePosition().x < 1024 && GetMousePosition().x > 0 && GetMousePosition().y < 768 && GetMousePosition().y > 0)
     {
-        DrawRectangleLines(map.tile[GetTile(GetMousePosition())].mPos.x, map.tile[GetTile(GetMousePosition())].mPos.y, SIZE, SIZE, ColorAlpha(WHITE, opacityZone));
+        DrawRectangleLines(map.tile[GetTile(GetMousePosition())].pos.x, map.tile[GetTile(GetMousePosition())].pos.y, SIZE, SIZE, ColorAlpha(WHITE, opacityZone));
     }
 
     if (InRec(jackHammerIcon) && hp > 0)
@@ -631,8 +631,8 @@ void Game::backUI()
     {
         if (GetMousePosition().x < 1024 && GetMousePosition().x > 0 && GetMousePosition().y < 768 && GetMousePosition().y > 0)
         {
-            turrets.back()->pos.x = map.tile[GetTile(GetMousePosition())].mPos.x + SIZE / 2;
-            turrets.back()->pos.y = map.tile[GetTile(GetMousePosition())].mPos.y + SIZE / 2;
+            turrets.back()->pos.x = map.tile[GetTile(GetMousePosition())].pos.x + SIZE / 2;
+            turrets.back()->pos.y = map.tile[GetTile(GetMousePosition())].pos.y + SIZE / 2;
         }
         else
         {
@@ -768,7 +768,7 @@ void Game::DeathAnimation()
             turretSelected = false;
         }
         opacityZone = 0;
-        map.Despawn.mTilePos = 1000;
+        map.Despawn.tilePos = 1000;
     }
     FrameTimer(timer.animationTimer);
 
@@ -792,30 +792,30 @@ void Game::DeathAnimation()
             map.Despawn.environment = -1 * map.Despawn.environment;
         }
 
-        Rectangle dest{float((int)map.Despawn.mPos.x), map.Despawn.mPos.y + map.Despawn.environment, SIZE, SIZE};
+        Rectangle dest{float((int)map.Despawn.pos.x), map.Despawn.pos.y + map.Despawn.environment, SIZE, SIZE};
         DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, WHITE);
     }
 
     else if (timer.animationTimer <= 240 && timer.animationTimer > 60)
     {
-        Rectangle dest{float((int)map.Despawn.mPos.x), float((int)map.Despawn.mPos.y), SIZE, SIZE};
+        Rectangle dest{float((int)map.Despawn.pos.x), float((int)map.Despawn.pos.y), SIZE, SIZE};
         Vector2 origin = {0, 0};
         Rectangle source = {map.texture[86].x, map.texture[86].y, SIZE, SIZE};
 
         DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, WHITE);
-        DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32, 50.0f, ColorAlpha(RED, 0.25f / 30.f * ((timer.animationTimer / 4) - 30.0f)));
-        DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32, 20.0f, ColorAlpha(ORANGE, 0.3f / 30.f * ((timer.animationTimer / 4) - 30.0f)));
+        DrawCircle(map.Despawn.pos.x + 32, map.Despawn.pos.y + 32, 50.0f, ColorAlpha(RED, 0.25f / 30.f * ((timer.animationTimer / 4) - 30.0f)));
+        DrawCircle(map.Despawn.pos.x + 32, map.Despawn.pos.y + 32, 20.0f, ColorAlpha(ORANGE, 0.3f / 30.f * ((timer.animationTimer / 4) - 30.0f)));
         float radius = (60 - (timer.animationTimer / 4)) * 2;
 
-        DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32 + radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
-        DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32 - radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
-        DrawCircle(map.Despawn.mPos.x + 32 + radius, map.Despawn.mPos.y + 32, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
-        DrawCircle(map.Despawn.mPos.x + 32 - radius, map.Despawn.mPos.y + 32, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
-        DrawCircle(map.Despawn.mPos.x + 32 + cos(45 * DEG2RAD) * radius, map.Despawn.mPos.y + 32 + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
-        DrawCircle(map.Despawn.mPos.x + 32 - cos(45 * DEG2RAD) * radius, map.Despawn.mPos.y + 32 + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
-        DrawCircle(map.Despawn.mPos.x + 32 + cos(45 * DEG2RAD) * radius, map.Despawn.mPos.y + 32 - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
-        DrawCircle(map.Despawn.mPos.x + 32 - cos(45 * DEG2RAD) * radius, map.Despawn.mPos.y + 32 - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
-        DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32, 1300 - ((timer.animationTimer - 120) * 1300 / 120), ColorAlpha(WHITE, 1 - (timer.animationTimer - 120) / 120.0f));
+        DrawCircle(map.Despawn.pos.x + 32, map.Despawn.pos.y + 32 + radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
+        DrawCircle(map.Despawn.pos.x + 32, map.Despawn.pos.y + 32 - radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
+        DrawCircle(map.Despawn.pos.x + 32 + radius, map.Despawn.pos.y + 32, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
+        DrawCircle(map.Despawn.pos.x + 32 - radius, map.Despawn.pos.y + 32, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
+        DrawCircle(map.Despawn.pos.x + 32 + cos(45 * DEG2RAD) * radius, map.Despawn.pos.y + 32 + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
+        DrawCircle(map.Despawn.pos.x + 32 - cos(45 * DEG2RAD) * radius, map.Despawn.pos.y + 32 + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
+        DrawCircle(map.Despawn.pos.x + 32 + cos(45 * DEG2RAD) * radius, map.Despawn.pos.y + 32 - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
+        DrawCircle(map.Despawn.pos.x + 32 - cos(45 * DEG2RAD) * radius, map.Despawn.pos.y + 32 - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
+        DrawCircle(map.Despawn.pos.x + 32, map.Despawn.pos.y + 32, 1300 - ((timer.animationTimer - 120) * 1300 / 120), ColorAlpha(WHITE, 1 - (timer.animationTimer - 120) / 120.0f));
     }
 
     else
@@ -996,7 +996,7 @@ void Game::DrawGame()
 
     for (long unsigned int t = 0; t < enemies.size(); t++) // DESTROY ENEMY CONDITIONS
     {
-        if (enemies[t]->posTile == map.Despawn.mTilePos)
+        if (enemies[t]->posTile == map.Despawn.tilePos)
         {
             if (enemies.size() == 1)
             {

@@ -48,7 +48,7 @@ void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, Tile *c, 
             {
             case 0:
             
-                if ( PrevTile != a->mTilePos &&  a->value!='g')
+                if ( PrevTile != a->tilePos &&  a->value!='g')
                 {
                     direction={-1,0};
                     check = true;
@@ -56,7 +56,7 @@ void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, Tile *c, 
                 }
                 break;
             case 1:
-                if ( PrevTile != b->mTilePos &&  b->value!='g')
+                if ( PrevTile != b->tilePos &&  b->value!='g')
                 {
                     direction={1,0};
                     check = true;
@@ -64,7 +64,7 @@ void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, Tile *c, 
                 }
                 break;
             case 2:
-                if ( PrevTile != c->mTilePos &&  c->value!='g')
+                if ( PrevTile != c->tilePos &&  c->value!='g')
                 {
                     direction={0,1};
                     check = true;
@@ -72,7 +72,7 @@ void RandDirChooser(Vector2 &direction, Vector2 pos, Tile *a, Tile *b, Tile *c, 
                 }
                 break;
             case 3:
-                if ( PrevTile != d->mTilePos &&  d->value!='g')
+                if ( PrevTile != d->tilePos &&  d->value!='g')
                 {
                     direction={0,-1};
                     check = true;
