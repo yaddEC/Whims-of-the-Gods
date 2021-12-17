@@ -4,7 +4,18 @@
 #include <raylib.h>
 #include "entities/turret.hpp"
 #include "entities/enemy.hpp"
+struct Timer
+{
+    int spawnTimer;
+    int frameCounter;
+    int animationTimer;
+    int secondTimer;
+    bool parTimer;
+    int moneyTimer; // Timer for the money gain animation (the "+$" stay for a cupple of frames)
+    int waveTimer;
+    int timerFadeScreen;
 
+};
 
 class Game
 {
@@ -15,17 +26,25 @@ public:
     bool gameOver;
     bool music;
     bool soundEffect;
+    bool turretSelected = false; // Is a turret selected (dragged)
+    bool jackActive = false;     // Is jackhammer slected (dragged)
+    float opacityZone;
+    Timer timer;
+
+    int maxEnemies;
+    int gameSpeed;
+
+    int moneyGain;
 
     bool credit;
     int creditHeight;
-    std::vector<const char*> creditTitle;
+    std::vector<const char *> creditTitle;
     int titleID;
 
     int hp;
     int maxHp;
     int money;
-    int timer;
-    int timerFadeScreen;
+
     int round;
     bool showTurretRange;
     bool highScoreBeated;
@@ -42,14 +61,14 @@ public:
     float scrollingSecond;
     float scrollingFirst;
 
-    Music* currentMusic = nullptr;
-    
+    Music *currentMusic = nullptr;
+
     Tile Spawn;
     Tile Despawn;
-    Tilemap map; 
-    
+    Tilemap map;
+
     std::vector<Turret *> turret; // TODO: Rename turrets
-    std::vector<Enemy *> enemy; // TODO: Rename enemies
+    std::vector<Enemy *> enemy;   // TODO: Rename enemies
     Game();
     void Menu();
     void Credit();
@@ -62,6 +81,12 @@ public:
     bool DynamicButton(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color);
     void SoundButton(Rectangle dest, bool &type);
     void DrawTextWave();
+    void NextWave();
+    void DeathAnimation();
+    void DrawGame();
+    void DrawPause();
+    void TimerUpdater();
+    void DrawGameOver();
     void EnemyDestroyedAnimation(Enemy *&e);
     ~Game();
 };

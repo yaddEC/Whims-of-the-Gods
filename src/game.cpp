@@ -5,23 +5,57 @@
 
 #define FPS 60
 
-static bool turretSelected = false; // Is a turret selected (dragged)
-static bool jackActive = false;     // Is jackhammer slected (dragged)
-static float opacityZone = 0.4;
-static int spawnTimer = 600;
-static int frameCounter = 60;
-static int animationTimer = 300;
-static int secondTimer = 0;
-static bool parTimer = false;
-static int maxEnemies = 10;
-static int gameSpeed = 1;
+void Game::UpdateAndDraw()
+{
+    TimerUpdater();
 
-static int moneyTimer = 0; // Timer for the money gain animation (the "+$" stay for a cupple of frames)
-static int moneyGain = 0;
+    if (!gameOver)
+    {
+        map.Draw(round);
+
+        if (!pause)
+        {
+            DrawGame();
+        }
+        else
+        {
+            DrawPause();
+        }
+    }
+    else
+    {
+
+        DrawGameOver();
+    }
+}
+
+void Game::TimerUpdater()
+{
+        FrameTimer(timer.frameCounter);
+    if (timer.frameCounter == 0)
+    {
+        timer.frameCounter = 60;
+        timer.secondTimer++;
+    }
+    if (timer.secondTimer % 2)
+        timer.parTimer = true;
+    else
+        timer.parTimer = false;
+}
 
 Game::Game()
 {
     credit = false;
+    opacityZone = 0.4;
+    timer.spawnTimer = 600;
+    timer.frameCounter = 60;
+    timer.animationTimer = 300;
+    timer.secondTimer = 0;
+    timer.parTimer = false;
+    maxEnemies = 10;
+    gameSpeed = 1;
+    timer.moneyTimer = 0;
+    moneyGain = 0;
     creditHeight = 780;
     creditTitle = {"Special Thanks",
                    "Caprice des dieux inc",
@@ -82,8 +116,8 @@ Game::Game()
     maxHp = 20;
     money = 100;
     round = 0;
-    timer = 0;
-    timerFadeScreen = FPS;
+    timer.waveTimer= 0;
+    timer.timerFadeScreen = FPS;
     showTurretRange = false;
 
     scrollingFive = 0.0f; // background slides positions in main menu
@@ -132,7 +166,7 @@ bool Game::Button(int x, int y, float width, float height, const char *name, flo
     return res;
 }
 
-void DynamicTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint) //  animated DrawTexturePro (used for title in main menu)
+void DynamicTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint, bool parTimer, int frameCounter) //  animated DrawTexturePro (used for title in main menu)
 {
     if (parTimer)
         DrawTexturePro(texture, source, {dest.x + (frameCounter - 30) / 4, dest.y + (frameCounter - 30) / 4, dest.width + 30 - frameCounter / 2, dest.height + 30 - frameCounter / 2}, origin, rotation, tint);
@@ -143,11 +177,11 @@ void DynamicTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vect
 
 bool Game::DynamicButton(int x, int y, float width, float height, const char *name, float nameSpacing, float nameSize, Color color) //  animated button (used for ready button)
 {
-    if (parTimer)
-        return Button(x + (frameCounter - 30) / 4, y + (frameCounter - 30) / 4, width + 30 - frameCounter / 2, height + 30 - frameCounter / 2, name, nameSpacing - 0.05 + (frameCounter / 2 * 0.001666), nameSize + 1.2 - (frameCounter / 2 * 0.04), color);
+    if (timer.parTimer)
+        return Button(x + (timer.frameCounter - 30) / 4, y + (timer.frameCounter - 30) / 4, width + 30 - timer.frameCounter / 2, height + 30 - timer.frameCounter / 2, name, nameSpacing - 0.05 + (timer.frameCounter / 2 * 0.001666), nameSize + 1.2 - (timer.frameCounter / 2 * 0.04), color);
 
     else
-        return Button(x - (frameCounter - 30) / 4, y - (frameCounter - 30) / 4, width + (frameCounter / 2), height + frameCounter / 2, name, nameSpacing - (frameCounter / 2 * 0.001666), nameSize + (frameCounter / 2 * 0.04), color);
+        return Button(x - (timer.frameCounter - 30) / 4, y - (timer.frameCounter - 30) / 4, width + (timer.frameCounter / 2), height + timer.frameCounter / 2, name, nameSpacing - (timer.frameCounter / 2 * 0.001666), nameSize + (timer.frameCounter / 2 * 0.04), color);
 }
 
 void Game::SoundButton(Rectangle dest, bool &type) // Create sound button, returns true when pressed
@@ -214,34 +248,34 @@ void Game::EnemyDestroyedAnimation(Enemy *&e) // Enemies death animation
 
 void Game::DrawTextWave()
 {
-    if (timer > 480)
+    if (timer.waveTimer> 480)
     {
         DrawText(TextFormat("WAVE %i", round), 370, 350, 80, WHITE);
     }
     else
     {
-        DrawText(TextFormat("WAVE %i", round), 370, 350, 80, ColorAlpha(WHITE, (timer - FPS * 7) / (float)FPS));
+        DrawText(TextFormat("WAVE %i", round), 370, 350, 80, ColorAlpha(WHITE, (timer.waveTimer- FPS * 7) / (float)FPS));
     }
 }
 
 void Game::Menu()
 {
 
-    FrameTimer(frameCounter);
-    if (frameCounter == 0)
+    FrameTimer(timer.frameCounter);
+    if (timer.frameCounter == 0)
     {
-        frameCounter = 60;
-        secondTimer++;
+        timer.frameCounter = 60;
+        timer.secondTimer++;
     }
-    if (secondTimer % 2)
+    if (timer.secondTimer % 2)
     {
-        parTimer = true;
+        timer.parTimer = true;
     }
     else
     {
-        parTimer = false;
+        timer.parTimer = false;
     }
-        
+
     scrollingFive -= 0.1f;
     scrollingThird -= 0.5f;
     scrollingSecond -= 0.8f;
@@ -251,7 +285,7 @@ void Game::Menu()
     {
         scrollingFive = 0;
     }
-    if (scrollingThird <= -gRes->textures.third.width * 2)  
+    if (scrollingThird <= -gRes->textures.third.width * 2)
     {
         scrollingThird = 0;
     }
@@ -277,7 +311,7 @@ void Game::Menu()
 
     DrawTextureEx(gRes->textures.first, (Vector2){scrollingFirst, 339}, 0.0f, 2.0f, WHITE);
     DrawTextureEx(gRes->textures.first, (Vector2){gRes->textures.first.width * 2 + scrollingFirst, 339}, 0.0f, 2.0f, WHITE);
-    DynamicTexturePro(gRes->textures.title, {0, 0, (float)gRes->textures.title.width, (float)gRes->textures.title.height}, {320, 124, (float)gRes->textures.title.width, (float)gRes->textures.title.height}, {0, 0}, 0, WHITE);
+    DynamicTexturePro(gRes->textures.title, {0, 0, (float)gRes->textures.title.width, (float)gRes->textures.title.height}, {320, 124, (float)gRes->textures.title.width, (float)gRes->textures.title.height}, {0, 0}, 0, WHITE, timer.parTimer, timer.frameCounter);
 
     if (Button(545, 535, 200, 50, "START", 0.22f, 3, GRAY))
     {
@@ -357,23 +391,23 @@ void Game::Credit()
 
     if (Button(1050, 700, 150, 35, "MENU", 0.3f, 2, GRAY))
     {
-        timerFadeScreen--;
+        timer.timerFadeScreen--;
     }
-    else if (timerFadeScreen < FPS && timerFadeScreen > 0)
+    else if (timer.timerFadeScreen < FPS && timer.timerFadeScreen > 0)
     {
         if (music)
         {
-            SetMusicVolume(gRes->sounds.creditsTheme, 0.5 - (0.5 - (timerFadeScreen * 0.5 / (float)(FPS))));
+            SetMusicVolume(gRes->sounds.creditsTheme, 0.5 - (0.5 - (timer.timerFadeScreen * 0.5 / (float)(FPS))));
         }
-        DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
-        FrameTimer(timerFadeScreen);
+        DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timer.timerFadeScreen / (float)(FPS))));
+        FrameTimer(timer.timerFadeScreen);
     }
-    else if (timerFadeScreen <= 0)
+    else if (timer.timerFadeScreen <= 0)
     {
-        DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
+        DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timer.timerFadeScreen / (float)(FPS))));
         titleID = 0;
         creditHeight = 768;
-        timerFadeScreen = FPS;
+        timer.timerFadeScreen = FPS;
         StopMusicStream(gRes->sounds.creditsTheme);
         credit = false;
     }
@@ -402,7 +436,7 @@ void Game::backUI()
         priceColor = classicColor = textureColor = LIGHTGRAY;
     }
 
-    if (hp>0 && enemy.size() != 0 && Button(1227, 69, 32, 32, TextFormat("x%i", gameSpeed), 0.2f, 2, BLANK))
+    if (hp > 0 && enemy.size() != 0 && Button(1227, 69, 32, 32, TextFormat("x%i", gameSpeed), 0.2f, 2, BLANK))
     {
         switch (gameSpeed)
         {
@@ -564,7 +598,7 @@ void Game::backUI()
                 PlaySound(gRes->sounds.sellTurret);
             }
             map.tile[GetTile(GetMousePosition())].environment = 9;
-            moneyTimer = FPS * 2;
+            timer.moneyTimer = FPS * 2;
             moneyGain = rand() % 15;
             money += moneyGain;
         }
@@ -580,7 +614,7 @@ void Game::backUI()
                     {
                         PlaySound(gRes->sounds.sellTurret);
                     }
-                    moneyTimer = FPS * 2;
+                    timer.moneyTimer = FPS * 2;
                     moneyGain = t->price / 2;
                     money += moneyGain;
                     delete t;
@@ -670,9 +704,9 @@ void Game::frontUI()
     Vector2 origin = {0, 0};
     DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, GOLD);
 
-    if (moneyTimer > 0)
+    if (timer.moneyTimer > 0)
     {
-        DrawText(TextFormat("+%i", moneyGain), 42, 700, GetFontDefault().baseSize * 3, ColorAlpha(GOLD, moneyTimer / (float)(FPS / 2))); // Money gain indicator
+        DrawText(TextFormat("+%i", moneyGain), 42, 700, GetFontDefault().baseSize * 3, ColorAlpha(GOLD, timer.moneyTimer / (float)(FPS / 2))); // Money gain indicator
     }
 
     // Health bar
@@ -685,7 +719,7 @@ void Game::frontUI()
     DrawRectangleLines(1040, 720, 225, 30, WHITE);
     DrawText(TextFormat("%i / %i", hp, maxHp), 1050, 727, GetFontDefault().baseSize * 2, WHITE);
 
-    if (timer == 0 && enemy.size() == 0 && hp > 0 && DynamicButton(400, 685, 224, 50, "Ready", 0.3f, 3, GREEN))
+    if (timer.waveTimer== 0 && enemy.size() == 0 && hp > 0 && DynamicButton(400, 685, 224, 50, "Ready", 0.3f, 3, GREEN))
     {
         switch (gameSpeed)
         {
@@ -703,9 +737,8 @@ void Game::frontUI()
             break;
         }
 
-
         round++;
-        timer = spawnTimer;
+        timer.waveTimer= timer.spawnTimer;
         if (round > 5)
         {
             maxEnemies += 2;
@@ -713,423 +746,416 @@ void Game::frontUI()
     }
 }
 
-void Game::UpdateAndDraw()
+void Game::DeathAnimation()
 {
-    FrameTimer(frameCounter);
-    if (frameCounter == 0)
+    if (timer.animationTimer == 300)
     {
-        frameCounter = 60;
-        secondTimer++;
-    }
-    if (secondTimer % 2)
-        parTimer = true;
-    else
-        parTimer = false;
-
-    if (!gameOver)
-    {
-        map.Draw(round);
-
-        if (!pause)
+        SetTargetFPS(60);
+        gameSpeed = 1;
+        Despawn.environment = 1;
+        StopMusicStream(gRes->sounds.secondTheme);
+        if (soundEffect)
         {
-            backUI();
+            currentMusic = &(gRes->sounds.kaboom);
+            SetMusicVolume(gRes->sounds.kaboom, 1);
+            PlayMusicStream(gRes->sounds.kaboom);
+        }
 
-            if (turret.size() > 0 && !turret.back()->active)
+        if (turretSelected)
+        {
+            delete turret.back();
+            turret.pop_back();
+            turretSelected = false;
+        }
+        opacityZone = 0;
+        map.Despawn.mTilePos = 1000;
+    }
+    FrameTimer(timer.animationTimer);
+
+    for (Turret *t : turret)
+    {
+        t->active = false;
+    }
+
+    for (Enemy *e : enemy)
+    {
+        e->direction = {0, 0};
+    }
+
+    if (timer.animationTimer > 240)
+    {
+
+        Rectangle source = {map.texture[63].x, map.texture[63].y, SIZE, SIZE};
+        Vector2 origin = {0, 0};
+        if (timer.animationTimer % 4 == 0)
+        {
+            map.Despawn.environment = -1 * map.Despawn.environment;
+        }
+
+        Rectangle dest{float((int)map.Despawn.mPos.x), map.Despawn.mPos.y + map.Despawn.environment, SIZE, SIZE};
+        DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, WHITE);
+    }
+
+    else if (timer.animationTimer <= 240 && timer.animationTimer > 60)
+    {
+        Rectangle dest{float((int)map.Despawn.mPos.x), float((int)map.Despawn.mPos.y), SIZE, SIZE};
+        Vector2 origin = {0, 0};
+        Rectangle source = {map.texture[86].x, map.texture[86].y, SIZE, SIZE};
+
+        DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, WHITE);
+        DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32, 50.0f, ColorAlpha(RED, 0.25f / 30.f * ((timer.animationTimer / 4) - 30.0f)));
+        DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32, 20.0f, ColorAlpha(ORANGE, 0.3f / 30.f * ((timer.animationTimer / 4) - 30.0f)));
+        float radius = (60 - (timer.animationTimer / 4)) * 2;
+
+        DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32 + radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
+        DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32 - radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
+        DrawCircle(map.Despawn.mPos.x + 32 + radius, map.Despawn.mPos.y + 32, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
+        DrawCircle(map.Despawn.mPos.x + 32 - radius, map.Despawn.mPos.y + 32, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
+        DrawCircle(map.Despawn.mPos.x + 32 + cos(45 * DEG2RAD) * radius, map.Despawn.mPos.y + 32 + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
+        DrawCircle(map.Despawn.mPos.x + 32 - cos(45 * DEG2RAD) * radius, map.Despawn.mPos.y + 32 + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
+        DrawCircle(map.Despawn.mPos.x + 32 + cos(45 * DEG2RAD) * radius, map.Despawn.mPos.y + 32 - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
+        DrawCircle(map.Despawn.mPos.x + 32 - cos(45 * DEG2RAD) * radius, map.Despawn.mPos.y + 32 - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((timer.animationTimer / 4) - 30) / 30.0f));
+        DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32, 1300 - ((timer.animationTimer - 120) * 1300 / 120), ColorAlpha(WHITE, 1 - (timer.animationTimer - 120) / 120.0f));
+    }
+
+    else
+    {
+        DrawRectangle(0, 0, 1280, 768, ColorAlpha(WHITE, 1));
+        std::ifstream readScore("HighScore.txt");
+        if (readScore)
+        {
+            int oldScore;
+            readScore >> oldScore;
+            if (round > oldScore)
             {
-                DrawCircleV(turret.back()->pos, turret.back()->range, ColorAlpha(turret.back()->colorZone, opacityZone)); // Draw turret range
-            }
-            for (Turret *t : turret)
-
-            {
-                t->UpdateAndDraw(enemy, gRes->textures.tilesheet, map.texture[t->id + 295], gRes->sounds, soundEffect);
-
-                if (t->showTurretUpgrade) // Draw upgrade button
-                {
-                    Color buttonColor = GREEN;
-                    if (t->updatePrice > t->price * 2) // Max Level Button
-                    {
-                        DrawRectangle(t->pos.x - 70, t->pos.y - 20, 140, 30, GRAY);
-                        DrawText("MAX LEVEL", t->pos.x - 60, t->pos.y - 13, GetFontDefault().baseSize * 2, WHITE);
-                    }
-                    else
-                    {
-                        if (t->updatePrice > money) // Not enough money Button
-                        {
-                            DrawRectangle(t->pos.x - 70, t->pos.y - 20, 140, 30, GRAY);
-                            DrawText("Upgrade", t->pos.x - 63, t->pos.y - 13, GetFontDefault().baseSize * 1.7, WHITE);
-                        }
-                        else if (Button(t->pos.x - 70, t->pos.y - 20, 140, 30, "Upgrade", 0.05, 1.7, buttonColor)) // enough money Button
-                        {
-                            money -= t->updatePrice;
-                            t->range += 64;
-                            t->updatePrice *= 2;
-                        }
-                        DrawText(TextFormat("%i", t->updatePrice), t->pos.x + 30, t->pos.y - 14, GetFontDefault().baseSize * 2, GOLD);
-                        Rectangle source = {map.texture[287].x, map.texture[287].y, SIZE, SIZE};
-                        Rectangle dest = {t->pos.x, t->pos.y - 22, SIZE / 2, SIZE / 2};
-                        Vector2 origin = {0, 0};
-                        DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, GOLD);
-                    }
-                }
-
-                if (turret.back()->active && InRec(t->pos.x - 32, t->pos.y - 32, SIZE, SIZE))
-                {
-                    DrawCircleLines(t->pos.x, t->pos.y, t->range, t->colorZone);                                            // Draw turret range
-                    if ((IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && t->showTurretUpgrade == false) || t->showTurretUpgrade) //Turn true showTurretRange
-                    {
-                        t->showTurretUpgrade = true;
-                    }
-                }
-                else
-                {
-                    t->showTurretUpgrade = false;
-                }
-            }
-
-            for (long unsigned int t = 0; t < enemy.size(); t++) // DESTROY ENEMY CONDITIONS
-            {
-                if (enemy[t]->posTile == map.Despawn.mTilePos)
-                {
-                    if (enemy.size() == 1)
-                    {
-                        SetTargetFPS(60);
-                    }
-                    hp -= enemy[t]->damage;
-                    if(hp<0)
-                    {
-                        hp = 0;
-                    }
-                    Enemy *tmp = enemy[t];
-                    enemy.erase(enemy.begin() + t);
-                    delete tmp;
-                    t--;
-                }
-                else if (enemy[t]->active)
-                {
-                    enemy[t]->UpdateAndDraw(map, round, enemy);
-                    if (enemy[t]->hp <= 0)
-                    {
-                        moneyTimer = FPS * 2;
-                        moneyGain = enemy[t]->reward;
-                        money += moneyGain;
-                        enemy[t]->timer = FPS * 2;
-                        enemy[t]->active = false;
-                    }
-                }
-                else if (enemy[t]->timer > 0)
-                {
-
-                    EnemyDestroyedAnimation(enemy[t]);
-                    FrameTimer(enemy[t]->timer);
-                }
-                else
-                {
-                    if (enemy.size() == 1)
-                    {
-                        SetTargetFPS(60);
-                    }
-                    Enemy *tmp = enemy[t];
-                    enemy.erase(enemy.begin() + t);
-                    delete tmp;
-                    t--;
-                }
-            }
-
-            if (timer > spawnTimer - (FPS * 3))
-            {
-                DrawTextWave();
-            }
-            if (timer != 0 && round != 0) // WAVES
-            {
-                if (round == 1 && timer % (2 * FPS) == 0) // TEST WAVE 1
-                {
-                    enemy.push_back(new Warrior);
-                    enemy.back()->sourceTexture = warriorEnemy;
-                }
-
-                else if (round == 2 && timer % FPS == 0) // TEST WAVE 2
-                {
-                    enemy.push_back(new Warrior);
-                    enemy.back()->sourceTexture = warriorEnemy;
-                }
-
-                else if (round == 3 && timer % FPS == 0) // TEST WAVE 3
-                {
-                    if (timer >= spawnTimer - (2 * FPS))
-                    {
-                        enemy.push_back(new Berserker);
-                        enemy.back()->sourceTexture = berserkerEnemy;
-                    }
-                    else if (timer % (2 * FPS) == 0)
-                    {
-                        enemy.push_back(new Warrior);
-                        enemy.back()->sourceTexture = warriorEnemy;
-                    }
-                }
-
-                else if (round == 4 && timer % 60 == 0) // TEST WAVE 4
-                {
-                    if (timer > spawnTimer - (5 * FPS))
-                    {
-                        enemy.push_back(new Berserker);
-                        enemy.back()->sourceTexture = berserkerEnemy;
-                    }
-                    else if (timer % (2 * FPS) == 0)
-                    {
-                        enemy.push_back(new Warrior);
-                        enemy.back()->sourceTexture = warriorEnemy;
-                    }
-                }
-
-                else if (round == 5 && timer % FPS == 0) // TEST WAVE 5
-                {
-                    if (timer >= spawnTimer - (2 * FPS))
-                    {
-                        enemy.push_back(new Berserker);
-                        enemy.back()->sourceTexture = berserkerEnemy;
-                    }
-                    else if (timer > FPS)
-                    {
-                        enemy.push_back(new Warrior);
-                        enemy.back()->sourceTexture = warriorEnemy;
-                    }
-                    else
-                    {
-                        enemy.push_back(new Healer);
-                        enemy.back()->sourceTexture = healerEnemy;
-                    }
-                }
-                else if (round > 5 && timer % (spawnTimer / maxEnemies) == 0)
-                {
-
-                    int random = rand() % 10;
-
-                    if (random < 3)
-                    {
-                        enemy.push_back(new Berserker);
-                        enemy.back()->sourceTexture = berserkerEnemy;
-                    }
-
-                    else if (random < 5)
-                    {
-                        enemy.push_back(new Healer);
-                        enemy.back()->sourceTexture = healerEnemy;
-                    }
-
-                    else
-                    {
-                        enemy.push_back(new Warrior);
-                        enemy.back()->sourceTexture = warriorEnemy;
-                    }
-                }
-            }
-
-            if (IsKeyPressed(KEY_SPACE)) // TEST enemy spawner
-            {
-                enemy.push_back(new Warrior);
-                enemy.back()->sourceTexture = warriorEnemy;
-                enemy.push_back(new Healer);
-                enemy.back()->sourceTexture = healerEnemy;
-                enemy.push_back(new Berserker);
-                enemy.back()->sourceTexture = berserkerEnemy;
-                round++;
-            }
-
-            FrameTimer(timer);
-            FrameTimer(moneyTimer);
-
-            frontUI();
-            if (hp <= 0)
-            {
-                if (animationTimer == 300)
-                {
-                    SetTargetFPS(60);
-                    gameSpeed = 1;
-                    Despawn.environment = 1;
-                    StopMusicStream(gRes->sounds.secondTheme);
-                    if (soundEffect)
-                    {
-                        currentMusic = &(gRes->sounds.kaboom);
-                        SetMusicVolume(gRes->sounds.kaboom, 1);
-                        PlayMusicStream(gRes->sounds.kaboom);
-                    }
-
-                    if (turretSelected)
-                    {
-                        delete turret.back();
-                        turret.pop_back();
-                        turretSelected = false;
-                    }
-                    opacityZone = 0;
-                    map.Despawn.mTilePos = 1000;
-                }
-                FrameTimer(animationTimer);
-
-                for (Turret *t : turret)
-                {
-                    t->active = false;
-                }
-
-                for (Enemy *e : enemy)
-                {
-                    e->direction = {0, 0};
-                }
-
-                if (animationTimer > 240)
-                {
-
-                    Rectangle source = {map.texture[63].x, map.texture[63].y, SIZE, SIZE};
-                    Vector2 origin = {0, 0};
-                    if (animationTimer % 4 == 0)
-                    {
-                        map.Despawn.environment = -1 * map.Despawn.environment;
-                    }
-
-                    Rectangle dest{float((int)map.Despawn.mPos.x), map.Despawn.mPos.y + map.Despawn.environment, SIZE, SIZE};
-                    DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, WHITE);
-                }
-
-                else if (animationTimer <= 240 && animationTimer > 60)
-                {
-                    Rectangle dest{float((int)map.Despawn.mPos.x), float((int)map.Despawn.mPos.y), SIZE, SIZE};
-                    Vector2 origin = {0, 0};
-                    Rectangle source = {map.texture[86].x, map.texture[86].y, SIZE, SIZE};
-
-                    DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, WHITE);
-                    DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32, 50.0f, ColorAlpha(RED, 0.25f / 30.f * ((animationTimer / 4) - 30.0f)));
-                    DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32, 20.0f, ColorAlpha(ORANGE, 0.3f / 30.f * ((animationTimer / 4) - 30.0f)));
-                    float radius = (60 - (animationTimer / 4)) * 2;
-
-                    DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32 + radius, 3, ColorAlpha(ORANGE, ((animationTimer / 4) - 30) / 30.0f));
-                    DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32 - radius, 3, ColorAlpha(ORANGE, ((animationTimer / 4) - 30) / 30.0f));
-                    DrawCircle(map.Despawn.mPos.x + 32 + radius, map.Despawn.mPos.y + 32, 3, ColorAlpha(ORANGE, ((animationTimer / 4) - 30) / 30.0f));
-                    DrawCircle(map.Despawn.mPos.x + 32 - radius, map.Despawn.mPos.y + 32, 3, ColorAlpha(ORANGE, ((animationTimer / 4) - 30) / 30.0f));
-                    DrawCircle(map.Despawn.mPos.x + 32 + cos(45 * DEG2RAD) * radius, map.Despawn.mPos.y + 32 + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((animationTimer / 4) - 30) / 30.0f));
-                    DrawCircle(map.Despawn.mPos.x + 32 - cos(45 * DEG2RAD) * radius, map.Despawn.mPos.y + 32 + sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((animationTimer / 4) - 30) / 30.0f));
-                    DrawCircle(map.Despawn.mPos.x + 32 + cos(45 * DEG2RAD) * radius, map.Despawn.mPos.y + 32 - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((animationTimer / 4) - 30) / 30.0f));
-                    DrawCircle(map.Despawn.mPos.x + 32 - cos(45 * DEG2RAD) * radius, map.Despawn.mPos.y + 32 - sin(45 * DEG2RAD) * radius, 3, ColorAlpha(ORANGE, ((animationTimer / 4) - 30) / 30.0f));
-                    DrawCircle(map.Despawn.mPos.x + 32, map.Despawn.mPos.y + 32, 1300 - ((animationTimer - 120) * 1300 / 120), ColorAlpha(WHITE, 1 - (animationTimer - 120) / 120.0f));
-                }
-
-                else
-                {
-                    DrawRectangle(0, 0, 1280, 768, ColorAlpha(WHITE, 1));
-                    std::ifstream readScore("HighScore.txt");
-                    if (readScore)
-                    {
-                        int oldScore;
-                        readScore >> oldScore;
-                        if (round > oldScore)
-                        {
-                            highScoreBeated = true;
-                            std::ofstream writeScore("HighScore.txt");
-                            writeScore << round << std::endl;
-                        }
-                    }
-                    else
-                    {
-                        highScoreBeated = true;
-                        std::ofstream writeScore("HighScore.txt");
-                        writeScore << round << std::endl;
-                    }
-
-                    StopMusicStream(gRes->sounds.secondTheme);
-                    gameOver = true;
-                    StopMusicStream(gRes->sounds.kaboom);
-                }
+                highScoreBeated = true;
+                std::ofstream writeScore("HighScore.txt");
+                writeScore << round << std::endl;
             }
         }
         else
         {
-            DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 0.3));
-
-            SoundButton({480, 600, SIZE * 1.5f, SIZE * 1.5f}, music);
-            SoundButton({700, 600, SIZE * 1.5f, SIZE * 1.5f}, soundEffect);
-
-            DrawText("Music", 498, 570, 20, WHITE);
-            DrawText("Sound Effects", 670, 570, 20, WHITE);
-
-            if (Button(440, 200, 400, 100, "RESUME", 0.35f, 3, GRAY))
-            {
-                pause = false;
-            }
-            if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY) && timerFadeScreen == FPS)
-            {
-                SetTargetFPS(60);
-                gameSpeed=1;
-                timerFadeScreen--;
-                
-            }
-            else if (timerFadeScreen < FPS && timerFadeScreen > 0)
-            {
-                if (music)
-                {
-                    SetMusicVolume(gRes->sounds.secondTheme, 0.5 - (0.5 - (timerFadeScreen * 0.5 / (float)(FPS))));
-                }
-                DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
-                FrameTimer(timerFadeScreen);
-            }
-            else if (timerFadeScreen <= 0)
-            {
-                DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
-                StopMusicStream(gRes->sounds.secondTheme);
-                bool isCurrentMusicActive = music;
-                bool isCurrentSoundActive = soundEffect;
-                this->~Game();
-                new (this) Game();
-                this->music = isCurrentMusicActive;
-                this->soundEffect = isCurrentSoundActive;
-            }
+            highScoreBeated = true;
+            std::ofstream writeScore("HighScore.txt");
+            writeScore << round << std::endl;
         }
+
+        StopMusicStream(gRes->sounds.secondTheme);
+        gameOver = true;
+        StopMusicStream(gRes->sounds.kaboom);
     }
-    else
+}
+
+void Game::NextWave()
+{
+    if (timer.waveTimer> timer.spawnTimer - (FPS * 3))
     {
+        DrawTextWave();
+    }
+    if (timer.waveTimer!= 0 && round != 0) // WAVES
+    {
+        if (round == 1 && timer.waveTimer% (2 * FPS) == 0) // TEST WAVE 1
+        {
+            enemy.push_back(new Warrior);
+            enemy.back()->sourceTexture = warriorEnemy;
+        }
 
-        if (animationTimer > 0)
+        else if (round == 2 && timer.waveTimer% FPS == 0) // TEST WAVE 2
         {
-            FrameTimer(animationTimer);
+            enemy.push_back(new Warrior);
+            enemy.back()->sourceTexture = warriorEnemy;
         }
-        else if (music && !IsMusicStreamPlaying(gRes->sounds.gameOver))
-        {
-            PlayMusicStream(gRes->sounds.gameOver);
-        }
-        DrawRectangleGradientV(0, 0, 1280, 1500, BLACK, MAROON);
-        DrawText(TextFormat("WAVE %i", round), 535, 200, 50, LIGHTGRAY);
-        if (highScoreBeated)
-        {
-            DrawText("New High Score!", 550, 250, 20, GOLD);
-        }
-        UpdateMusicStream(gRes->sounds.gameOver);
 
-        if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY) && timerFadeScreen == FPS)
+        else if (round == 3 && timer.waveTimer% FPS == 0) // TEST WAVE 3
         {
-            timerFadeScreen--;
-        }
-        else if (timerFadeScreen < FPS && timerFadeScreen > 0)
-        {
-            if (music)
+            if (timer.waveTimer>= timer.spawnTimer - (2 * FPS))
             {
-                SetMusicVolume(gRes->sounds.gameOver, 0.5 - (0.5 - (timerFadeScreen * 0.5 / (float)(FPS))));
+                enemy.push_back(new Berserker);
+                enemy.back()->sourceTexture = berserkerEnemy;
             }
-            DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
-            FrameTimer(timerFadeScreen);
+            else if (timer.waveTimer% (2 * FPS) == 0)
+            {
+                enemy.push_back(new Warrior);
+                enemy.back()->sourceTexture = warriorEnemy;
+            }
         }
-        DrawRectangle(0, 0, 1280, 768, ColorAlpha(WHITE, (float)(animationTimer / 60.0f)));
-        if (timerFadeScreen <= 0)
+
+        else if (round == 4 && timer.waveTimer% 60 == 0) // TEST WAVE 4
         {
-            DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timerFadeScreen / (float)(FPS))));
-            StopMusicStream(gRes->sounds.secondTheme);
-            animationTimer = 300;
-            opacityZone = 0.4;
-            bool isCurrentMusicActive = music;
-            bool isCurrentSoundActive = soundEffect;
-            this->~Game();
-            new (this) Game();
-            this->music = isCurrentMusicActive;
-            this->soundEffect = isCurrentSoundActive;
+            if (timer.waveTimer> timer.spawnTimer - (5 * FPS))
+            {
+                enemy.push_back(new Berserker);
+                enemy.back()->sourceTexture = berserkerEnemy;
+            }
+            else if (timer.waveTimer% (2 * FPS) == 0)
+            {
+                enemy.push_back(new Warrior);
+                enemy.back()->sourceTexture = warriorEnemy;
+            }
+        }
+
+        else if (round == 5 && timer.waveTimer % FPS == 0) // TEST WAVE 5
+        {
+            if (timer.waveTimer>= timer.spawnTimer - (2 * FPS))
+            {
+                enemy.push_back(new Berserker);
+                enemy.back()->sourceTexture = berserkerEnemy;
+            }
+            else if (timer.waveTimer> FPS)
+            {
+                enemy.push_back(new Warrior);
+                enemy.back()->sourceTexture = warriorEnemy;
+            }
+            else
+            {
+                enemy.push_back(new Healer);
+                enemy.back()->sourceTexture = healerEnemy;
+            }
+        }
+        else if (round > 5 && timer.waveTimer% (timer.spawnTimer / maxEnemies) == 0)
+        {
+
+            int random = rand() % 10;
+
+            if (random < 3)
+            {
+                enemy.push_back(new Berserker);
+                enemy.back()->sourceTexture = berserkerEnemy;
+            }
+
+            else if (random < 5)
+            {
+                enemy.push_back(new Healer);
+                enemy.back()->sourceTexture = healerEnemy;
+            }
+
+            else
+            {
+                enemy.push_back(new Warrior);
+                enemy.back()->sourceTexture = warriorEnemy;
+            }
         }
     }
 }
+
+void Game::DrawGame()
+{
+    backUI();
+
+    if (turret.size() > 0 && !turret.back()->active)
+    {
+        DrawCircleV(turret.back()->pos, turret.back()->range, ColorAlpha(turret.back()->colorZone, opacityZone)); // Draw turret range
+    }
+    for (Turret *t : turret)
+
+    {
+        t->UpdateAndDraw(enemy, gRes->textures.tilesheet, map.texture[t->id + 295], gRes->sounds, soundEffect);
+
+        if (t->showTurretUpgrade) // Draw upgrade button
+        {
+            Color buttonColor = GREEN;
+            if (t->updatePrice > t->price * 2) // Max Level Button
+            {
+                DrawRectangle(t->pos.x - 70, t->pos.y - 20, 140, 30, GRAY);
+                DrawText("MAX LEVEL", t->pos.x - 60, t->pos.y - 13, GetFontDefault().baseSize * 2, WHITE);
+            }
+            else
+            {
+                if (t->updatePrice > money) // Not enough money Button
+                {
+                    DrawRectangle(t->pos.x - 70, t->pos.y - 20, 140, 30, GRAY);
+                    DrawText("Upgrade", t->pos.x - 63, t->pos.y - 13, GetFontDefault().baseSize * 1.7, WHITE);
+                }
+                else if (Button(t->pos.x - 70, t->pos.y - 20, 140, 30, "Upgrade", 0.05, 1.7, buttonColor)) // enough money Button
+                {
+                    money -= t->updatePrice;
+                    t->range += 64;
+                    t->updatePrice *= 2;
+                }
+                DrawText(TextFormat("%i", t->updatePrice), t->pos.x + 30, t->pos.y - 14, GetFontDefault().baseSize * 2, GOLD);
+                Rectangle source = {map.texture[287].x, map.texture[287].y, SIZE, SIZE};
+                Rectangle dest = {t->pos.x, t->pos.y - 22, SIZE / 2, SIZE / 2};
+                Vector2 origin = {0, 0};
+                DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, GOLD);
+            }
+        }
+
+        if (turret.back()->active && InRec(t->pos.x - 32, t->pos.y - 32, SIZE, SIZE))
+        {
+            DrawCircleLines(t->pos.x, t->pos.y, t->range, t->colorZone);                                            // Draw turret range
+            if ((IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && t->showTurretUpgrade == false) || t->showTurretUpgrade) //Turn true showTurretRange
+            {
+                t->showTurretUpgrade = true;
+            }
+        }
+        else
+        {
+            t->showTurretUpgrade = false;
+        }
+    }
+
+    for (long unsigned int t = 0; t < enemy.size(); t++) // DESTROY ENEMY CONDITIONS
+    {
+        if (enemy[t]->posTile == map.Despawn.mTilePos)
+        {
+            if (enemy.size() == 1)
+            {
+                SetTargetFPS(60);
+            }
+            hp -= enemy[t]->damage;
+            if (hp < 0)
+            {
+                hp = 0;
+            }
+            Enemy *tmp = enemy[t];
+            enemy.erase(enemy.begin() + t);
+            delete tmp;
+            t--;
+        }
+        else if (enemy[t]->active)
+        {
+            enemy[t]->UpdateAndDraw(map, round, enemy);
+            if (enemy[t]->hp <= 0)
+            {
+                timer.moneyTimer = FPS * 2;
+                moneyGain = enemy[t]->reward;
+                money += moneyGain;
+                enemy[t]->timer = FPS * 2;
+                enemy[t]->active = false;
+            }
+        }
+        else if (enemy[t]->timer > 0)
+        {
+
+            EnemyDestroyedAnimation(enemy[t]);
+            FrameTimer(enemy[t]->timer);
+        }
+        else
+        {
+            if (enemy.size() == 1)
+            {
+                SetTargetFPS(60);
+            }
+            Enemy *tmp = enemy[t];
+            enemy.erase(enemy.begin() + t);
+            delete tmp;
+            t--;
+        }
+    }
+
+    NextWave();
+
+    if (IsKeyPressed(KEY_SPACE)) // TEST enemy spawner
+    {
+        enemy.push_back(new Warrior);
+        enemy.back()->sourceTexture = warriorEnemy;
+        enemy.push_back(new Healer);
+        enemy.back()->sourceTexture = healerEnemy;
+        enemy.push_back(new Berserker);
+        enemy.back()->sourceTexture = berserkerEnemy;
+        round++;
+    }
+
+    FrameTimer(timer.waveTimer);
+    FrameTimer(timer.moneyTimer);
+
+    frontUI();
+    if (hp <= 0)
+    {
+        DeathAnimation();
+    }
+}
+
+void Game::DrawPause()
+{
+    DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 0.3));
+
+    SoundButton({480, 600, SIZE * 1.5f, SIZE * 1.5f}, music);
+    SoundButton({700, 600, SIZE * 1.5f, SIZE * 1.5f}, soundEffect);
+
+    DrawText("Music", 498, 570, 20, WHITE);
+    DrawText("Sound Effects", 670, 570, 20, WHITE);
+
+    if (Button(440, 200, 400, 100, "RESUME", 0.35f, 3, GRAY))
+    {
+        pause = false;
+    }
+    if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY) && timer.timerFadeScreen == FPS)
+    {
+        SetTargetFPS(60);
+        gameSpeed = 1;
+        timer.timerFadeScreen--;
+    }
+    else if (timer.timerFadeScreen < FPS && timer.timerFadeScreen > 0)
+    {
+        if (music)
+        {
+            SetMusicVolume(gRes->sounds.secondTheme, 0.5 - (0.5 - (timer.timerFadeScreen * 0.5 / (float)(FPS))));
+        }
+        DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timer.timerFadeScreen / (float)(FPS))));
+        FrameTimer(timer.timerFadeScreen);
+    }
+    else if (timer.timerFadeScreen <= 0)
+    {
+        DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timer.timerFadeScreen / (float)(FPS))));
+        StopMusicStream(gRes->sounds.secondTheme);
+        bool isCurrentMusicActive = music;
+        bool isCurrentSoundActive = soundEffect;
+        this->~Game();
+        new (this) Game();
+        this->music = isCurrentMusicActive;
+        this->soundEffect = isCurrentSoundActive;
+    }
+}
+
+void Game::DrawGameOver()
+{
+    if (timer.animationTimer > 0)
+    {
+        FrameTimer(timer.animationTimer);
+    }
+    else if (music && !IsMusicStreamPlaying(gRes->sounds.gameOver))
+    {
+        PlayMusicStream(gRes->sounds.gameOver);
+    }
+    DrawRectangleGradientV(0, 0, 1280, 1500, BLACK, MAROON);
+    DrawText(TextFormat("WAVE %i", round), 535, 200, 50, LIGHTGRAY);
+    if (highScoreBeated)
+    {
+        DrawText("New High Score!", 550, 250, 20, GOLD);
+    }
+    UpdateMusicStream(gRes->sounds.gameOver);
+
+    if (Button(440, 400, 400, 100, "MENU", 0.35f, 3, GRAY) && timer.timerFadeScreen == FPS)
+    {
+        timer.timerFadeScreen--;
+    }
+    else if (timer.timerFadeScreen < FPS && timer.timerFadeScreen > 0)
+    {
+        if (music)
+        {
+            SetMusicVolume(gRes->sounds.gameOver, 0.5 - (0.5 - (timer.timerFadeScreen * 0.5 / (float)(FPS))));
+        }
+        DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timer.timerFadeScreen / (float)(FPS))));
+        FrameTimer(timer.timerFadeScreen);
+    }
+    DrawRectangle(0, 0, 1280, 768, ColorAlpha(WHITE, (float)(timer.animationTimer / 60.0f)));
+    if (timer.timerFadeScreen <= 0)
+    {
+        DrawRectangle(0, 0, 1280, 768, ColorAlpha(BLACK, 1.0 - (timer.timerFadeScreen / (float)(FPS))));
+        StopMusicStream(gRes->sounds.secondTheme);
+        timer.animationTimer = 300;
+        opacityZone = 0.4;
+        bool isCurrentMusicActive = music;
+        bool isCurrentSoundActive = soundEffect;
+        this->~Game();
+        new (this) Game();
+        this->music = isCurrentMusicActive;
+        this->soundEffect = isCurrentSoundActive;
+    }
+}
+
+
 
 Game::~Game()
 {
