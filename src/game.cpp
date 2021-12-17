@@ -436,7 +436,7 @@ void Game::backUI()
         priceColor = classicColor = textureColor = LIGHTGRAY;
     }
 
-    if (hp > 0 && enemy.size() != 0 && Button(1227, 69, 32, 32, TextFormat("x%i", gameSpeed), 0.2f, 2, BLANK))
+    if (hp > 0 && enemies.size() != 0 && Button(1227, 69, 32, 32, TextFormat("x%i", gameSpeed), 0.2f, 2, BLANK))
     {
         switch (gameSpeed)
         {
@@ -475,8 +475,8 @@ void Game::backUI()
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 50) // Buy and place new classic turret
         {
             turretSelected = true;
-            turret.push_back(new ClassicTurret);
-            turret.back()->sourceTexture = classicTurret;
+            turrets.push_back(new ClassicTurret);
+            turrets.back()->sourceTexture = classicTurret;
         }
     }
 
@@ -514,8 +514,8 @@ void Game::backUI()
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 150) // Buy and place new slowing turret
             {
                 turretSelected = true;
-                turret.push_back(new SlowingTurret);
-                turret.back()->sourceTexture = slowingTurret;
+                turrets.push_back(new SlowingTurret);
+                turrets.back()->sourceTexture = slowingTurret;
             }
         }
     }
@@ -554,8 +554,8 @@ void Game::backUI()
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && money >= 300) // Buy and place new explosive turret
             {
                 turretSelected = true;
-                turret.push_back(new ExplosiveTurret);
-                turret.back()->sourceTexture = explosiveTurret;
+                turrets.push_back(new ExplosiveTurret);
+                turrets.back()->sourceTexture = explosiveTurret;
             }
         }
     }
@@ -605,7 +605,7 @@ void Game::backUI()
         else
         {
             int a = 0;
-            for (Turret *t : turret)
+            for (Turret *t : turrets)
             {
 
                 if (GetTile(GetMousePosition()) == GetTile(t->pos))
@@ -618,7 +618,7 @@ void Game::backUI()
                     moneyGain = t->price / 2;
                     money += moneyGain;
                     delete t;
-                    turret.erase(turret.begin() + a);
+                    turrets.erase(turrets.begin() + a);
                     break;
                 }
                 a++;
@@ -631,32 +631,32 @@ void Game::backUI()
     {
         if (GetMousePosition().x < 1024 && GetMousePosition().x > 0 && GetMousePosition().y < 768 && GetMousePosition().y > 0)
         {
-            turret.back()->pos.x = map.tile[GetTile(GetMousePosition())].mPos.x + SIZE / 2;
-            turret.back()->pos.y = map.tile[GetTile(GetMousePosition())].mPos.y + SIZE / 2;
+            turrets.back()->pos.x = map.tile[GetTile(GetMousePosition())].mPos.x + SIZE / 2;
+            turrets.back()->pos.y = map.tile[GetTile(GetMousePosition())].mPos.y + SIZE / 2;
         }
         else
         {
-            turret.back()->pos = GetMousePosition();
+            turrets.back()->pos = GetMousePosition();
         }
 
         if ((GetMousePosition().x >= 1024 || GetMousePosition().x <= 0 || GetMousePosition().y >= 768 || GetMousePosition().y <= 0) || map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].road != false)
         {
-            turret.back()->colorZone = RED;
+            turrets.back()->colorZone = RED;
             if (IsMouseButtonUp(MOUSE_LEFT_BUTTON))
             {
-                delete turret.back();
-                turret.pop_back();
+                delete turrets.back();
+                turrets.pop_back();
                 turretSelected = false;
             }
         }
         else
         {
-            turret.back()->colorZone = DARKBLUE;
+            turrets.back()->colorZone = DARKBLUE;
             if (IsMouseButtonUp(MOUSE_LEFT_BUTTON))
             {
-                money -= turret.back()->price;
+                money -= turrets.back()->price;
                 map.tile[GetTile(GetMousePosition())].active = true;
-                turret.back()->active = true;
+                turrets.back()->active = true;
                 turretSelected = false;
             }
         }
@@ -664,9 +664,9 @@ void Game::backUI()
 
     if (showTurretRange)
     {
-        for (long unsigned int i = 0; i < turret.size(); i++)
+        for (long unsigned int i = 0; i < turrets.size(); i++)
         {
-            DrawCircleV(turret[i]->pos, turret[i]->range, ColorAlpha(turret[i]->colorZone, opacityZone)); // Draw turret range
+            DrawCircleV(turrets[i]->pos, turrets[i]->range, ColorAlpha(turrets[i]->colorZone, opacityZone)); // Draw turret range
         }
     }
 
@@ -719,7 +719,7 @@ void Game::frontUI()
     DrawRectangleLines(1040, 720, 225, 30, WHITE);
     DrawText(TextFormat("%i / %i", hp, maxHp), 1050, 727, GetFontDefault().baseSize * 2, WHITE);
 
-    if (timer.waveTimer== 0 && enemy.size() == 0 && hp > 0 && DynamicButton(400, 685, 224, 50, "Ready", 0.3f, 3, GREEN))
+    if (timer.waveTimer== 0 && enemies.size() == 0 && hp > 0 && DynamicButton(400, 685, 224, 50, "Ready", 0.3f, 3, GREEN))
     {
         switch (gameSpeed)
         {
@@ -763,8 +763,8 @@ void Game::DeathAnimation()
 
         if (turretSelected)
         {
-            delete turret.back();
-            turret.pop_back();
+            delete turrets.back();
+            turrets.pop_back();
             turretSelected = false;
         }
         opacityZone = 0;
@@ -772,12 +772,12 @@ void Game::DeathAnimation()
     }
     FrameTimer(timer.animationTimer);
 
-    for (Turret *t : turret)
+    for (Turret *t : turrets)
     {
         t->active = false;
     }
 
-    for (Enemy *e : enemy)
+    for (Enemy *e : enemies)
     {
         e->direction = {0, 0};
     }
@@ -856,27 +856,27 @@ void Game::NextWave()
     {
         if (round == 1 && timer.waveTimer% (2 * FPS) == 0) // TEST WAVE 1
         {
-            enemy.push_back(new Warrior);
-            enemy.back()->sourceTexture = warriorEnemy;
+            enemies.push_back(new Warrior);
+            enemies.back()->sourceTexture = warriorEnemy;
         }
 
         else if (round == 2 && timer.waveTimer% FPS == 0) // TEST WAVE 2
         {
-            enemy.push_back(new Warrior);
-            enemy.back()->sourceTexture = warriorEnemy;
+            enemies.push_back(new Warrior);
+            enemies.back()->sourceTexture = warriorEnemy;
         }
 
         else if (round == 3 && timer.waveTimer% FPS == 0) // TEST WAVE 3
         {
             if (timer.waveTimer>= timer.spawnTimer - (2 * FPS))
             {
-                enemy.push_back(new Berserker);
-                enemy.back()->sourceTexture = berserkerEnemy;
+                enemies.push_back(new Berserker);
+                enemies.back()->sourceTexture = berserkerEnemy;
             }
             else if (timer.waveTimer% (2 * FPS) == 0)
             {
-                enemy.push_back(new Warrior);
-                enemy.back()->sourceTexture = warriorEnemy;
+                enemies.push_back(new Warrior);
+                enemies.back()->sourceTexture = warriorEnemy;
             }
         }
 
@@ -884,13 +884,13 @@ void Game::NextWave()
         {
             if (timer.waveTimer> timer.spawnTimer - (5 * FPS))
             {
-                enemy.push_back(new Berserker);
-                enemy.back()->sourceTexture = berserkerEnemy;
+                enemies.push_back(new Berserker);
+                enemies.back()->sourceTexture = berserkerEnemy;
             }
             else if (timer.waveTimer% (2 * FPS) == 0)
             {
-                enemy.push_back(new Warrior);
-                enemy.back()->sourceTexture = warriorEnemy;
+                enemies.push_back(new Warrior);
+                enemies.back()->sourceTexture = warriorEnemy;
             }
         }
 
@@ -898,18 +898,18 @@ void Game::NextWave()
         {
             if (timer.waveTimer>= timer.spawnTimer - (2 * FPS))
             {
-                enemy.push_back(new Berserker);
-                enemy.back()->sourceTexture = berserkerEnemy;
+                enemies.push_back(new Berserker);
+                enemies.back()->sourceTexture = berserkerEnemy;
             }
             else if (timer.waveTimer> FPS)
             {
-                enemy.push_back(new Warrior);
-                enemy.back()->sourceTexture = warriorEnemy;
+                enemies.push_back(new Warrior);
+                enemies.back()->sourceTexture = warriorEnemy;
             }
             else
             {
-                enemy.push_back(new Healer);
-                enemy.back()->sourceTexture = healerEnemy;
+                enemies.push_back(new Healer);
+                enemies.back()->sourceTexture = healerEnemy;
             }
         }
         else if (round > 5 && timer.waveTimer% (timer.spawnTimer / maxEnemies) == 0)
@@ -919,20 +919,20 @@ void Game::NextWave()
 
             if (random < 3)
             {
-                enemy.push_back(new Berserker);
-                enemy.back()->sourceTexture = berserkerEnemy;
+                enemies.push_back(new Berserker);
+                enemies.back()->sourceTexture = berserkerEnemy;
             }
 
             else if (random < 5)
             {
-                enemy.push_back(new Healer);
-                enemy.back()->sourceTexture = healerEnemy;
+                enemies.push_back(new Healer);
+                enemies.back()->sourceTexture = healerEnemy;
             }
 
             else
             {
-                enemy.push_back(new Warrior);
-                enemy.back()->sourceTexture = warriorEnemy;
+                enemies.push_back(new Warrior);
+                enemies.back()->sourceTexture = warriorEnemy;
             }
         }
     }
@@ -942,14 +942,14 @@ void Game::DrawGame()
 {
     backUI();
 
-    if (turret.size() > 0 && !turret.back()->active)
+    if (turrets.size() > 0 && !turrets.back()->active)
     {
-        DrawCircleV(turret.back()->pos, turret.back()->range, ColorAlpha(turret.back()->colorZone, opacityZone)); // Draw turret range
+        DrawCircleV(turrets.back()->pos, turrets.back()->range, ColorAlpha(turrets.back()->colorZone, opacityZone)); // Draw turret range
     }
-    for (Turret *t : turret)
+    for (Turret *t : turrets)
 
     {
-        t->UpdateAndDraw(enemy, gRes->textures.tilesheet, map.texture[t->id + 295], gRes->sounds, soundEffect);
+        t->UpdateAndDraw(enemies, gRes->textures.tilesheet, map.texture[t->id + 295], gRes->sounds, soundEffect);
 
         if (t->showTurretUpgrade) // Draw upgrade button
         {
@@ -980,7 +980,7 @@ void Game::DrawGame()
             }
         }
 
-        if (turret.back()->active && InRec(t->pos.x - 32, t->pos.y - 32, SIZE, SIZE))
+        if (turrets.back()->active && InRec(t->pos.x - 32, t->pos.y - 32, SIZE, SIZE))
         {
             DrawCircleLines(t->pos.x, t->pos.y, t->range, t->colorZone);                                            // Draw turret range
             if ((IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && t->showTurretUpgrade == false) || t->showTurretUpgrade) //Turn true showTurretRange
@@ -994,50 +994,50 @@ void Game::DrawGame()
         }
     }
 
-    for (long unsigned int t = 0; t < enemy.size(); t++) // DESTROY ENEMY CONDITIONS
+    for (long unsigned int t = 0; t < enemies.size(); t++) // DESTROY ENEMY CONDITIONS
     {
-        if (enemy[t]->posTile == map.Despawn.mTilePos)
+        if (enemies[t]->posTile == map.Despawn.mTilePos)
         {
-            if (enemy.size() == 1)
+            if (enemies.size() == 1)
             {
                 SetTargetFPS(60);
             }
-            hp -= enemy[t]->damage;
+            hp -= enemies[t]->damage;
             if (hp < 0)
             {
                 hp = 0;
             }
-            Enemy *tmp = enemy[t];
-            enemy.erase(enemy.begin() + t);
+            Enemy *tmp = enemies[t];
+            enemies.erase(enemies.begin() + t);
             delete tmp;
             t--;
         }
-        else if (enemy[t]->active)
+        else if (enemies[t]->active)
         {
-            enemy[t]->UpdateAndDraw(map, round, enemy);
-            if (enemy[t]->hp <= 0)
+            enemies[t]->UpdateAndDraw(map, round, enemies);
+            if (enemies[t]->hp <= 0)
             {
                 timer.moneyTimer = FPS * 2;
-                moneyGain = enemy[t]->reward;
+                moneyGain = enemies[t]->reward;
                 money += moneyGain;
-                enemy[t]->timer = FPS * 2;
-                enemy[t]->active = false;
+                enemies[t]->timer = FPS * 2;
+                enemies[t]->active = false;
             }
         }
-        else if (enemy[t]->timer > 0)
+        else if (enemies[t]->timer > 0)
         {
 
-            EnemyDestroyedAnimation(enemy[t]);
-            FrameTimer(enemy[t]->timer);
+            EnemyDestroyedAnimation(enemies[t]);
+            FrameTimer(enemies[t]->timer);
         }
         else
         {
-            if (enemy.size() == 1)
+            if (enemies.size() == 1)
             {
                 SetTargetFPS(60);
             }
-            Enemy *tmp = enemy[t];
-            enemy.erase(enemy.begin() + t);
+            Enemy *tmp = enemies[t];
+            enemies.erase(enemies.begin() + t);
             delete tmp;
             t--;
         }
@@ -1047,12 +1047,12 @@ void Game::DrawGame()
 
     if (IsKeyPressed(KEY_SPACE)) // TEST enemy spawner
     {
-        enemy.push_back(new Warrior);
-        enemy.back()->sourceTexture = warriorEnemy;
-        enemy.push_back(new Healer);
-        enemy.back()->sourceTexture = healerEnemy;
-        enemy.push_back(new Berserker);
-        enemy.back()->sourceTexture = berserkerEnemy;
+        enemies.push_back(new Warrior);
+        enemies.back()->sourceTexture = warriorEnemy;
+        enemies.push_back(new Healer);
+        enemies.back()->sourceTexture = healerEnemy;
+        enemies.push_back(new Berserker);
+        enemies.back()->sourceTexture = berserkerEnemy;
         round++;
     }
 
@@ -1160,8 +1160,8 @@ void Game::DrawGameOver()
 Game::~Game()
 {
 
-    for (Turret *t : turret)
+    for (Turret *t : turrets)
         delete t;
-    for (Enemy *e : enemy)
+    for (Enemy *e : enemies)
         delete e;
 }
