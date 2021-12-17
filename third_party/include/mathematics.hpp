@@ -12,6 +12,13 @@ inline float norm(A Vec)
 {
     return sqrt((Vec.x * Vec.x) + (Vec.y * Vec.y));
 }
+template <typename A>
+inline float distance(A Vec1, A Vec2)
+{
+    A Vec = vector(Vec1,Vec2);
+
+    return sqrt((Vec.x * Vec.x) + (Vec.y * Vec.y));
+}
 
 template <typename A, typename B>
 bool collCirclex2(A posCircle1, int radiusCircle1, B posCircle2, int radiusCircle2)
@@ -32,10 +39,4 @@ A vector(A a, A b)
     res.x = b.x - a.x;
     res.y = b.y - a.y;
     return res;
-}
-
-template <typename A>
-int GetTile(A vec)
-{
-    return static_cast<int>(vec.x / 64) + 16 * static_cast<int>(vec.y / 64);
 }

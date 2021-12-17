@@ -535,7 +535,7 @@ void Game::backUI()
 
     if (GetMousePosition().x < 1024 && GetMousePosition().x > 0 && GetMousePosition().y < 768 && GetMousePosition().y > 0)
     {
-        DrawRectangleLines(map.tile[GetTile(GetMousePosition())].pos.x, map.tile[GetTile(GetMousePosition())].pos.y, SIZE, SIZE, ColorAlpha(WHITE, opacityZone));
+        DrawRectangleLines(map.tile[Tile::GetTile(GetMousePosition())].pos.x, map.tile[Tile::GetTile(GetMousePosition())].pos.y, SIZE, SIZE, ColorAlpha(WHITE, opacityZone));
     }
 
     if (InRec(jackHammerIcon) && hp > 0)
@@ -556,14 +556,14 @@ void Game::backUI()
     //Jack Hammer turret/trees & bushes deletion
     else if (IsMouseButtonUp(MOUSE_LEFT_BUTTON) && jackActive) 
     {
-        map.tile[GetTile(GetMousePosition())].active = false;
-        if (map.tile[GetTile(GetMousePosition())].environment != 9)
+        map.tile[Tile::GetTile(GetMousePosition())].active = false;
+        if (map.tile[Tile::GetTile(GetMousePosition())].environment != 9)
         {
             if (soundEffect)
             {
                 PlaySound(gRes->sounds.sellTurret);
             }
-            map.tile[GetTile(GetMousePosition())].environment = 9;
+            map.tile[Tile::GetTile(GetMousePosition())].environment = 9;
             timer.moneyTimer = FPS * 2;
             moneyGain = rand() % 15;
             money += moneyGain;
@@ -574,7 +574,7 @@ void Game::backUI()
             for (Turret *t : turrets)
             {
 
-                if (GetTile(GetMousePosition()) == GetTile(t->pos))
+                if (Tile::GetTile(GetMousePosition()) == Tile::GetTile(t->pos))
                 {
                     if (soundEffect)
                     {
@@ -599,15 +599,15 @@ void Game::backUI()
     {
         if (GetMousePosition().x < 1024 && GetMousePosition().x > 0 && GetMousePosition().y < 768 && GetMousePosition().y > 0) // set turret in the center of the tile if mouse on the map
         {
-            turrets.back()->pos.x = map.tile[GetTile(GetMousePosition())].pos.x + SIZE / 2;
-            turrets.back()->pos.y = map.tile[GetTile(GetMousePosition())].pos.y + SIZE / 2;
+            turrets.back()->pos.x = map.tile[Tile::GetTile(GetMousePosition())].pos.x + SIZE / 2;
+            turrets.back()->pos.y = map.tile[Tile::GetTile(GetMousePosition())].pos.y + SIZE / 2;
         }
         else //make turret follow your mouse if mouse on ui
         {
             turrets.back()->pos = GetMousePosition();
         }
 
-        if ((GetMousePosition().x >= 1024 || GetMousePosition().x <= 0 || GetMousePosition().y >= 768 || GetMousePosition().y <= 0) || map.tile[GetTile(GetMousePosition())].active == true || map.tile[GetTile(GetMousePosition())].road != false) //change range color in red(cant place turret in ui/road/rocks or trees)
+        if ((GetMousePosition().x >= 1024 || GetMousePosition().x <= 0 || GetMousePosition().y >= 768 || GetMousePosition().y <= 0) || map.tile[Tile::GetTile(GetMousePosition())].active == true || map.tile[Tile::GetTile(GetMousePosition())].road != false) //change range color in red(cant place turret in ui/road/rocks or trees)
         {
             turrets.back()->colorZone = RED;
             if (IsMouseButtonUp(MOUSE_LEFT_BUTTON))
@@ -623,7 +623,7 @@ void Game::backUI()
             if (IsMouseButtonUp(MOUSE_LEFT_BUTTON))
             {
                 money -= turrets.back()->price;
-                map.tile[GetTile(GetMousePosition())].active = true;
+                map.tile[Tile::GetTile(GetMousePosition())].active = true;
                 turrets.back()->active = true;
                 turretSelected = false;
             }
@@ -721,7 +721,7 @@ void Game::DeathAnimation()
     {
         SetTargetFPS(FPS);
         gameSpeed = 1;
-        Despawn.environment = 1;
+        map.Despawn.environment = 1;
         StopMusicStream(gRes->sounds.secondTheme);
         if (soundEffect)
         {
@@ -741,17 +741,17 @@ void Game::DeathAnimation()
     }
     FrameTimer(timer.animationTimer);
 
-    for (Turret *t : turrets)
+    for (Turret *t : turrets) // stop all turrets
     {
         t->active = false;
     }
 
-    for (Enemy *e : enemies)
+    for (Enemy *e : enemies) // stop all enemies
     {
         e->direction = {0, 0};
     }
 
-    if (timer.animationTimer > FPS * 4)
+    if (timer.animationTimer > FPS * 4) // make the castle shake
     {
 
         Rectangle source = {map.texture[63].x, map.texture[63].y, SIZE, SIZE};
@@ -765,7 +765,7 @@ void Game::DeathAnimation()
         DrawTexturePro(gRes->textures.tilesheet, source, dest, origin, 0, WHITE);
     }
 
-    else if (timer.animationTimer <= FPS * 4 && timer.animationTimer > FPS)
+    else if (timer.animationTimer <= FPS * 4 && timer.animationTimer > FPS) // draw the explosion + the white blast
     {
         Rectangle dest{float((int)map.Despawn.pos.x), float((int)map.Despawn.pos.y), SIZE, SIZE};
         Vector2 origin = {0, 0};
@@ -823,19 +823,19 @@ void Game::NextWave()
     }
     if (timer.waveTimer != 0 && round != 0) // WAVES
     {
-        if (round == 1 && timer.waveTimer % (2 * FPS) == 0) // TEST WAVE 1
+        if (round == 1 && timer.waveTimer % (2 * FPS) == 0) // WAVE 1
         {
             enemies.push_back(new Warrior);
             enemies.back()->sourceTexture = warriorEnemy;
         }
 
-        else if (round == 2 && timer.waveTimer % FPS == 0) // TEST WAVE 2
+        else if (round == 2 && timer.waveTimer % FPS == 0) // WAVE 2
         {
             enemies.push_back(new Warrior);
             enemies.back()->sourceTexture = warriorEnemy;
         }
 
-        else if (round == 3 && timer.waveTimer % FPS == 0) // TEST WAVE 3
+        else if (round == 3 && timer.waveTimer % FPS == 0) // WAVE 3
         {
             if (timer.waveTimer >= timer.spawnTimer - (2 * FPS))
             {
@@ -849,7 +849,7 @@ void Game::NextWave()
             }
         }
 
-        else if (round == 4 && timer.waveTimer % FPS == 0) // TEST WAVE 4
+        else if (round == 4 && timer.waveTimer % FPS == 0) // WAVE 4
         {
             if (timer.waveTimer > timer.spawnTimer - (5 * FPS))
             {
@@ -863,7 +863,7 @@ void Game::NextWave()
             }
         }
 
-        else if (round == 5 && timer.waveTimer % FPS == 0) // TEST WAVE 5
+        else if (round == 5 && timer.waveTimer % FPS == 0) // WAVE 5
         {
             if (timer.waveTimer >= timer.spawnTimer - (2 * FPS))
             {

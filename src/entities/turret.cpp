@@ -28,7 +28,8 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemies, Texture2D tilesheet, V
             if (enemies[j]->active)
             {
 
-                float normTurretEnemy = norm(vector(enemies[j]->pos, Vector2{pos.x, pos.y}));
+              
+                float normTurretEnemy = distance(enemies[j]->pos, Vector2{pos.x, pos.y});
                 if (normTurretEnemy <= range) // if enemy in turret range
                 {
                     if (nearestEnemyDistance == -1 || normTurretEnemy < nearestEnemyDistance) // if enemy closer than current nearest enemy
@@ -43,9 +44,9 @@ void Turret::UpdateAndDraw(std::vector<Enemy *> &enemies, Texture2D tilesheet, V
         {
             target = nearestEnemyId;
         }
-        if (target != -1 && enemies[target]->hp > 0 && norm(vector(enemies[target]->pos, Vector2{pos.x, pos.y})) <= range) // The turret rotate to aim the target
+        if (target != -1 && enemies[target]->hp > 0 && distance(enemies[target]->pos, Vector2{pos.x, pos.y}) <= range) // The turret rotate to aim the target
         {
-            rotation = -acos((enemies[target]->pos.x - pos.x) / norm(vector(enemies[target]->pos, Vector2{pos.x, pos.y}))) * RAD2DEG;
+            rotation = -acos((enemies[target]->pos.x - pos.x) / distance(enemies[target]->pos, Vector2{pos.x, pos.y})) * RAD2DEG;
             if (enemies[target]->pos.y - pos.y > 0)
             {
                 rotation = -rotation;

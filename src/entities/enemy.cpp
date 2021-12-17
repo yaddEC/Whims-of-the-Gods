@@ -72,10 +72,10 @@ void Enemy::GetEnemyDirection(Tilemap &map, int round)
     float rot;
     Vector2 dirmem;
 
-    if (posTile != GetTile(pos))
+    if (posTile != Tile::GetTile(pos))
     {
         prevTile = posTile;
-        posTile = GetTile(pos);
+        posTile = Tile::GetTile(pos);
     }
 
     if ((map.tile[posTile].value == '>') || ((map.tile[posTile].value == 'L' && round < 20) && (round % 2 == 1)))

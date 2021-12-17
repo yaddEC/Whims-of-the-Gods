@@ -70,8 +70,7 @@ public:
     float scrollingSecond;
     float scrollingFirst;
 
-    Tile Spawn;
-    Tile Despawn;
+
     Tilemap map;
 
     std::vector<Turret *> turrets;

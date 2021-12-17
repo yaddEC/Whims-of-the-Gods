@@ -20,6 +20,11 @@ public:
     Tile(int i, int mapWidth, char val);
 
     void Draw(Vector2 frame);
+
+    static int GetTile(Vector2 vec)
+    {
+        return static_cast<int>(vec.x / 64) + 16 * static_cast<int>(vec.y / 64);
+    }
 };
 
 class Tilemap
@@ -39,4 +44,5 @@ public:
     void Init();
     void Draw(int round);
     ~Tilemap();
+
 };
